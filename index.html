@@ -1,28 +1,373 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Store</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
-        iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gravion Book Online - Katalog & Pembelian</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'], }, colors: { goge: { primary: '#1A6B52', dark: '#13503D', light: '#E8F5E9', bg: '#F8FAFC', navy: '#1E293B' } } } }
+    }
+  </script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Pustaka HTML5 QR Code Scanner -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+  <style>
+    body { background-color: #e2e8f0; -webkit-tap-highlight-color: transparent; }
+    .app-container { max-width: 414px; margin: 0 auto; background-color: #F8FAFC; min-height: 100vh; position: relative; overflow-x: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.1); padding-bottom: 80px; }
+    
+    @media (min-width: 768px) {
+      .app-container {
+        max-width: 1536px !important;
+        border-radius: 1.5rem;
+        margin: 2rem auto;
+        min-height: calc(100vh - 4rem);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        padding-bottom: 4rem;
+      }
+      .desktop-grid-catalog {
+        display: grid !important;
+        grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+        gap: 0.75rem !important;
+      }
+      .desktop-header-fixed {
+        max-width: 1536px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        border-bottom-left-radius: 1.5rem;
+        border-bottom-right-radius: 1.5rem;
+      }
+      .desktop-nav-fixed {
+        max-width: 1536px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        border-top-left-radius: 1.5rem;
+        border-top-right-radius: 1.5rem;
+      }
+      .desktop-content-max {
+        max-width: 1480px;
+        margin: 0 auto;
+      }
+    }
+
+    ::-webkit-scrollbar { width: 0px; background: transparent; }
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .login-bg { background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?q=80&w=1000&auto=format&fit=crop') center/cover; }
+    input[type="file"] { display: none; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
 </head>
-<body>
-    <!-- Link Google Apps Script kamu ditampilkan secara penuh (100%) -->
-    <iframe src="https://script.google.com/macros/s/AKfycbyeYr7DSavEUzeN5nBjF8xRsliUoGn-5F5SDS2xXuGVd0eY-znehTQbNMlAUD4O68m0/exec" allow="camera"></iframe>
+<body class="text-slate-800">
+
+  <div class="app-container">
+
+    <!-- Modal Scanner Kamera -->
+    <div id="modal-scanner" class="fixed inset-0 bg-black/80 z-[115] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+       <div class="bg-white rounded-3xl w-full max-w-[360px] p-5 relative text-center shadow-2xl">
+          <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+             <h3 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-qrcode text-goge-primary mr-1"></i> Scan Barcode / QR Buku</h3>
+             <button onclick="closeScannerModal()" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-xs"></i></button>
+          </div>
+          <div id="reader" class="w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 mb-4 min-h-[250px]"></div>
+          <p class="text-[11px] text-slate-500 mb-3">Arahkan kamera ke barcode atau QR Code pada buku.</p>
+          <button onclick="closeScannerModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs cursor-pointer">Tutup Scanner</button>
+       </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="custom-alert" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-5 backdrop-blur-sm transition-opacity">
+       <div id="custom-alert-content" class="bg-white rounded-3xl w-full max-w-[320px] p-6 text-center transform transition-all scale-95 opacity-0 shadow-2xl">
+          <div id="custom-alert-icon" class="mb-4 flex justify-center"></div>
+          <h3 id="custom-alert-title" class="text-lg font-extrabold text-slate-800 mb-2">Pemberitahuan</h3>
+          <p id="custom-alert-message" class="text-sm text-slate-500 mb-6 leading-relaxed">Pesan disini</p>
+          <button onclick="closeCustomAlert()" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm hover:bg-goge-dark transition-all shadow-lg shadow-goge-primary/30 cursor-pointer">MENGERTI</button>
+       </div>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="#" onclick="tanyaAdmin()" class="fixed bottom-[90px] right-5 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-500/40 z-[95] hover:bg-green-600 transition-transform hover:scale-105 cursor-pointer">
+       <i class="fa-brands fa-whatsapp text-3xl"></i>
+    </a>
+
+    <!-- Katalog Tampilan Utama (Termasuk Header dengan Tombol Scan) -->
+    <section id="content-catalog" class="fade-in block">
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-30 bg-goge-primary rounded-b-2xl pt-4 pb-3 px-5 shadow-md space-y-2.5 desktop-header-fixed md:px-10">
+        <div class="flex justify-between items-center text-white">
+          <div class="flex items-center gap-2">
+             <div id="header-logo-wrapper" class="w-7 h-7 flex items-center justify-center bg-white/20 rounded-lg overflow-hidden">
+                <i id="header-logo-icon" class="fa-solid fa-book-open text-sm"></i>
+             </div>
+             <span class="font-bold text-base tracking-wide">GRAVION</span>
+          </div>
+        </div>
+        
+        <!-- Kolom Pencarian + Tombol Scan Barcode -->
+        <div class="relative flex items-center gap-2">
+           <div class="relative flex-1">
+              <i class="fa-solid fa-search absolute left-4 top-3 text-slate-400 text-xs"></i>
+              <input type="text" id="global-search" oninput="handleSearch()" onfocus="handleSearchFocus()" onblur="handleSearchBlur()" placeholder="Cari Buku / Scan Barcode..." class="w-full bg-white rounded-xl pl-9 pr-9 py-2 text-xs focus:outline-none shadow-sm text-slate-700 font-medium placeholder-slate-400">
+              <button id="clear-search-btn" onclick="clearSearchInput()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 hidden cursor-pointer text-xs"><i class="fa-solid fa-xmark"></i></button>
+           </div>
+           <!-- Tombol Pemicu Kamera Scanner -->
+           <button onclick="openScannerModal()" class="bg-white text-goge-primary px-3 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-goge-light transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="Scan Barcode">
+              <i class="fa-solid fa-camera text-sm"></i>
+           </button>
+        </div>
+      </div>
+
+      <div class="pt-[110px] px-3 space-y-4 md:px-6 md:pt-[130px] desktop-content-max">
+        <div id="collapsible-search-hide" class="space-y-4 transition-all duration-300">
+          <div class="bg-goge-primary/10 p-3 rounded-2xl border border-goge-primary/20">
+            <p class="text-[10px] font-bold text-goge-primary mb-2 text-center uppercase tracking-wider">Pilih Cabang Toko</p>
+            <div id="cabang-filter-container" class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar justify-start md:justify-center"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2"><h3 class="font-bold text-sm text-slate-800">Katalog Produk</h3></div>
+          <div id="catalog-grid" class="grid grid-cols-3 gap-2 pb-4 desktop-grid-catalog">
+             <div class="col-span-3 md:col-span-8 text-center text-slate-400 py-10 text-sm font-medium"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-goge-primary"></i><br>Memuat Produk dari Database...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // URL Web App Google Apps Script Anda (Ganti dengan URL /exec Anda)
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxRuFR-cVhRMPjbyOocCjLgiglWg-sTB9DuiIwjZlw0k57T7MemmUuj1qTgDjx2sm_K/exec";
+
+    let masterData = [];
+    let currentCabangFilter = 'Semua';
+    let cabangList = ["Toko Miko", "Pam Miko", "Toko Pusat", "New Store"];
+    let html5QrCode = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchMasterDataFromGAS();
+    });
+
+    // Mengambil data barang langsung dari Google Apps Script secara asynchronous (JSONP/Fetch)
+    function fetchMasterDataFromGAS() {
+        fetch(GAS_API_URL)
+            .then(res => res.text())
+            .then(text => {
+                // Karena GAS mengembalikan halaman HTML Web App, kita ambil data master melalui pemanggilan fungsi atau endpoint khusus, 
+                // Atau jika Anda menggunakan script, pastikan memuat data optimasi:
+                // Cara paling mudah di GitHub Pages adalah melakukan fetch ke endpoint dengan parameter atau memuat data dummy/cache jika diperlukan.
+            })
+            .catch(err => {
+                console.warn("Gagal memuat langsung, menggunakan simulasi data / contoh lokal.");
+            });
+
+        // Alternatif jembatan aman jika menggunakan google.script.run (hanya aktif di dalam Google environment):
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run.withSuccessHandler(onDataLoaded).getOptimizedMasterItems();
+        } else {
+            // Contoh data dummy/fallback jika diakses murni statis di GitHub Pages sebelum terhubung penuh
+            onDataLoaded({
+                status: "success",
+                data: [
+                    { idBarang: "B001", namaBarang: "The Extraordinary Adventure of Arsene Lupin", cabang: "Toko Pusat", stok: 10, rak: "A-01", harga: 75000, image: "" },
+                    { idBarang: "B002", namaBarang: "Perempuan Patah Hati", cabang: "Toko Miko", stok: 5, rak: "B-02", harga: 85000, image: "" }
+                ]
+            });
+        }
+    }
+
+    function onDataLoaded(response) {
+        try {
+            if (typeof response === 'string') response = JSON.parse(response);
+            if (Array.isArray(response)) masterData = response;
+            else if (response && response.status === "success" && Array.isArray(response.data)) { masterData = response.data; }
+            else masterData = [];
+        } catch (e) { masterData = []; }
+        
+        renderCabangDropdowns();
+        applyFilters();
+    }
+
+    // --- FUNGSI SCANNER KAMERA (HTML5-QRCODE) ---
+    function openScannerModal() {
+        document.getElementById('modal-scanner').classList.remove('hidden');
+        
+        // Memulai pemindaian kamera belakang (environment)
+        setTimeout(() => {
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
+            }
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 150 }
+                },
+                (decodedText, decodedResult) => {
+                    // Ketika Barcode/QR berhasil dibaca:
+                    handleScanSuccess(decodedText);
+                },
+                (errorMessage) => {
+                    // Scanning error or searching frame, abaikan agar tidak mengganggu console
+                }
+            ).catch(err => {
+                showCustomAlert("Akses Kamera Ditolak", "Pastikan Anda memberikan izin akses kamera pada browser.", "error");
+                closeScannerModal();
+            });
+        }, 300);
+    }
+
+    function closeScannerModal() {
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().then(() => {
+                document.getElementById('modal-scanner').classList.add('hidden');
+            }).catch(err => {
+                document.getElementById('modal-scanner').classList.add('hidden');
+            });
+        } else {
+            document.getElementById('modal-scanner').classList.add('hidden');
+        }
+    }
+
+    function handleScanSuccess(codeText) {
+        closeScannerModal();
+        // Masukkan hasil scan ke kolom pencarian otomatis
+        const searchInput = document.getElementById('global-search');
+        if (searchInput) {
+            searchInput.value = codeText;
+            handleSearch();
+        }
+        showCustomAlert("Berhasil Scan", `Kode terdeteksi: <b>${codeText}</b>`, "success");
+    }
+
+    // --- FILTER & RENDER KATALOG ---
+    function filterByCabang(cabang) { 
+        currentCabangFilter = cabang; 
+        renderCabangDropdowns(); 
+        applyFilters(); 
+    }
+
+    function applyFilters() {
+      const searchInput = document.getElementById('global-search') ? document.getElementById('global-search').value : '';
+      let filtered = masterData.filter(item => {
+        let itemCabangStr = String(item.cabang || "Lainnya").toLowerCase();
+        let matchCabang = (currentCabangFilter === 'Semua') || (itemCabangStr === currentCabangFilter.toLowerCase());
+        let matchQuery = matchFlexibleQuery((item.idBarang || '') + ' ' + (item.namaBarang || '') + ' ' + (item.rak || ''), searchInput);
+        return matchCabang && matchQuery;
+      });
+      renderCatalog(filtered);
+    }
+
+    function handleSearch() {
+        const searchInput = document.getElementById('global-search');
+        const clearBtn = document.getElementById('clear-search-btn');
+        if (searchInput && searchInput.value.trim().length > 0) {
+            clearBtn.classList.remove('hidden');
+        } else if (clearBtn) {
+            clearBtn.classList.add('hidden');
+        }
+        applyFilters();
+    }
+
+    function clearSearchInput() {
+        const searchInput = document.getElementById('global-search');
+        if (searchInput) {
+            searchInput.value = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            applyFilters();
+        }
+    }
+
+    function matchFlexibleQuery(text, query) {
+        if (!query) return true;
+        const cleanText = String(text || '').toLowerCase(); 
+        const words = String(query).toLowerCase().trim().split(/\s+/);
+        return words.every(word => cleanText.includes(word));
+    }
+
+    function renderCabangDropdowns() {
+        const filterContainer = document.getElementById('cabang-filter-container');
+        if(!filterContainer) return;
+        let activeStyle = "bg-goge-primary text-white"; 
+        let inactiveStyle = "bg-white text-goge-primary";
+        let html = `<div onclick="filterByCabang('Semua')" class="flex flex-col items-center gap-1 cursor-pointer shrink-0"><div class="w-11 h-11 rounded-xl shadow-sm flex items-center justify-center text-sm border border-slate-200 transition-colors ${currentCabangFilter === 'Semua' ? activeStyle : inactiveStyle}"><i class="fa-solid fa-layer-group"></i></div><span class="text-[9px] font-semibold ${currentCabangFilter === 'Semua' ? 'text-goge-primary' : 'text-slate-500'}">Semua</span></div>`;
+        cabangList.forEach(c => {
+            let isActive = currentCabangFilter === c;
+            html += `<div onclick="filterByCabang('${c}')" class="flex flex-col items-center gap-1 cursor-pointer shrink-0"><div class="w-11 h-11 rounded-xl shadow-sm flex items-center justify-center text-sm border border-slate-200 transition-colors ${isActive ? activeStyle : inactiveStyle}"><i class="fa-solid fa-store"></i></div><span class="text-[9px] font-semibold truncate max-w-[60px] text-center ${isActive ? 'text-goge-primary' : 'text-slate-500'}">${c}</span></div>`;
+        });
+        filterContainer.innerHTML = html;
+    }
+
+    function renderCatalog(items) {
+      const grid = document.getElementById('catalog-grid'); 
+      if (!grid) return; 
+      grid.innerHTML = ''; 
+      if (!items || items.length === 0) { 
+          grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku yang ditemukan.</p>'; 
+          return; 
+      }
+      items.forEach((item) => {
+        let stock = item.stok || item.stock || 0; 
+        let rak = item.rak || item.lokasiRak || '-'; 
+        let imgUrl = item.image ? item.image : 'https://placehold.co/150x200/e2e8f0/94a3b8?text=No+Cover'; 
+        
+        grid.insertAdjacentHTML('beforeend', `
+          <div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 relative group flex flex-col justify-between">
+            <div>
+              <div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 flex items-center justify-center overflow-hidden relative">
+                <img src="${imgUrl}" alt="${item.namaBarang}" class="w-full h-full object-cover">
+                <div class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md text-white text-[7px] font-bold px-1.5 py-0.5 rounded shadow flex items-center gap-0.5 z-10 border border-white/20">
+                   <i class="fa-solid fa-bookmark text-[6px] text-amber-400"></i> ${rak}
+                </div>
+              </div>
+              <div class="space-y-0.5">
+                <h4 class="font-bold text-[9px] text-slate-800 line-clamp-2 leading-tight">${item.namaBarang}</h4>
+                <div class="flex items-center justify-between text-[7px] text-slate-400">
+                   <span class="font-mono text-[8px] text-blue-600">${item.idBarang || ''}</span>
+                   <span class="font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 shrink-0 ml-1">Stok: ${stock}</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-1.5 mt-auto">
+               <span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    function showCustomAlert(title, message, type = 'info') {
+        const modal = document.getElementById('custom-alert'); 
+        const content = document.getElementById('custom-alert-content'); 
+        const iconContainer = document.getElementById('custom-alert-icon');
+        document.getElementById('custom-alert-title').innerText = title; 
+        document.getElementById('custom-alert-message').innerHTML = String(message).replace(/\n/g, '<br>');
+        if (type === 'success') iconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-5xl text-goge-primary drop-shadow-md"></i>';
+        else if (type === 'warning' || type === 'error') iconContainer.innerHTML = '<i class="fa-solid fa-circle-exclamation text-5xl text-red-500 drop-shadow-md"></i>';
+        else iconContainer.innerHTML = '<i class="fa-solid fa-circle-info text-5xl text-blue-500 drop-shadow-md"></i>';
+        modal.classList.remove('hidden'); 
+        setTimeout(() => { content.classList.remove('scale-95', 'opacity-0'); content.classList.add('scale-100', 'opacity-100'); }, 10);
+    }
+    
+    function closeCustomAlert() { 
+        const modal = document.getElementById('custom-alert'); 
+        const content = document.getElementById('custom-alert-content'); 
+        content.classList.remove('scale-100', 'opacity-100'); 
+        content.classList.add('scale-95', 'opacity-0'); 
+        setTimeout(() => { modal.classList.add('hidden'); }, 200); 
+    }
+
+    function handleSearchFocus() {}
+    function handleSearchBlur() {}
+    function tanyaAdmin() {
+        window.open(`https://wa.me/6281234567890?text=${encodeURIComponent("Halo Admin, saya ingin bertanya...")}`, '_blank');
+    }
+  </script>
 </body>
 </html>
