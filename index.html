@@ -14,61 +14,30 @@
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Pustaka HTML5 QR Code Scanner untuk GitHub Pages -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
   <style>
     body { background-color: #e2e8f0; -webkit-tap-highlight-color: transparent; }
     .app-container { max-width: 414px; margin: 0 auto; background-color: #F8FAFC; min-height: 100vh; position: relative; overflow-x: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.1); padding-bottom: 80px; }
-    
     @media (min-width: 768px) {
-      .app-container {
-        max-width: 1536px !important;
-        border-radius: 1.5rem;
-        margin: 2rem auto;
-        min-height: calc(100vh - 4rem);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        padding-bottom: 4rem;
-      }
-      .desktop-grid-catalog {
-        display: grid !important;
-        grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
-        gap: 0.75rem !important;
-      }
-      .desktop-header-fixed {
-        max-width: 1536px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        border-bottom-left-radius: 1.5rem;
-        border-bottom-right-radius: 1.5rem;
-      }
-      .desktop-nav-fixed {
-        max-width: 1536px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        border-top-left-radius: 1.5rem;
-        border-top-right-radius: 1.5rem;
-      }
-      .desktop-content-max {
-        max-width: 1480px;
-        margin: 0 auto;
-      }
+      .app-container { max-width: 1536px !important; border-radius: 1.5rem; margin: 2rem auto; min-height: calc(100vh - 4rem); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); padding-bottom: 4rem; }
+      .desktop-grid-catalog { display: grid !important; grid-template-columns: repeat(8, minmax(0, 1fr)) !important; gap: 0.75rem !important; }
+      .desktop-header-fixed { max-width: 1536px !important; left: 50% !important; transform: translateX(-50%) !important; border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem; }
+      .desktop-nav-fixed { max-width: 1536px !important; left: 50% !important; transform: translateX(-50%) !important; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; }
+      .desktop-content-max { max-width: 1480px; margin: 0 auto; }
     }
-
     ::-webkit-scrollbar { width: 0px; background: transparent; }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .login-bg { background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?q=80&w=1000&auto=format&fit=crop') center/cover; }
     input[type="file"] { display: none; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="text-slate-800">
-
   <div class="app-container">
 
-    <!-- Modal Scanner Kamera -->
+    <!-- Modal Scanner -->
     <div id="modal-scanner" class="fixed inset-0 bg-black/80 z-[115] hidden flex items-center justify-center p-4 backdrop-blur-sm">
        <div class="bg-white rounded-3xl w-full max-w-[360px] p-5 relative text-center shadow-2xl">
           <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
@@ -76,184 +45,24 @@
              <button onclick="closeScannerModal()" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-xs"></i></button>
           </div>
           <div id="reader" class="w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 mb-4 min-h-[250px]"></div>
-          <p class="text-[11px] text-slate-500 mb-3">Arahkan kamera ke barcode atau QR Code pada buku.</p>
           <button onclick="closeScannerModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs cursor-pointer">Tutup Scanner</button>
        </div>
     </div>
 
-    <!-- Custom Alert Modal -->
+    <!-- Custom Alert -->
     <div id="custom-alert" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-5 backdrop-blur-sm transition-opacity">
        <div id="custom-alert-content" class="bg-white rounded-3xl w-full max-w-[320px] p-6 text-center transform transition-all scale-95 opacity-0 shadow-2xl">
           <div id="custom-alert-icon" class="mb-4 flex justify-center"></div>
           <h3 id="custom-alert-title" class="text-lg font-extrabold text-slate-800 mb-2">Pemberitahuan</h3>
-          <p id="custom-alert-message" class="text-sm text-slate-500 mb-6 leading-relaxed">Pesan disini</p>
-          <button onclick="closeCustomAlert()" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm hover:bg-goge-dark transition-all shadow-lg shadow-goge-primary/30 cursor-pointer">MENGERTI</button>
+          <p id="custom-alert-message" class="text-sm text-slate-500 mb-6 leading-relaxed">Pesan</p>
+          <button onclick="closeCustomAlert()" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm cursor-pointer shadow-lg">MENGERTI</button>
        </div>
     </div>
 
-    <!-- Custom Exit Confirmation Modal -->
-    <div id="custom-exit-modal" class="fixed inset-0 bg-black/70 z-[120] hidden flex items-center justify-center p-5 backdrop-blur-sm transition-opacity">
-       <div id="custom-exit-content" class="bg-white rounded-3xl w-full max-w-[320px] p-6 text-center transform transition-all scale-95 opacity-0 shadow-2xl">
-          <div class="mb-4 flex justify-center">
-             <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-2xl shadow-inner">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-             </div>
-          </div>
-          <h3 class="text-lg font-extrabold text-slate-800 mb-2">Konfirmasi Keluar</h3>
-          <p class="text-sm text-slate-500 mb-6 leading-relaxed">Apakah Anda yakin ingin keluar?</p>
-          <div class="flex gap-2">
-             <button onclick="cancelExitAction()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl text-sm transition-all cursor-pointer">Batal</button>
-             <button onclick="confirmExitAction()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-red-500/30 transition-all cursor-pointer">Keluar</button>
-          </div>
-       </div>
-    </div>
+    <!-- Floating WhatsApp -->
+    <a href="#" onclick="tanyaAdmin()" class="fixed bottom-[90px] right-5 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg z-[95] hover:bg-green-600"><i class="fa-brands fa-whatsapp text-3xl"></i></a>
 
-    <!-- Floating WhatsApp Button -->
-    <a href="#" onclick="tanyaAdmin()" class="fixed bottom-[90px] right-5 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-500/40 z-[95] hover:bg-green-600 transition-transform hover:scale-105 cursor-pointer">
-       <i class="fa-brands fa-whatsapp text-3xl"></i>
-    </a>
-
-    <!-- Modal Admin Master Barang -->
-    <div id="modal-admin-barang" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-       <div class="bg-white rounded-3xl w-full max-w-sm p-6 transform transition-all shadow-2xl relative">
-          <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-box text-blue-500 mr-2"></i>Data Barang</h3>
-          <div class="space-y-3">
-             <input type="hidden" id="admin-input-idbarang" value="">
-             <div><label class="text-xs font-bold text-slate-500">Nama Buku</label><input type="text" id="admin-input-namabarang" placeholder="Masukkan nama..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
-             <div>
-                <label class="text-xs font-bold text-slate-500">Pilih Cabang</label>
-                <select id="admin-input-cabangbarang" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></select>
-             </div>
-             <div class="flex gap-2">
-                <div class="flex-1"><label class="text-xs font-bold text-slate-500">Stok (Sistem)</label><input type="number" id="admin-input-stok" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div class="flex-1"><label class="text-xs font-bold text-slate-500">Lokasi Rak</label><input type="text" id="admin-input-rak" placeholder="Cth: A-01" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
-             </div>
-             <div><label class="text-xs font-bold text-slate-500">Harga (Rp)</label><input type="number" id="admin-input-hargabarang" placeholder="Contoh: 50000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
-             <div class="pt-3 flex gap-2">
-                <button type="button" onclick="closeAdminModal('modal-admin-barang')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm cursor-pointer">Batal</button>
-                <button type="button" onclick="simpanDataBarangMaster()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md cursor-pointer">Simpan Data</button>
-             </div>
-          </div>
-       </div>
-    </div>
-
-    <!-- Modal Status Pesanan Admin -->
-    <div id="modal-admin-status" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-      <div class="bg-white rounded-3xl w-full max-w-[320px] p-6 transform transition-all shadow-2xl relative">
-         <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2">Ubah Status Pesanan</h3>
-         <input type="hidden" id="admin-status-orderid">
-         <div class="space-y-3">
-            <select id="admin-status-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-goge-primary">
-               <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
-               <option value="Diproses">Diproses</option>
-               <option value="Dikirim">Dikirim</option>
-               <option value="Siap Diambil">Siap Diambil</option>
-               <option value="Selesai">Selesai</option>
-               <option value="Dibatalkan">Dibatalkan</option>
-            </select>
-            <div class="pt-2 flex gap-2">
-               <button onclick="closeAdminModal('modal-admin-status')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-sm cursor-pointer">Batal</button>
-               <button onclick="simpanStatusPesanan()" class="flex-1 bg-goge-primary text-white font-bold py-2.5 rounded-xl text-sm shadow-md cursor-pointer">Simpan</button>
-            </div>
-         </div>
-      </div>
-    </div>
-
-    <!-- Modal Checkout -->
-    <div id="checkout-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end justify-center sm:items-center">
-      <div id="checkout-modal-content" class="bg-white w-full max-w-[414px] rounded-t-3xl sm:rounded-3xl p-5 transform transition-transform translate-y-full">
-        <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-slate-800">Detail Pengiriman</h3><button onclick="closeCheckoutModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark"></i></button></div>
-        <div class="space-y-4">
-          <input type="hidden" id="checkout-cabang-target" value="">
-          <div><label class="block text-xs font-bold text-slate-500 mb-1">Nama Penerima</label><input type="text" id="checkout-name" placeholder="Misal: Budi Santoso" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-goge-primary"></div>
-          <div><label class="block text-xs font-bold text-slate-500 mb-1">Alamat Pengiriman</label><textarea id="checkout-address" placeholder="Alamat lengkap..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-goge-primary h-20 resize-none"></textarea></div>
-          <div><label class="block text-xs font-bold text-slate-500 mb-1">Opsi Pengiriman</label><select id="checkout-delivery" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-goge-primary appearance-none cursor-pointer" onchange="updateCheckoutSummary()"><option value="Dikirim">Dikirim ke Alamat</option><option value="Ambil Sendiri">Ambil di Toko (Bebas Ongkir)</option></select></div>
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mt-2 space-y-1">
-             <div class="flex justify-between text-xs text-slate-500"><span>Subtotal Barang</span><span id="checkout-summary-subtotal" class="font-bold text-slate-700">Rp 0</span></div>
-             <div class="flex justify-between text-xs text-slate-500"><span>Biaya Pengiriman</span><span id="checkout-summary-ongkir" class="font-bold text-slate-700">Rp 0</span></div>
-             <div class="flex justify-between text-sm pt-1 mt-1 border-t border-slate-200"><span class="font-bold text-slate-700">Total Tagihan</span><span id="checkout-summary-total" class="font-extrabold text-goge-primary">Rp 0</span></div>
-          </div>
-          <div class="pt-2"><button onclick="proceedToPayment()" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 transition-all text-sm flex justify-center items-center gap-2 cursor-pointer">Pilih Pembayaran <i class="fa-solid fa-arrow-right"></i></button></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal Pembayaran QRIS -->
-    <div id="payment-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-end justify-center sm:items-center">
-      <div id="payment-modal-content" class="bg-white w-full max-w-[414px] rounded-t-3xl sm:rounded-3xl p-5 transform transition-transform translate-y-full max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center mb-5 pb-3 border-b border-slate-100"><button onclick="backToCheckoutModal()" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 rounded-full mr-2 -ml-2 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg text-slate-800">Pembayaran QRIS</h3><button onclick="closePaymentModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 ml-auto -mr-2 cursor-pointer"><i class="fa-solid fa-xmark"></i></button></div>
-        <div class="space-y-5 text-center">
-          <div><p class="text-xs text-slate-500 font-medium mb-1">Total Tagihan</p><h2 id="payment-total-amount" class="text-3xl font-extrabold text-goge-primary">Rp 0</h2></div>
-          <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-4 flex flex-col items-center justify-center relative mx-4">
-             <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="h-6 mb-3">
-             <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-2">
-                 <img id="customer-qris-img" src="" alt="QR Code" class="w-40 h-40 object-contain">
-             </div>
-             <p id="customer-qris-name" class="text-[10px] text-slate-400 font-bold uppercase"></p>
-          </div>
-          <div class="text-left px-2">
-             <label class="block text-xs font-bold text-slate-600 mb-2">Upload Bukti Transfer <span class="text-red-500">*</span></label>
-             <label for="receipt-upload" class="flex flex-col items-center justify-center w-full h-24 bg-goge-light/50 border border-goge-primary/30 rounded-xl cursor-pointer hover:bg-goge-light transition-colors group relative overflow-hidden">
-                <div id="upload-placeholder" class="flex flex-col items-center justify-center"><i class="fa-solid fa-cloud-arrow-up text-xl text-goge-primary mb-1"></i><p class="text-[11px] font-medium text-goge-dark">Ketuk untuk memilih foto/screenshot</p></div>
-                <img id="upload-preview" src="#" alt="Preview" class="absolute inset-0 w-full h-full object-cover hidden opacity-50 group-hover:opacity-30">
-                <div id="upload-success-text" class="absolute inset-0 hidden flex items-center justify-center bg-goge-primary/90 text-white text-xs font-bold gap-2"><i class="fa-solid fa-check-circle"></i> Bukti Terpilih</div>
-             </label>
-             <input type="file" id="receipt-upload" accept="image/*" onchange="handleReceiptSelect(event)">
-          </div>
-          <div class="pt-4 pb-2 border-t border-slate-100"><button id="btn-submit-order" onclick="submitFinalOrder()" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 transition-all text-sm flex justify-center items-center gap-2 cursor-pointer">Selesaikan Pembayaran</button></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal Pratinjau Bukti Bayar -->
-    <div id="modal-receipt-preview" class="fixed inset-0 bg-black/80 z-[110] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-       <div class="bg-white rounded-3xl w-full max-w-[360px] p-5 relative text-center">
-          <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-             <h3 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-receipt text-goge-primary mr-1"></i> Bukti Pembayaran</h3>
-             <button onclick="closeReceiptModal()" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-xs"></i></button>
-          </div>
-          <div class="w-full h-80 bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-200 mb-4">
-             <img id="receipt-preview-img" src="" alt="Bukti Transfer" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='https://placehold.co/300x300?text=Gagal+Memuat+Gambar';">
-          </div>
-          <button onclick="closeReceiptModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs cursor-pointer">Tutup</button>
-       </div>
-    </div>
-
-    <section id="content-login" class="min-h-screen login-bg flex-col justify-center items-center p-6 fade-in hidden z-50 relative overflow-y-auto pt-10 pb-20">
-      <div class="w-full max-w-sm flex flex-col items-center">
-        <div id="login-logo-container" class="bg-white p-4 rounded-3xl mb-2 shadow-lg flex items-center justify-center w-16 h-16 overflow-hidden">
-           <i id="login-logo-icon" class="fa-solid fa-book-open text-4xl text-goge-primary relative"></i>
-           <img id="login-logo-img" src="" alt="Logo" class="w-full h-full object-contain hidden">
-        </div>
-        <h1 class="text-3xl font-extrabold text-white mb-1 tracking-wide text-center">GRAVION</h1>
-        
-        <div class="flex bg-black/30 rounded-full p-1 w-full max-w-[240px] mt-4 mb-6 relative">
-            <div id="auth-bg-slider" class="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-goge-primary rounded-full transition-all duration-300"></div>
-            <button onclick="toggleAuthMode('login')" id="btn-tab-login" class="flex-1 text-white text-xs font-bold py-2 relative z-10">MASUK</button>
-            <button onclick="toggleAuthMode('register')" id="btn-tab-register" class="flex-1 text-white/70 text-xs font-bold py-2 relative z-10 transition-colors">DAFTAR</button>
-        </div>
-
-        <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="w-full space-y-4">
-          <div class="relative"><input type="text" id="login-phone" placeholder="No. HP / Username" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
-          <div class="relative"><input type="password" id="login-password" placeholder="Password" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
-          <button type="submit" id="btn-submit-login" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 transition-all text-sm cursor-pointer mt-2 flex justify-center items-center gap-2">MASUK</button>
-        </form>
-
-        <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="w-full space-y-4 hidden">
-          <div class="bg-blue-500/20 border border-blue-400 text-white text-[10px] p-3 rounded-xl mb-2 text-center backdrop-blur-sm">
-             <i class="fa-solid fa-circle-info mr-1"></i> Wajib mendaftar bagi customer baru. No HP digunakan sebagai Username.
-          </div>
-          <div><input type="number" id="reg-phone" placeholder="No. HP WhatsApp Aktif" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
-          <div><input type="text" id="reg-name" placeholder="Nama Lengkap" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
-          <div><textarea id="reg-address" placeholder="Alamat Pengiriman Lengkap" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium h-20 resize-none"></textarea></div>
-          <div><input type="password" id="reg-password" placeholder="Buat Password" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
-          <button type="submit" id="btn-submit-register" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-500/30 transition-all text-sm cursor-pointer mt-2 flex justify-center items-center gap-2">DAFTAR SEKARANG</button>
-        </form>
-
-        <div class="text-center pt-1 mt-6"><button type="button" onclick="switchTab('catalog')" class="text-white/80 text-xs font-bold hover:text-white transition-colors cursor-pointer"><i class="fa-solid fa-arrow-left"></i> Kembali ke Katalog Tampilan Saja</button></div>
-      </div>
-    </section>
-
+    <!-- Katalog -->
     <section id="content-catalog" class="fade-in block">
       <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-30 bg-goge-primary rounded-b-2xl pt-4 pb-3 px-5 shadow-md space-y-2.5 desktop-header-fixed md:px-10">
         <div class="flex justify-between items-center text-white">
@@ -264,46 +73,26 @@
              </div>
              <span class="font-bold text-base tracking-wide">GRAVION</span>
           </div>
-          <div id="top-auth-btn" onclick="switchTab('login')" class="flex items-center gap-2 text-xs bg-white/20 pl-2 pr-3 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors max-w-[170px]">
-            <div class="w-6 h-6 rounded-full overflow-hidden bg-white/30 flex items-center justify-center shrink-0 border border-white/50" id="top-auth-avatar-box">
-              <i class="fa-solid fa-user text-white text-[10px]" id="top-auth-icon"></i>
-            </div>
+          <div id="top-auth-btn" onclick="switchTab('login')" class="flex items-center gap-2 text-xs bg-white/20 pl-2 pr-3 py-1 rounded-full cursor-pointer">
+            <div class="w-6 h-6 rounded-full overflow-hidden bg-white/30 flex items-center justify-center shrink-0 border border-white/50" id="top-auth-avatar-box"><i class="fa-solid fa-user text-white text-[10px]" id="top-auth-icon"></i></div>
             <span class="font-bold truncate text-[11px]" id="top-auth-text">Masuk / Daftar</span>
           </div>
         </div>
-        
-        <!-- Kolom Pencarian + Tombol Scanner Kamera -->
         <div class="relative flex items-center gap-2">
            <div class="relative flex-1">
               <i class="fa-solid fa-search absolute left-4 top-3 text-slate-400 text-xs"></i>
-              <input type="text" id="global-search" oninput="handleSearch()" onfocus="handleSearchFocus()" onblur="handleSearchBlur()" placeholder="Cari Buku Pilihan (bebas/acak)..." class="w-full bg-white rounded-xl pl-9 pr-9 py-2 text-xs focus:outline-none shadow-sm text-slate-700 font-medium placeholder-slate-400">
-              <button id="clear-search-btn" onclick="clearSearchInput()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 hidden cursor-pointer text-xs"><i class="fa-solid fa-xmark"></i></button>
+              <input type="text" id="global-search" oninput="handleSearch()" placeholder="Cari Buku Pilihan..." class="w-full bg-white rounded-xl pl-9 pr-9 py-2 text-xs focus:outline-none shadow-sm text-slate-700 font-medium placeholder-slate-400">
+              <button id="clear-search-btn" onclick="clearSearchInput()" class="absolute right-3 top-2.5 text-slate-400 hidden cursor-pointer text-xs"><i class="fa-solid fa-xmark"></i></button>
            </div>
-           <button onclick="openScannerModal()" class="bg-white text-goge-primary px-3 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-goge-light transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="Scan Barcode">
-              <i class="fa-solid fa-camera text-sm"></i>
-           </button>
+           <button onclick="openScannerModal()" class="bg-white text-goge-primary px-3 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-goge-light flex items-center gap-1 shrink-0 cursor-pointer"><i class="fa-solid fa-camera text-sm"></i></button>
         </div>
       </div>
 
       <div class="pt-[110px] px-3 space-y-4 md:px-6 md:pt-[130px] desktop-content-max">
-        <div id="collapsible-search-hide" class="space-y-4 transition-all duration-300">
-          <div class="bg-goge-primary/10 p-3 rounded-2xl border border-goge-primary/20">
-            <p class="text-[10px] font-bold text-goge-primary mb-2 text-center uppercase tracking-wider">Pilih Cabang Toko</p>
-            <div id="cabang-filter-container" class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar justify-start md:justify-center"></div>
-          </div>
-
-          <div class="bg-slate-800 rounded-2xl overflow-hidden shadow-lg relative flex items-center p-0 md:h-36">
-            <div class="p-5 flex-1 relative z-10 md:p-6">
-               <span id="promo-badge-text" class="inline-block bg-yellow-400 text-slate-900 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase mb-1">PROMO MINGGU INI!</span>
-               <h2 id="promo-title-text" class="text-white text-lg font-extrabold leading-tight mb-1 md:text-xl">Spesial Diskon<br>Buku Populer</h2>
-            </div>
-            <div class="w-1/2 h-full absolute right-0">
-               <img id="promo-banner-img" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop" class="w-full h-full object-cover rounded-l-3xl opacity-80" alt="Promo">
-               <div class="absolute inset-0 bg-gradient-to-r from-slate-800 to-transparent"></div>
-            </div>
-          </div>
+        <div class="bg-goge-primary/10 p-3 rounded-2xl border border-goge-primary/20">
+          <p class="text-[10px] font-bold text-goge-primary mb-2 text-center uppercase tracking-wider">Pilih Cabang Toko</p>
+          <div id="cabang-filter-container" class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar justify-start md:justify-center"></div>
         </div>
-
         <div>
           <div class="flex items-center justify-between mb-2"><h3 class="font-bold text-sm text-slate-800">Katalog Produk</h3></div>
           <div id="catalog-grid" class="grid grid-cols-3 gap-2 pb-4 desktop-grid-catalog">
@@ -313,319 +102,133 @@
       </div>
     </section>
 
+    <!-- Login -->
+    <section id="content-login" class="min-h-screen login-bg flex-col justify-center items-center p-6 fade-in hidden z-50 relative overflow-y-auto pt-10 pb-20">
+      <div class="w-full max-w-sm flex flex-col items-center">
+        <h1 class="text-3xl font-extrabold text-white mb-4 tracking-wide text-center">GRAVION</h1>
+        <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="w-full space-y-4">
+          <input type="text" id="login-phone" placeholder="No. HP / Username" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm">
+          <input type="password" id="login-password" placeholder="Password" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm">
+          <button type="submit" id="btn-submit-login" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm cursor-pointer shadow-lg">MASUK</button>
+        </form>
+        <div class="text-center pt-4"><button type="button" onclick="switchTab('catalog')" class="text-white/80 text-xs font-bold cursor-pointer">Kembali ke Katalog</button></div>
+      </div>
+    </section>
+
+    <!-- Keranjang -->
     <section id="content-cart" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3 rounded-b-2xl shadow-md"><button onclick="switchTab('catalog')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Keranjang Saya</h2></div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><button onclick="switchTab('catalog')" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Keranjang Saya</h2></div>
       <div id="cart-items-container" class="pt-[88px] px-5 pb-24 space-y-4"></div>
     </section>
 
+    <!-- Riwayat -->
     <section id="content-orders" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50">
-        <div class="bg-goge-primary text-white p-4 flex items-center gap-3 shadow-md"><button onclick="switchTab('profile')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Riwayat Pesanan</h2></div>
-        <div class="flex px-5 pt-4 bg-white border-b border-slate-200 shadow-sm rounded-b-2xl">
-          <div id="tab-order-active" onclick="setOrderFilter('active')" class="flex-1 text-center font-bold text-sm text-goge-primary border-b-2 border-goge-primary pb-3 cursor-pointer">Sedang Berjalan</div>
-          <div id="tab-order-done" onclick="setOrderFilter('done')" class="flex-1 text-center font-semibold text-sm text-slate-400 pb-3 cursor-pointer hover:text-slate-600 border-b-2 border-transparent">Selesai</div>
-        </div>
-      </div>
-      <div id="customer-orders-container" class="pt-[140px] px-5 pb-24 space-y-4"></div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><button onclick="switchTab('profile')" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Riwayat Pesanan</h2></div>
+      <div id="customer-orders-container" class="pt-[100px] px-5 pb-24 space-y-4"></div>
     </section>
 
+    <!-- Profil -->
     <section id="content-profile" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="bg-slate-800 rounded-b-[2.5rem] pt-10 pb-10 px-5 text-center shadow-lg relative">
-        <div class="relative inline-block mb-3">
-          <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto shadow-inner overflow-hidden border-4 border-goge-primary/30 relative group cursor-pointer" onclick="document.getElementById('profile-avatar-input').click()">
-            <img id="profile-avatar-img" src="" class="w-full h-full object-cover hidden">
-            <i id="profile-avatar-placeholder" class="fa-solid fa-user text-4xl text-slate-300"></i>
-            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <i class="fa-solid fa-camera text-white text-lg"></i>
-            </div>
-          </div>
-          <input type="file" id="profile-avatar-input" accept="image/*" onchange="handleProfileAvatarUpload(event)">
-        </div>
-        <h3 id="profile-name" class="font-bold text-xl text-white tracking-wide">Pengguna Gravion</h3>
-        <p id="profile-phone" class="text-sm text-slate-300 mt-0.5 font-medium">-</p>
-        <div class="mt-2 inline-block bg-white/20 text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider" id="profile-role-badge">CUSTOMER</div>
+      <div class="bg-slate-800 rounded-b-[2.5rem] pt-10 pb-10 px-5 text-center shadow-lg text-white">
+        <h3 id="profile-name" class="font-bold text-xl">Pengguna</h3>
+        <p id="profile-phone" class="text-sm text-slate-300">-</p>
+        <span id="profile-role-badge" class="inline-block bg-white/20 text-[10px] px-3 py-1 rounded-full font-bold mt-2">CUSTOMER</span>
       </div>
-
-      <div class="px-5 pt-6 pb-24 space-y-4">
-        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
-           <h4 class="font-bold text-sm text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2"><i class="fa-solid fa-user-pen text-goge-primary"></i> Edit Data Profil</h4>
-           <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Nama Lengkap</label>
-              <input type="text" id="edit-profile-name" placeholder="Masukkan nama Anda..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-goge-primary">
-           </div>
-           <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Alamat Utama Pengiriman</label>
-              <textarea id="edit-profile-address" placeholder="Masukkan alamat lengkap pengiriman..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-goge-primary h-20 resize-none"></textarea>
-           </div>
-           <button onclick="saveUserProfileData()" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3 rounded-xl shadow-md transition-all text-xs flex justify-center items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan (Lokal)
-           </button>
-        </div>
-        <button onclick="handleLogout()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 rounded-xl shadow-md transition-all text-sm cursor-pointer">KELUAR</button>
+      <div class="px-5 pt-6 pb-24 space-y-3">
+        <button onclick="handleLogout()" class="w-full bg-red-500 text-white font-bold py-3.5 rounded-xl cursor-pointer shadow-md">KELUAR</button>
       </div>
     </section>
 
+    <!-- Dashboard Admin -->
     <section id="content-settings" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3"><h2 class="font-bold text-lg">Dashboard Admin</h2></div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><h2 class="font-bold text-lg">Dashboard Admin</h2></div>
       <div class="pt-[88px] px-5 pb-24 space-y-4">
-         
-         <div onclick="switchTab('admin-master')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+         <div onclick="switchTab('admin-master')" class="bg-white rounded-2xl p-4 shadow-sm border flex items-center gap-4 cursor-pointer">
             <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-stacked"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Master Barang</h4><p class="text-[10px] text-slate-400">Tambah, Edit, Hapus Buku</p></div>
+            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Master Barang</h4><p class="text-[10px] text-slate-400">Kelola database produk</p></div>
             <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-
-         <div onclick="switchTab('admin-cabang')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-store"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Kelola Cabang</h4><p class="text-[10px] text-slate-400">Atur lokasi dan daftar toko</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-
-         <div onclick="switchTab('admin-orders')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-green-50 text-green-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-list"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Daftar Pesanan</h4><p class="text-[10px] text-slate-400">Konfirmasi & update status order</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-
-         <div onclick="switchTab('admin-logo')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-icons"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Pengaturan Logo Website</h4><p class="text-[10px] text-slate-400">Ganti logo di samping teks GRAVION</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-
-         <div onclick="switchTab('admin-promo')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-pink-50 text-pink-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-image"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Banner Promo Minggu Ini</h4><p class="text-[10px] text-slate-400">Ganti gambar & teks promo</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-
-         <div onclick="switchTab('admin-users')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-users-gear"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Kelola Pengguna</h4><p class="text-[10px] text-slate-400">Atur hak akses & No WhatsApp Admin</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-
-         <div onclick="switchTab('admin-qris')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-qrcode"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Pengaturan QRIS</h4><p class="text-[10px] text-slate-400">Perbarui barcode pembayaran</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-
-      </div>
-    </section>
-
-    <!-- Sub-page: Admin Logo Settings -->
-    <section id="content-admin-logo" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Pengaturan Logo Website</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4">
-         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-5 text-center">
-             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-2 text-left">Upload Logo Baru (Format PNG/JPG/SVG)</label>
-                <div class="w-32 h-32 mx-auto bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex items-center justify-center relative overflow-hidden cursor-pointer group shadow-inner" onclick="document.getElementById('admin-logo-upload').click()">
-                    <img id="admin-logo-preview" src="" class="w-full h-full object-contain p-2 hidden">
-                    <div id="admin-logo-placeholder-preview" class="flex flex-col items-center justify-center text-slate-400">
-                        <i class="fa-solid fa-image text-3xl mb-1"></i>
-                        <span class="text-[10px]">Pilih Logo</span>
-                    </div>
-                    <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
-                        <i class="fa-solid fa-camera text-2xl mb-1"></i><span class="text-[10px] font-bold">Ganti Logo</span>
-                    </div>
-                </div>
-                <input type="file" id="admin-logo-upload" accept="image/*" class="hidden" onchange="handleAdminLogoUpload(event)">
-             </div>
-             <div class="flex gap-2">
-                 <button onclick="resetDefaultLogo()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition-colors cursor-pointer"><i class="fa-solid fa-rotate-left mr-1"></i> Gunakan Ikon Default</button>
-                 <button id="btn-simpan-logo" onclick="simpanPengaturanLogo()" class="flex-1 bg-goge-primary hover:bg-goge-dark transition-colors text-white font-bold py-3 rounded-xl shadow-lg shadow-goge-primary/30 text-xs cursor-pointer flex justify-center items-center gap-1"><i class="fa-solid fa-save"></i> Simpan Logo</button>
-             </div>
          </div>
       </div>
     </section>
 
-    <!-- Sub-page: Admin Promo Banner -->
-    <section id="content-admin-promo" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Pengaturan Banner Promo</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4">
-         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-2">Upload Gambar Banner Baru</label>
-                <div class="w-full h-40 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer group" onclick="document.getElementById('admin-promo-upload').click()">
-                    <img id="admin-promo-preview" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
-                        <i class="fa-solid fa-camera text-2xl mb-1"></i><span class="text-[10px] font-bold">Ganti Gambar Banner</span>
-                    </div>
-                </div>
-                <input type="file" id="admin-promo-upload" accept="image/*" class="hidden" onchange="handleAdminPromoUpload(event)">
-             </div>
-             <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Badge Atas (Cth: PROMO MINGGU INI!)</label>
-                  <input type="text" id="admin-promo-badge" placeholder="PROMO MINGGU INI!" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-goge-primary text-slate-700">
-             </div>
-             <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Judul / Teks Promo (Bisa pakai &lt;br&gt; untuk baris baru)</label>
-                  <textarea id="admin-promo-title" placeholder="Spesial Diskon Buku Populer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:border-goge-primary h-20 resize-none text-slate-700"></textarea>
-             </div>
-             <button id="btn-simpan-promo" onclick="simpanPengaturanPromo()" class="w-full bg-goge-primary hover:bg-goge-dark transition-colors text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 text-sm cursor-pointer flex justify-center items-center gap-1"><i class="fa-solid fa-save"></i> Terapkan Banner Promo</button>
-         </div>
-      </div>
-    </section>
-
-    <!-- Sub-page: Admin Master Barang -->
+    <!-- Master Barang -->
     <section id="content-admin-master" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md space-y-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3"><button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Master Barang</h2></div>
-          <button onclick="openBarangModalBaru()" class="text-xs bg-white text-goge-primary px-3 py-1.5 rounded-lg font-bold cursor-pointer hover:bg-goge-light transition-colors shadow-sm"><i class="fa-solid fa-plus"></i> Baru</button>
-        </div>
-        <div class="relative"><i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i><input type="text" id="admin-search-barang" oninput="handleAdminSearch()" placeholder="Cari nama buku (bebas/acak)..." class="w-full bg-white rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none text-slate-700 font-medium placeholder-slate-400 cursor-text shadow-inner"></div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3">
+         <button onclick="switchTab('settings')" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+         <h2 class="font-bold text-lg">Master Barang</h2>
       </div>
-      <div class="pt-[130px] px-5 pb-24 space-y-3" id="admin-master-list"></div>
+      <div class="pt-[90px] px-5 pb-24 space-y-3" id="admin-master-list"></div>
     </section>
 
-    <!-- Sub-page: Admin Kelola Cabang -->
-    <section id="content-admin-cabang" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Kelola Cabang</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4">
-         <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-2 items-center">
-             <input type="text" id="new-cabang-input" placeholder="Masukkan nama cabang baru..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-goge-primary">
-             <button onclick="tambahCabangAdmin()" class="bg-orange-500 hover:bg-orange-600 text-white w-11 h-11 rounded-xl shadow-md flex justify-center items-center transition-colors cursor-pointer"><i class="fa-solid fa-plus text-lg"></i></button>
-         </div>
-         <div>
-            <h3 class="font-bold text-xs text-slate-500 mb-2 uppercase tracking-wide">Daftar Cabang Aktif</h3>
-            <div id="admin-cabang-list" class="space-y-2"></div>
-         </div>
-      </div>
-    </section>
-
-    <!-- Sub-page: Admin Daftar Pesanan -->
-    <section id="content-admin-orders" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Daftar Semua Pesanan</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4" id="admin-all-orders-list"></div>
-    </section>
-
-    <!-- Sub-page: Admin Kelola Pengguna & WhatsApp -->
-    <section id="content-admin-users" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Kelola Pengguna & WhatsApp</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-6">
-         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-             <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> Pengaturan No. WA Admin (Maks 5)</h4>
-             <p class="text-[10px] text-slate-400">Masukkan nomor WhatsApp admin (format 62..., pisahkan dengan koma jika lebih dari satu).</p>
-             <textarea id="admin-whatsapp-input" placeholder="Cth: 6281234567890, 6289876543210" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-goge-primary h-20 resize-none font-mono"></textarea>
-             <button onclick="saveAdminWhatsAppSettings()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all cursor-pointer"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Nomor WA Admin</button>
-         </div>
-
-         <div>
-            <h3 class="font-bold text-xs text-slate-500 mb-2 uppercase tracking-wide">Daftar Akun Pengguna & Hak Akses</h3>
-            <div id="admin-users-list" class="space-y-3"></div>
-         </div>
-      </div>
-    </section>
-
-    <!-- Sub-page: Admin QRIS -->
-    <section id="content-admin-qris" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Pengaturan QRIS</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4">
-         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-5 text-center">
-             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-2 text-left">Upload Barcode Baru</label>
-                <div class="w-48 h-48 mx-auto bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer group" onclick="document.getElementById('admin-qris-upload').click()">
-                    <img id="admin-qris-preview" src="" class="w-full h-full object-contain p-2">
-                    <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
-                        <i class="fa-solid fa-camera text-2xl mb-1"></i><span class="text-[10px] font-bold">Ubah Gambar</span>
-                    </div>
-                </div>
-                <input type="file" id="admin-qris-upload" accept="image/*" class="hidden" onchange="handleAdminQrisUpload(event)">
-             </div>
-             <div class="text-left">
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Nama Merchant (BCA / GoPay / Jago)</label>
-                  <input type="text" id="admin-qris-name" placeholder="Misal: Toko Buku Virion" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-goge-primary text-slate-700">
-             </div>
-             <button id="btn-simpan-qris" onclick="simpanPengaturanQris()" class="w-full bg-goge-primary hover:bg-goge-dark transition-colors text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 text-sm cursor-pointer flex justify-center items-center gap-1"><i class="fa-solid fa-save"></i> Terapkan Pengaturan</button>
-         </div>
-      </div>
-    </section>
-
-    <!-- Bottom Navigation Bar -->
-    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[414px] mx-auto bg-white border-t border-slate-200 flex justify-around items-center pt-2 pb-3 shadow-[0_-10px_20px_rgba(0,0,0,0.03)] z-40 rounded-t-2xl desktop-nav-fixed md:rounded-b-2xl">
-      <div onclick="switchTab('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-goge-primary transition-colors"><i class="fa-solid fa-house text-lg"></i><span class="text-[9px] font-bold">Beranda</span></div>
-      <div onclick="switchTab('cart')" id="nav-cart" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors relative"><i class="fa-solid fa-cart-shopping text-lg relative"><span id="cart-badge" class="absolute -top-1 -right-1.5 bg-red-500 border border-white text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center hidden">0</span></i><span class="text-[9px] font-bold">Keranjang</span></div>
-      <div onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-solid fa-clock-rotate-left text-lg"></i><span class="text-[9px] font-bold">Riwayat</span></div>
-      <div onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-regular fa-user text-lg"></i><span class="text-[9px] font-bold">Profil</span></div>
-      <div onclick="switchTab('settings')" id="hidden-desktop-settings" class="hidden flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-solid fa-gear text-lg"></i><span class="text-[9px] font-bold">Pengaturan</span></div>
+    <!-- Bottom Nav -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[414px] mx-auto bg-white border-t border-slate-200 flex justify-around items-center pt-2 pb-3 z-40 rounded-t-2xl desktop-nav-fixed">
+      <div onclick="switchTab('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-goge-primary"><i class="fa-solid fa-house text-lg"></i><span class="text-[9px] font-bold">Beranda</span></div>
+      <div onclick="switchTab('cart')" id="nav-cart" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 relative"><i class="fa-solid fa-cart-shopping text-lg"><span id="cart-badge" class="absolute -top-1 -right-1.5 bg-red-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center hidden">0</span></i><span class="text-[9px] font-bold">Keranjang</span></div>
+      <div onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400"><i class="fa-solid fa-clock-rotate-left text-lg"></i><span class="text-[9px] font-bold">Riwayat</span></div>
+      <div onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400"><i class="fa-regular fa-user text-lg"></i><span class="text-[9px] font-bold">Profil</span></div>
+      <div onclick="switchTab('settings')" id="hidden-desktop-settings" class="hidden flex-col items-center gap-1 cursor-pointer w-16 text-slate-400"><i class="fa-solid fa-gear text-lg"></i><span class="text-[9px] font-bold">Admin</span></div>
     </nav>
-
   </div>
 
   <script>
-    let masterData = [];
+    // ==========================================
+    // MASUKKAN LINK /EXEC GOOGLE APPS SCRIPT ANDA DI SINI:
+    // ==========================================
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx6huah4LoGGoRpjs5n2Lt9ApBIBtxhdaFLkYyU_j2MtCVxYO60LL95q9J0sZcfyw5U/exec";
+
+    let masterData = [];
     let cartData = [];
-    let globalOrders = [];
-    let globalUsers = [];
     let currentCabangFilter = 'Semua';
-    const defaultOngkir = 15000;
-    
-    let adminWhatsAppNumbers = ["6281234567890"];
-    let currentWaIndex = 0;
-    
-    let currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" }; 
-    let checkoutState = { targetCabang: "", subtotal: 0, ongkir: 0, total: 0, receiptBase64: "" };
-    let currentOrderFilter = 'active';
-
     let cabangList = ["Toko Miko", "Pam Miko", "Toko Pusat", "New Store"];
-    let qrisSettings = { image: "https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg", name: "TOKO BUKU VIRION" };
-    
-    let storeLogoSettings = { type: "icon", value: "fa-solid fa-book-open" };
-    
-    let promoBannerSettings = {
-        image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop",
-        badge: "PROMO MINGGU INI!",
-        title: "Spesial Diskon<br>Buku Populer"
-    };
-
-    let tempLogoBase64 = "";
-    let tempPromoBase64 = "";
-    let tempQrisBase64 = "";
+    let currentUser = { phone: "", name: "Pengguna", role: "guest", address: "" }; 
     let html5QrCode = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        let savedUser = localStorage.getItem('gravion_user');
+        if (savedUser) { try { currentUser = JSON.parse(savedUser); } catch(e){} }
+        updateAuthUI(); 
+        renderCabangDropdowns();
+        loadCartFromStorage();
+
+        // Ambil data langsung dari Google Sheets via Fetch URL Web App
+        fetch(GAS_WEB_APP_URL + "?action=getOptimizedMasterItems")
+            .then(res => res.json())
+            .then(res => {
+                onDataLoaded(res);
+            })
+            .catch(err => {
+                onDataLoaded({ status: "error" });
+            });
+    });
+
+    function callGasApi(action, payload, callback) {
+        let url = GAS_WEB_APP_URL + "?action=" + action;
+        if (payload) { url += "&data=" + encodeURIComponent(JSON.stringify(payload)); }
+        fetch(url)
+            .then(res => res.json())
+            .then(res => { if (callback) callback(res); })
+            .catch(err => { if (callback) callback({ status: "error", message: err.toString() }); });
+    }
+
+    function onDataLoaded(response) {
+        try {
+            masterData = (response && response.status === "success" && Array.isArray(response.data)) ? response.data : [];
+        } catch (e) { masterData = []; }
+        filterByCabang(currentCabangFilter);
+        renderAdminMasterList(masterData);
+    }
 
     function openScannerModal() {
         document.getElementById('modal-scanner').classList.remove('hidden');
         setTimeout(() => {
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("reader");
-            }
-            html5QrCode.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 150 } },
-                (decodedText) => {
-                    closeScannerModal();
-                    const searchInput = document.getElementById('global-search');
-                    if (searchInput) {
-                        searchInput.value = decodedText;
-                        handleSearch();
-                    }
-                    showCustomAlert("Berhasil Scan", `Kode terdeteksi: <b>${decodedText}</b>`, "success");
-                },
-                () => {}
-            ).catch(() => {
-                showCustomAlert("Akses Ditolak", "Gagal membuka kamera. Pastikan izin kamera diaktifkan pada browser.", "error");
+            if (!html5QrCode) { html5QrCode = new Html5Qrcode("reader"); }
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, (text) => {
+                closeScannerModal();
+                document.getElementById('global-search').value = text;
+                handleSearch();
+                showCustomAlert("Berhasil Scan", `Kode: <b>${text}</b>`, "success");
+            }, () => {}).catch(() => {
+                showCustomAlert("Akses Ditolak", "Gagal membuka kamera.", "error");
                 closeScannerModal();
             });
         }, 300);
@@ -633,1365 +236,124 @@
 
     function closeScannerModal() {
         if (html5QrCode && html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => {
-                document.getElementById('modal-scanner').classList.add('hidden');
-            }).catch(() => {
-                document.getElementById('modal-scanner').classList.add('hidden');
-            });
-        } else {
-            document.getElementById('modal-scanner').classList.add('hidden');
-        }
-    }
-
-    function compressImage(file, maxWidth, format, quality, callback) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                if (width > maxWidth) {
-                    height = Math.round(height * (maxWidth / width));
-                    width = maxWidth;
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                let compressed = canvas.toDataURL(format, quality);
-                callback(compressed);
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function getItemCabang(item) {
-        if (!item) return "Lainnya";
-        return String(item.cabang || item.namaCabang || item.Cabang || item.CABANG || "Lainnya");
-    }
-
-    function findMasterProduct(idBarang, cabang) {
-        return masterData.find(m => String(m.idBarang) === String(idBarang) && getItemCabang(m).toLowerCase() === String(cabang).toLowerCase()) || masterData.find(m => String(m.idBarang) === String(idBarang));
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        let savedUser = localStorage.getItem('gravion_user');
-        if (savedUser) { try { let parsed = JSON.parse(savedUser); if (parsed && parsed.role) currentUser = parsed; } catch(e){} }
-        
-        let savedCabang = localStorage.getItem('gravion_cabang_list');
-        if(savedCabang) { try { cabangList = JSON.parse(savedCabang); } catch(e){} }
-        
-        let savedQris = localStorage.getItem('gravion_qris');
-        if(savedQris) { try { qrisSettings = JSON.parse(savedQris); } catch(e){} }
-        
-        let savedWaNums = localStorage.getItem('gravion_admin_wa');
-        if(savedWaNums) { try { adminWhatsAppNumbers = JSON.parse(savedWaNums); } catch(e){} }
-
-        let savedPromo = localStorage.getItem('gravion_promo_banner');
-        if(savedPromo) { try { promoBannerSettings = JSON.parse(savedPromo); } catch(e){} }
-        applyPromoBannerUI();
-
-        let savedLogo = localStorage.getItem('gravion_store_logo');
-        if(savedLogo) { try { storeLogoSettings = JSON.parse(savedLogo); } catch(e){} }
-        applyStoreLogoUI();
-
-        updateAuthUI(); loadCartFromStorage(); renderCabangDropdowns();
-        
-        let dataHasLoaded = false;
-        const safetyTimer = setTimeout(() => { 
-            if (!dataHasLoaded) {
-               dataHasLoaded = true;
-               onDataLoaded({ status: "success", data: [] });
-            }
-        }, 3000);
-
-        fetch(GAS_WEB_APP_URL + "?action=getOptimizedMasterItems")
-          .then(res => res.json())
-          .then(res => {
-             dataHasLoaded = true; clearTimeout(safetyTimer); onDataLoaded(res);
-          })
-          .catch(err => {
-             dataHasLoaded = true; clearTimeout(safetyTimer); onDataLoaded({ status: "error" });
-          });
-            google.script.run.withSuccessHandler(function(res) { 
-                dataHasLoaded = true; clearTimeout(safetyTimer); onDataLoaded(res); 
-            }).withFailureHandler(function(err) { 
-                dataHasLoaded = true; clearTimeout(safetyTimer); onDataLoaded({ status: "error" }); 
-            }).getOptimizedMasterItems(); 
-            
-            if(google.script.run.getAllUsers) {
-                google.script.run.withSuccessHandler(function(res) {
-                   if(res && res.status === "success" && res.data) {
-                       globalUsers = res.data;
-                       localStorage.setItem('gravion_global_users', JSON.stringify(globalUsers));
-                   }
-                }).getAllUsers();
-            }
-
-            if(google.script.run.getStoreSettings) {
-                google.script.run.withSuccessHandler(function(res) {
-                   if(res && res.status === "success" && res.data) {
-                      if(res.data.waNumbers) {
-                          adminWhatsAppNumbers = res.data.waNumbers;
-                          localStorage.setItem('gravion_admin_wa', JSON.stringify(adminWhatsAppNumbers));
-                      }
-                      if(res.data.promoBanner) {
-                          promoBannerSettings = res.data.promoBanner;
-                          localStorage.setItem('gravion_promo_banner', JSON.stringify(promoBannerSettings));
-                          applyPromoBannerUI();
-                      }
-                      if(res.data.storeLogo) {
-                          storeLogoSettings = res.data.storeLogo;
-                          localStorage.setItem('gravion_store_logo', JSON.stringify(storeLogoSettings));
-                          applyStoreLogoUI();
-                      }
-                      if(res.data.qrisSettings) {
-                          qrisSettings = res.data.qrisSettings;
-                          localStorage.setItem('gravion_qris', JSON.stringify(qrisSettings));
-                      }
-                   }
-                }).getStoreSettings();
-            }
-        } else {
-            dataHasLoaded = true; clearTimeout(safetyTimer); 
-            onDataLoaded({ status: "success", data: [] });
-        }
-
-        window.history.pushState({ page: "gravion_app" }, "", window.location.href);
-
-        window.addEventListener('popstate', function (e) {
-            if (window.isExitConfirmed) return;
-            window.history.pushState({ page: "gravion_app" }, "", window.location.href);
-            openCustomExitModal();
-        });
-
-        window.addEventListener('beforeunload', function (e) {
-            if (window.isExitConfirmed) return;
-            e.preventDefault();
-            e.returnValue = '';
-            return '';
-        });
-    });
-
-    function openCustomExitModal() {
-        const modal = document.getElementById('custom-exit-modal');
-        const content = document.getElementById('custom-exit-content');
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-
-    function cancelExitAction() {
-        const modal = document.getElementById('custom-exit-modal');
-        const content = document.getElementById('custom-exit-content');
-        content.classList.remove('scale-100', 'opacity-100');
-        content.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => { modal.classList.add('hidden'); }, 200);
-    }
-
-    function confirmExitAction() {
-        window.isExitConfirmed = true;
-        cancelExitAction();
-        window.history.back();
-    }
-
-    function applyStoreLogoUI() {
-        const headerIcon = document.getElementById('header-logo-icon');
-        const headerImg = document.getElementById('header-logo-img');
-        const loginIcon = document.getElementById('login-logo-icon');
-        const loginImg = document.getElementById('login-logo-img');
-
-        if (storeLogoSettings.type === "image" && storeLogoSettings.value) {
-            if(headerIcon) headerIcon.classList.add('hidden');
-            if(headerImg) { headerImg.src = storeLogoSettings.value; headerImg.classList.remove('hidden'); }
-            if(loginIcon) loginIcon.classList.add('hidden');
-            if(loginImg) { loginImg.src = storeLogoSettings.value; loginImg.classList.remove('hidden'); }
-        } else {
-            if(headerImg) headerImg.classList.add('hidden');
-            if(headerIcon) { headerIcon.className = storeLogoSettings.value || "fa-solid fa-book-open text-sm"; headerIcon.classList.remove('hidden'); }
-            if(loginImg) loginImg.classList.add('hidden');
-            if(loginIcon) {
-                loginIcon.className = (storeLogoSettings.value || "fa-solid fa-book-open").replace('text-sm', 'text-4xl') + " text-goge-primary relative";
-                loginIcon.classList.remove('hidden');
-            }
-        }
-    }
-
-    function populateAdminLogoData() {
-        const preview = document.getElementById('admin-logo-preview');
-        const placeholder = document.getElementById('admin-logo-placeholder-preview');
-        if (storeLogoSettings.type === "image" && storeLogoSettings.value) {
-            preview.src = storeLogoSettings.value;
-            preview.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-        } else {
-            preview.classList.add('hidden');
-            preview.src = "";
-            placeholder.classList.remove('hidden');
-        }
-    }
-
-    function handleAdminLogoUpload(event) {
-        const file = event.target.files[0];
-        if(!file) return;
-        compressImage(file, 250, 'image/png', 1.0, function(compressedBase64) {
-            const preview = document.getElementById('admin-logo-preview');
-            const placeholder = document.getElementById('admin-logo-placeholder-preview');
-            preview.src = compressedBase64;
-            preview.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-            tempLogoBase64 = compressedBase64; 
-        });
-    }
-
-    function resetDefaultLogo() {
-        storeLogoSettings = { type: "icon", value: "fa-solid fa-book-open" };
-        localStorage.setItem('gravion_store_logo', JSON.stringify(storeLogoSettings));
-        applyStoreLogoUI();
-        populateAdminLogoData();
-        showCustomAlert('Berhasil', 'Logo dikembalikan ke ikon default.', 'success');
-        if (typeof google !== 'undefined' && google.script && google.script.run && google.script.run.saveStoreSettings) {
-            google.script.run.saveStoreSettings({ storeLogo: storeLogoSettings });
-        }
-    }
-
-    function simpanPengaturanLogo() {
-        const btn = document.getElementById('btn-simpan-logo');
-        if (tempLogoBase64) {
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengunggah ke Drive...';
-            btn.disabled = true;
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run.withSuccessHandler(function(driveUrl) {
-                    storeLogoSettings = { type: "image", value: driveUrl };
-                    finalizeSimpanLogo(btn);
-                }).withFailureHandler(function() {
-                    btn.innerHTML = '<i class="fa-solid fa-save"></i> Simpan Logo';
-                    btn.disabled = false;
-                    showCustomAlert('Error Upload', 'Gagal mengunggah Logo ke Google Drive.', 'error');
-                }).uploadImageToDrive(tempLogoBase64, 'Logo_Gravion');
-            } else {
-                storeLogoSettings = { type: "image", value: tempLogoBase64 };
-                finalizeSimpanLogo(btn);
-            }
-        } else {
-            finalizeSimpanLogo(btn);
-        }
-    }
-    
-    function finalizeSimpanLogo(btn) {
-        localStorage.setItem('gravion_store_logo', JSON.stringify(storeLogoSettings));
-        applyStoreLogoUI();
-        tempLogoBase64 = ""; 
-        if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-save"></i> Simpan Logo';
-            btn.disabled = false;
-        }
-        showCustomAlert('Berhasil', 'Logo website berhasil diperbarui dan disinkronisasi!', 'success');
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-            google.script.run.saveStoreSettings({ storeLogo: storeLogoSettings });
-        }
-    }
-
-    function applyPromoBannerUI() {
-        const badgeEl = document.getElementById('promo-badge-text');
-        const titleEl = document.getElementById('promo-title-text');
-        const imgEl = document.getElementById('promo-banner-img');
-        if(badgeEl) badgeEl.innerText = promoBannerSettings.badge || "PROMO MINGGU INI!";
-        if(titleEl) titleEl.innerHTML = promoBannerSettings.title || "Spesial Diskon<br>Buku Populer";
-        if(imgEl) imgEl.src = promoBannerSettings.image || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop";
-    }
-
-    function populateAdminPromoData() {
-        document.getElementById('admin-promo-preview').src = promoBannerSettings.image;
-        document.getElementById('admin-promo-badge').value = promoBannerSettings.badge;
-        document.getElementById('admin-promo-title').value = promoBannerSettings.title.replace(/<br>/g, '\n');
-    }
-
-    function handleAdminPromoUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        compressImage(file, 800, 'image/jpeg', 0.8, function(compressedBase64) {
-            document.getElementById('admin-promo-preview').src = compressedBase64;
-            tempPromoBase64 = compressedBase64;
-        });
-    }
-
-    function simpanPengaturanPromo() {
-        const btn = document.getElementById('btn-simpan-promo');
-        const badge = document.getElementById('admin-promo-badge').value.trim() || "PROMO MINGGU INI!";
-        const titleRaw = document.getElementById('admin-promo-title').value.trim() || "Spesial Diskon<br>Buku Populer";
-        const title = titleRaw.replace(/\n/g, '<br>');
-
-        if (tempPromoBase64) {
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengunggah Banner...';
-            btn.disabled = true;
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run.withSuccessHandler(function(driveUrl) {
-                    promoBannerSettings = { image: driveUrl, badge: badge, title: title };
-                    finalizeSimpanPromo(btn);
-                }).withFailureHandler(function() {
-                    btn.innerHTML = '<i class="fa-solid fa-save"></i> Terapkan Banner Promo';
-                    btn.disabled = false;
-                    showCustomAlert('Error Upload', 'Gagal mengunggah banner promo.', 'error');
-                }).uploadImageToDrive(tempPromoBase64, 'Banner_Promo');
-            } else {
-                promoBannerSettings = { image: tempPromoBase64, badge: badge, title: title };
-                finalizeSimpanPromo(btn);
-            }
-        } else {
-            promoBannerSettings.badge = badge;
-            promoBannerSettings.title = title;
-            finalizeSimpanPromo(btn);
-        }
-    }
-    
-    function finalizeSimpanPromo(btn) {
-        localStorage.setItem('gravion_promo_banner', JSON.stringify(promoBannerSettings));
-        applyPromoBannerUI();
-        tempPromoBase64 = "";
-        if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-save"></i> Terapkan Banner Promo';
-            btn.disabled = false;
-        }
-        showCustomAlert('Berhasil', 'Banner promo berhasil diperbarui dan disinkronisasi!', 'success');
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-            google.script.run.saveStoreSettings({ promoBanner: promoBannerSettings });
-        }
-    }
-
-    function onDataLoaded(response) {
-        try {
-            if (typeof response === 'string') response = JSON.parse(response);
-            if (Array.isArray(response)) masterData = response;
-            else if (response && response.status === "success" && Array.isArray(response.data)) { masterData = response.data; }
-            else masterData = [];
-        } catch (e) { masterData = []; }
-        if (!Array.isArray(masterData)) masterData = [];
-        filterByCabang(currentCabangFilter);
-        renderAdminMasterList(masterData);
-    }
-
-    function toggleAuthMode(mode) {
-       const btnLogin = document.getElementById('btn-tab-login');
-       const btnReg = document.getElementById('btn-tab-register');
-       const slider = document.getElementById('auth-bg-slider');
-       const formLogin = document.getElementById('form-login');
-       const formReg = document.getElementById('form-register');
-
-       if(mode === 'login') {
-            slider.style.left = '4px';
-            btnLogin.classList.replace('text-white/70', 'text-white');
-            btnReg.classList.replace('text-white', 'text-white/70');
-            formLogin.classList.remove('hidden');
-            formReg.classList.add('hidden');
-       } else {
-            slider.style.left = 'calc(50%)';
-            btnReg.classList.replace('text-white/70', 'text-white');
-            btnLogin.classList.replace('text-white', 'text-white/70');
-            formReg.classList.remove('hidden');
-            formLogin.classList.add('hidden');
-       }
-    }
-
-    function handleRegister() {
-        const phone = document.getElementById('reg-phone').value.trim();
-        const name = document.getElementById('reg-name').value.trim();
-        const address = document.getElementById('reg-address').value.trim();
-        const password = document.getElementById('reg-password').value.trim();
-        
-        if(!phone || !name || !address || !password) {
-            return showCustomAlert('Perhatian', 'Mohon lengkapi semua data pendaftaran.', 'warning');
-        }
-
-        const btnSubmit = document.getElementById('btn-submit-register');
-        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
-        btnSubmit.disabled = true;
-
-        if (typeof google === 'undefined' || !google.script) {
-            btnSubmit.innerHTML = 'DAFTAR SEKARANG'; btnSubmit.disabled = false;
-            showCustomAlert('Error', 'Backend GAS tidak terhubung.', 'error');
-            return;
-        }
-
-        google.script.run.withSuccessHandler(function(res) {
-            btnSubmit.innerHTML = 'DAFTAR SEKARANG'; btnSubmit.disabled = false;
-            if(res.status === 'success') {
-                showCustomAlert('Berhasil', res.message, 'success');
-                document.getElementById('form-register').reset();
-                document.getElementById('login-phone').value = phone; 
-                toggleAuthMode('login');
-            } else {
-                showCustomAlert('Pendaftaran Gagal', res.message, 'error');
-            }
-        }).withFailureHandler(function() {
-            btnSubmit.innerHTML = 'DAFTAR SEKARANG'; btnSubmit.disabled = false;
-            showCustomAlert('Error', 'Gagal terhubung ke server.', 'error');
-        }).registerNewCustomer(phone, name, address, password);
+            html5QrCode.stop().then(() => { document.getElementById('modal-scanner').classList.add('hidden'); });
+        } else { document.getElementById('modal-scanner').classList.add('hidden'); }
     }
 
     function handleLogin() {
       const phoneInput = document.getElementById('login-phone').value.trim(); 
       const passInput = document.getElementById('login-password').value.trim();
-      if (!phoneInput || !passInput) { showCustomAlert('Perhatian', 'Masukkan No HP dan Password.', 'warning'); return; }
-
-      const btnSubmit = document.getElementById('btn-submit-login');
-      btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengecek...';
-      btnSubmit.disabled = true;
-
-      if (typeof google === 'undefined' || !google.script) {
-            btnSubmit.innerHTML = 'MASUK'; btnSubmit.disabled = false;
-            showCustomAlert('Error', 'Backend GAS tidak terhubung.', 'error');
-            return;
-      }
-
-      google.script.run.withSuccessHandler(function(res) {
-          btnSubmit.innerHTML = 'MASUK'; btnSubmit.disabled = false;
+      callGasApi("verifyLogin", { username: phoneInput, password: passInput }, function(res) {
           if(res.status === 'success') {
              currentUser = res.data;
              localStorage.setItem('gravion_user', JSON.stringify(currentUser)); 
-             updateAuthUI(); loadCartFromStorage(); switchTab('catalog'); 
-             showCustomAlert('Berhasil Masuk', `Selamat datang kembali, <b>${currentUser.name}</b>.`, 'success');
-          } else {
-             showCustomAlert('Gagal Masuk', res.message, 'error');
-          }
-      }).withFailureHandler(function(err) {
-          btnSubmit.innerHTML = 'MASUK'; btnSubmit.disabled = false;
-          showCustomAlert('Error Server', err.message, 'error');
-      }).verifyLogin(phoneInput, passInput);
+             updateAuthUI(); switchTab('catalog'); 
+             showCustomAlert('Berhasil Masuk', `Selamat datang, <b>${currentUser.name}</b>`, 'success');
+          } else { showCustomAlert('Gagal Masuk', res.message, 'error'); }
+      });
     }
-    
+
     function handleLogout() { 
-        currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" }; 
+        currentUser = { phone: "", name: "Pengguna", role: "guest", address: "" }; 
         localStorage.removeItem('gravion_user'); 
-        document.getElementById('login-phone').value = ''; 
-        document.getElementById('login-password').value = ''; 
-        loadCartFromStorage(); 
-        updateAuthUI(); 
-        switchTab('catalog'); 
+        updateAuthUI(); switchTab('catalog'); 
     }
 
     function updateAuthUI() {
-        if (!currentUser) currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" };
         const topText = document.getElementById('top-auth-text'); 
-        const avatarBox = document.getElementById('top-auth-avatar-box'); 
         const desktopSettings = document.getElementById('hidden-desktop-settings');
-        
         if (currentUser.role === 'guest') { 
             if(topText) topText.innerText = "Masuk / Daftar"; 
-            if(avatarBox) avatarBox.innerHTML = '<i class="fa-solid fa-user text-white text-[10px]"></i>';
-            if(desktopSettings) { desktopSettings.classList.add('hidden'); desktopSettings.classList.remove('flex'); }
+            if(desktopSettings) desktopSettings.classList.add('hidden');
         } else { 
-            let displayName = currentUser.name && currentUser.name !== "Pengguna" ? currentUser.name : currentUser.phone;
-            if(topText) topText.innerText = displayName; 
-            if(avatarBox) { 
-                if (currentUser.avatar) avatarBox.innerHTML = `<img src="${currentUser.avatar}" class="w-full h-full object-cover">`; 
-                else avatarBox.innerHTML = `<i class="fa-solid fa-user text-white text-[10px]"></i>`; 
-            }
+            if(topText) topText.innerText = currentUser.name || currentUser.phone; 
             if(desktopSettings) { 
                 if (currentUser.role === 'owner' || currentUser.role === 'admin') { 
                     desktopSettings.classList.remove('hidden'); desktopSettings.classList.add('flex'); 
-                } else { 
-                    desktopSettings.classList.add('hidden'); desktopSettings.classList.remove('flex'); 
-                } 
+                } else { desktopSettings.classList.add('hidden'); } 
             }
         }
-        renderUserProfileView();
-    }
-
-    function renderUserProfileView() {
-        const phoneEl = document.getElementById('profile-phone'); 
-        const nameEl = document.getElementById('profile-name'); 
-        const editNameEl = document.getElementById('edit-profile-name'); 
-        const editAddressEl = document.getElementById('edit-profile-address'); 
-        const roleBadge = document.getElementById('profile-role-badge');
-        if(phoneEl) phoneEl.innerText = currentUser.phone || "-"; 
-        if(nameEl) nameEl.innerText = currentUser.name || "Pengguna Gravion";
-        if(editNameEl) editNameEl.value = currentUser.name && currentUser.name !== "Pengguna" && currentUser.name !== "Pengguna Gravion" ? currentUser.name : "";
-        if(editAddressEl) editAddressEl.value = currentUser.address || "";
-        if(roleBadge) roleBadge.innerText = (currentUser.role || 'guest').toUpperCase();
-        
-        const avatarImg = document.getElementById('profile-avatar-img'); 
-        const avatarPlaceholder = document.getElementById('profile-avatar-placeholder');
-        if (avatarImg && avatarPlaceholder) { 
-            if (currentUser.avatar) { 
-                avatarImg.src = currentUser.avatar; 
-                avatarImg.classList.remove('hidden'); 
-                avatarPlaceholder.classList.add('hidden'); 
-            } else { 
-                avatarImg.classList.add('hidden'); 
-                avatarPlaceholder.classList.remove('hidden'); 
-            } 
-        }
-    }
-
-    function saveUserProfileData() {
-        const newName = document.getElementById('edit-profile-name').value.trim(); 
-        const newAddress = document.getElementById('edit-profile-address').value.trim();
-        if (!newName) { showCustomAlert('Perhatian', 'Nama lengkap tidak boleh kosong.', 'warning'); return; }
-        currentUser.name = newName; currentUser.address = newAddress; 
-        localStorage.setItem('gravion_user', JSON.stringify(currentUser)); 
-        updateAuthUI(); 
-        showCustomAlert('Berhasil', 'Data profil Anda telah diperbarui secara lokal.', 'success');
-    }
-
-    function handleProfileAvatarUpload(event) {
-        const file = event.target.files[0]; 
-        if (!file) return;
-        compressImage(file, 200, 'image/jpeg', 0.8, function(compressedBase64) {
-            currentUser.avatar = compressedBase64; 
-            localStorage.setItem('gravion_user', JSON.stringify(currentUser)); 
-            updateAuthUI(); 
-            showCustomAlert('Foto Diperbarui', 'Foto profil berhasil diubah.', 'success'); 
-        });
-    }
-
-    function renderAdminMasterList(items) {
-        const listContainer = document.getElementById('admin-master-list'); 
-        if (!listContainer) return; 
-        const searchInput = document.getElementById('admin-search-barang');
-        const searchQuery = searchInput ? searchInput.value : '';
-
-        let validItems = (Array.isArray(items)) ? items : masterData;
-        let filtered = validItems.filter(item => item && matchFlexibleQuery(item.namaBarang || '', searchQuery));
-        
-        if (filtered.length === 0) { 
-            listContainer.innerHTML = `<div class="text-center text-slate-400 py-10 bg-white rounded-2xl border border-slate-100 shadow-sm mt-2"><i class="fa-solid fa-box-open text-4xl mb-3 text-slate-300"></i><p class="text-sm font-medium">Data barang kosong atau tidak ditemukan.</p></div>`; 
-            return; 
-        }
-
-        listContainer.innerHTML = '';
-        filtered.forEach(item => {
-           let stock = item.stok || item.stock || 0; 
-           let rak = item.rak || item.lokasiRak || '-';
-           let imgUrl = item.image ? item.image : 'https://placehold.co/150x200?text=No+Cover';
-           let itemCabangStr = getItemCabang(item);
-           
-           listContainer.insertAdjacentHTML('beforeend', `
-           <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-3 items-center">
-                <div class="w-14 h-20 bg-slate-100 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    <img src="${imgUrl}" class="w-full h-full object-cover">
-                </div>
-                <div class="flex-1">
-                    <h4 class="font-bold text-sm text-slate-800 line-clamp-1 mb-0.5">${item.namaBarang || 'Tanpa Nama'}</h4>
-                    <p class="text-[10px] text-slate-500 mb-1.5"><i class="fa-solid fa-store mr-1"></i>${itemCabangStr} (Stok: ${stock}) • <span class="font-bold text-slate-700">Rp ${Number(item.harga||0).toLocaleString('id-ID')}</span></p>
-                    <div class="flex gap-2">
-                        <span class="text-[9px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 truncate max-w-[120px]">Rak: ${rak}</span>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-2 shrink-0">
-                    <button onclick="editMasterItem('${item.idBarang}', '${itemCabangStr}')" class="w-8 h-8 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center cursor-pointer hover:bg-blue-100 transition-colors"><i class="fa-solid fa-pen text-xs"></i></button>
-                    <button onclick="hapusMasterItem('${item.idBarang}', '${itemCabangStr}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-xl flex items-center justify-center cursor-pointer hover:bg-red-100 transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
-                </div>
-           </div>`);
-        });
-    }
-
-    function handleAdminSearch() { renderAdminMasterList(masterData); }
-
-    function openBarangModalBaru() {
-        document.getElementById('admin-input-idbarang').value = '';
-        document.getElementById('admin-input-namabarang').value = '';
-        document.getElementById('admin-input-cabangbarang').value = (cabangList.length > 0) ? cabangList[0] : 'Toko Pusat';
-        document.getElementById('admin-input-stok').value = '';
-        document.getElementById('admin-input-rak').value = '';
-        document.getElementById('admin-input-hargabarang').value = '';
-        openAdminModal('modal-admin-barang');
-    }
-
-    function simpanDataBarangMaster() {
-        const idBarang = document.getElementById('admin-input-idbarang').value || ('BRG-' + Date.now());
-        const namaBarang = document.getElementById('admin-input-namabarang').value.trim();
-        const cabang = document.getElementById('admin-input-cabangbarang').value;
-        const stok = document.getElementById('admin-input-stok').value || 0;
-        const rak = document.getElementById('admin-input-rak').value || '-';
-        const harga = document.getElementById('admin-input-hargabarang').value || 0;
-
-        if (!namaBarang || !harga) { showCustomAlert('Perhatian', 'Nama buku dan harga wajib diisi.', 'warning'); return; }
-
-        const newItem = { idBarang, namaBarang, cabang, stok: Number(stok), rak, harga: Number(harga), image: "" };
-        let index = masterData.findIndex(item => String(item.idBarang) === String(idBarang) && getItemCabang(item).toLowerCase() === cabang.toLowerCase());
-        if (index !== -1) { masterData[index] = newItem; } else { masterData.push(newItem); }
-
-        closeAdminModal('modal-admin-barang'); 
-        filterByCabang(currentCabangFilter); 
-        renderAdminMasterList(masterData); 
-        showCustomAlert('Berhasil', 'Data barang berhasil disimpan.', 'success');
-        if (typeof google !== 'undefined' && google.script && google.script.run && google.script.run.saveMasterItem) { 
-            google.script.run.saveMasterItem(newItem); 
-        }
-    }
-
-    function editMasterItem(idBarang, cabang) {
-        let item = findMasterProduct(idBarang, cabang); if (!item) return;
-        document.getElementById('admin-input-idbarang').value = item.idBarang;
-        document.getElementById('admin-input-namabarang').value = item.namaBarang;
-        document.getElementById('admin-input-cabangbarang').value = getItemCabang(item);
-        document.getElementById('admin-input-stok').value = item.stok || 0;
-        document.getElementById('admin-input-rak').value = item.rak || '';
-        document.getElementById('admin-input-hargabarang').value = item.harga || 0;
-        openAdminModal('modal-admin-barang');
-    }
-
-    function hapusMasterItem(idBarang, cabang) {
-        masterData = masterData.filter(m => !(String(m.idBarang) === String(idBarang) && getItemCabang(m).toLowerCase() === String(cabang).toLowerCase()));
-        filterByCabang(currentCabangFilter); 
-        renderAdminMasterList(masterData); 
-        showCustomAlert('Terhapus', 'Barang berhasil dihapus.', 'success');
-        if (typeof google !== 'undefined' && google.script && google.script.run && google.script.run.deleteMasterItem) {
-             google.script.run.deleteMasterItem(idBarang, cabang);
-        }
-    }
-
-    function renderAdminUsers() {
-        const container = document.getElementById('admin-users-list');
-        const waInput = document.getElementById('admin-whatsapp-input');
-        if(waInput) { waInput.value = adminWhatsAppNumbers.join(', '); }
-        if(!container) return;
-        container.innerHTML = '';
-        
-        if (globalUsers.length === 0) {
-            container.innerHTML = `<div class="text-center text-slate-400 py-10 bg-white rounded-2xl"><p class="text-sm">Tidak ada data pengguna.</p></div>`;
-            return;
-        }
-
-        globalUsers.forEach(user => {
-            let selectHtml = '';
-            if (user.role === 'owner' && currentUser.phone !== user.phone) {
-                selectHtml = `<span class="text-xs font-bold px-2 py-1 bg-indigo-50 text-indigo-500 rounded border border-indigo-100">Owner</span>`;
-            } else if (currentUser.phone === user.phone) {
-                selectHtml = `<span class="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-500 rounded border border-slate-200">Anda</span>`;
-            } else {
-                selectHtml = `
-                <select onchange="changeUserRole('${user.phone}', this.value)" class="text-xs bg-slate-50 border border-slate-200 rounded px-2 py-1.5 focus:outline-none focus:border-goge-primary cursor-pointer">
-                    <option value="customer" ${user.role === 'customer' ? 'selected' : ''}>Customer</option>
-                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                    <option value="owner" ${user.role === 'owner' ? 'selected' : ''}>Owner</option>
-                </select>`;
-            }
-
-            container.insertAdjacentHTML('beforeend', `
-                <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 overflow-hidden">
-                            <i class="fa-solid fa-user text-slate-400 text-xs"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-slate-800">${user.name || 'Tanpa Nama'}</h4>
-                            <p class="text-[10px] text-slate-500">${user.phone}</p>
-                        </div>
-                    </div>
-                    <div>${selectHtml}</div>
-                </div>
-            `);
-        });
-    }
-
-    function saveAdminWhatsAppSettings() {
-        const val = document.getElementById('admin-whatsapp-input').value.trim();
-        if(!val) return showCustomAlert('Perhatian', 'Masukkan minimal satu nomor WhatsApp admin.', 'warning');
-        let nums = val.split(',').map(n => n.trim().replace(/\D/g, '')).filter(Boolean);
-        if(nums.length === 0) return showCustomAlert('Format Salah', 'Format nomor WhatsApp tidak valid.', 'error');
-        adminWhatsAppNumbers = nums;
-        localStorage.setItem('gravion_admin_wa', JSON.stringify(adminWhatsAppNumbers));
-        showCustomAlert('Berhasil', `Nomor WA Admin berhasil disimpan (${adminWhatsAppNumbers.length} nomor aktif).`, 'success');
-        if (typeof google !== 'undefined' && google.script && google.script.run && google.script.run.saveStoreSettings) {
-            google.script.run.saveStoreSettings({ waNumbers: adminWhatsAppNumbers });
-        }
-    }
-
-    function changeUserRole(phone, newRole) {
-        let userIndex = globalUsers.findIndex(u => u.phone === phone);
-        if(userIndex !== -1) {
-            globalUsers[userIndex].role = newRole;
-            localStorage.setItem('gravion_global_users', JSON.stringify(globalUsers));
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run.updateUserRoleSheet(phone, newRole);
-            }
-            showCustomAlert('Role Diperbarui', `Role untuk ${phone} berhasil diubah menjadi <b>${newRole.toUpperCase()}</b>.`, 'success');
-        }
-    }
-
-    function renderCabangDropdowns() {
-        const adminSelect = document.getElementById('admin-input-cabangbarang');
-        if(adminSelect) { adminSelect.innerHTML = ''; cabangList.forEach(c => adminSelect.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`)); }
-
-        const listCabangAdmin = document.getElementById('admin-cabang-list');
-        if(listCabangAdmin) {
-            listCabangAdmin.innerHTML = '';
-            cabangList.forEach(c => {
-                listCabangAdmin.insertAdjacentHTML('beforeend', `
-                    <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
-                      <span class="font-bold text-sm text-slate-700 flex items-center gap-2"><i class="fa-solid fa-store text-slate-400"></i> ${c}</span>
-                      <button onclick="hapusCabangAdmin('${c}')" class="text-red-500 hover:text-red-700 bg-white border border-red-100 p-2 rounded-lg shadow-sm cursor-pointer"><i class="fa-solid fa-trash text-xs"></i></button>
-                   </div>`);
-            });
-        }
-
-        const filterContainer = document.getElementById('cabang-filter-container');
-        if(filterContainer) {
-            let activeStyle = "bg-goge-primary text-white"; let inactiveStyle = "bg-white text-goge-primary";
-            let html = `<div onclick="filterByCabang('Semua')" class="flex flex-col items-center gap-1 cursor-pointer shrink-0"><div class="w-11 h-11 rounded-xl shadow-sm flex items-center justify-center text-sm border border-slate-200 transition-colors ${currentCabangFilter === 'Semua' ? activeStyle : inactiveStyle}"><i class="fa-solid fa-layer-group"></i></div><span class="text-[9px] font-semibold ${currentCabangFilter === 'Semua' ? 'text-goge-primary' : 'text-slate-500'}">Semua</span></div>`;
-            cabangList.forEach(c => {
-                let isActive = currentCabangFilter === c;
-                html += `<div onclick="filterByCabang('${c}')" class="flex flex-col items-center gap-1 cursor-pointer shrink-0"><div class="w-11 h-11 rounded-xl shadow-sm flex items-center justify-center text-sm border border-slate-200 transition-colors ${isActive ? activeStyle : inactiveStyle}"><i class="fa-solid fa-store"></i></div><span class="text-[9px] font-semibold truncate max-w-[60px] text-center ${isActive ? 'text-goge-primary' : 'text-slate-500'}">${c}</span></div>`;
-            });
-            filterContainer.innerHTML = html;
-        }
-    }
-
-    function tambahCabangAdmin() {
-        const input = document.getElementById('new-cabang-input'); const val = input.value.trim();
-        if(!val) return showCustomAlert('Perhatian', 'Nama cabang tidak boleh kosong.', 'warning');
-        if(cabangList.includes(val)) return showCustomAlert('Perhatian', 'Cabang sudah ada.', 'warning');
-        cabangList.push(val); localStorage.setItem('gravion_cabang_list', JSON.stringify(cabangList)); input.value = ''; renderCabangDropdowns(); showCustomAlert('Berhasil', `Cabang <b>${val}</b> ditambahkan.`, 'success');
-    }
-    function hapusCabangAdmin(namaCabang) { cabangList = cabangList.filter(c => c !== namaCabang); localStorage.setItem('gravion_cabang_list', JSON.stringify(cabangList)); if(currentCabangFilter === namaCabang) filterByCabang('Semua'); else renderCabangDropdowns(); }
-
-    function populateAdminQrisData() { 
-        document.getElementById('admin-qris-preview').src = qrisSettings.image; 
-        document.getElementById('admin-qris-name').value = qrisSettings.name; 
-    }
-    
-    function handleAdminQrisUpload(event) { 
-        const file = event.target.files[0]; 
-        if (!file) return; 
-        compressImage(file, 500, 'image/jpeg', 0.8, function(compressedBase64) {
-            document.getElementById('admin-qris-preview').src = compressedBase64;
-            tempQrisBase64 = compressedBase64;
-        });
-    }
-    
-    function simpanPengaturanQris() {
-        const btn = document.getElementById('btn-simpan-qris');
-        const name = document.getElementById('admin-qris-name').value.trim();
-        if(!name) return showCustomAlert('Perhatian', 'Nama Merchant tidak boleh kosong.', 'warning');
-
-        if (tempQrisBase64) {
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengunggah...';
-            btn.disabled = true;
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run.withSuccessHandler(function(driveUrl) {
-                    qrisSettings = { image: driveUrl, name: name };
-                    finalizeSimpanQris(btn);
-                }).withFailureHandler(function() {
-                    btn.innerHTML = '<i class="fa-solid fa-save"></i> Terapkan Pengaturan';
-                    btn.disabled = false;
-                    showCustomAlert('Error Upload', 'Gagal mengunggah QRIS.', 'error');
-                }).uploadImageToDrive(tempQrisBase64, 'QRIS_Barcode');
-            } else {
-                qrisSettings = { image: tempQrisBase64, name: name };
-                finalizeSimpanQris(btn);
-            }
-        } else {
-            qrisSettings.name = name;
-            finalizeSimpanQris(btn);
-        }
-    }
-    
-    function finalizeSimpanQris(btn) {
-        localStorage.setItem('gravion_qris', JSON.stringify(qrisSettings));
-        tempQrisBase64 = "";
-        if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-save"></i> Terapkan Pengaturan';
-            btn.disabled = false;
-        }
-        showCustomAlert('Tersimpan', 'Pengaturan QRIS berhasil diperbarui dan disinkronisasi.', 'success');
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-            google.script.run.saveStoreSettings({ qrisSettings: qrisSettings });
-        }
-    }
-
-    function renderAdminAllOrders() {
-        const container = document.getElementById('admin-all-orders-list'); container.innerHTML = '';
-        if(globalOrders.length === 0) { container.innerHTML = `<div class="text-center text-slate-400 py-10 bg-white rounded-2xl border border-slate-100 shadow-sm mt-2"><i class="fa-solid fa-box-open text-4xl mb-3 text-slate-300"></i><p class="text-sm font-medium">Belum ada pesanan masuk.</p></div>`; return; }
-
-        globalOrders.slice().reverse().forEach(ord => {
-            let statColor = 'text-orange-500 bg-orange-50';
-            if (ord.status.includes('Selesai')) statColor = 'text-green-600 bg-green-50';
-            else if (ord.status.includes('Batal')) statColor = 'text-red-500 bg-red-50';
-            else if (ord.status.includes('Proses') || ord.status.includes('Dikirim')) statColor = 'text-blue-500 bg-blue-50';
-
-            let itemsListHtml = '';
-            if(ord.items && Array.isArray(ord.items)) {
-                ord.items.forEach(it => {
-                    itemsListHtml += `<div class="flex justify-between text-xs text-slate-600 py-1 border-b border-slate-50 last:border-b-0"><span>${it.namaBarang} (x${it.qty})</span><span class="font-medium">Rp ${Number((it.harga||0) * (it.qty||1)).toLocaleString('id-ID')}</span></div>`;
-                });
-            } else {
-                itemsListHtml = `<p class="text-xs text-slate-500">Detail barang tidak tersedia.</p>`;
-            }
-
-            let ongkirVal = Number(ord.totalOngkir || 0);
-            let receiptBtnHtml = '';
-            if(ord.receiptUrl) {
-                let directImgUrl = ord.receiptUrl;
-                if (directImgUrl.includes('drive.google.com')) {
-                    let matchId = directImgUrl.match(/\/d\/(.*?)\//) || directImgUrl.match(/id=(.*?)(&|$)/);
-                    if (matchId && matchId[1]) { directImgUrl = `https://lh3.googleusercontent.com/d/${matchId[1]}=s800`; }
-                }
-                receiptBtnHtml = `<button onclick="openReceiptModal('${directImgUrl}')" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-receipt"></i> Lihat Bukti Bayar</button>`;
-            } else {
-                receiptBtnHtml = `<span class="text-[10px] text-slate-400 italic">Tanpa bukti</span>`;
-            }
-
-            container.insertAdjacentHTML('beforeend', `
-               <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-4 space-y-3">
-                  <div class="flex justify-between items-start border-b border-slate-100 pb-2.5">
-                     <div>
-                        <h4 class="font-bold text-xs text-slate-800">${ord.orderId}</h4>
-                        <p class="text-xs text-slate-700 font-bold mt-1"><i class="fa-solid fa-user text-[10px] mr-1 text-goge-primary"></i> ${ord.name} (${ord.phone})</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5"><i class="fa-solid fa-truck text-[9px] mr-1"></i> ${ord.delivery || 'Dikirim'}</p>
-                     </div>
-                     <button onclick="bukaModalStatusOrder('${ord.orderId}', '${ord.status}')" class="text-[10px] font-bold ${statColor} px-2.5 py-1 rounded-lg border border-transparent hover:border-slate-300 transition-all cursor-pointer"><i class="fa-solid fa-pen mr-1"></i> ${ord.status}</button>
-                  </div>
-                  <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1">
-                     <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Rincian Barang:</p>
-                     ${itemsListHtml}
-                  </div>
-                  <div class="space-y-1 text-xs px-1">
-                     <div class="flex justify-between text-slate-500"><span>Biaya Pengiriman (Ongkir)</span><span class="font-medium">Rp ${ongkirVal.toLocaleString('id-ID')}</span></div>
-                     <div class="flex justify-between text-sm font-extrabold text-slate-800 pt-1.5 border-t border-slate-100"><span>Total Tagihan</span><span class="text-goge-primary">Rp ${Number(ord.total).toLocaleString('id-ID')}</span></div>
-                  </div>
-                  <div class="flex justify-between items-center pt-2 border-t border-slate-100">
-                     ${receiptBtnHtml}
-                     <span class="text-[10px] text-slate-400 font-mono">${new Date(ord.date || Date.now()).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'})}</span>
-                  </div>
-               </div>`);
-        });
-    }
-
-    function bukaModalStatusOrder(orderId, currentStatus) {
-        document.getElementById('admin-status-orderid').value = orderId;
-        const select = document.getElementById('admin-status-select');
-        for(let i=0; i<select.options.length; i++) { if(select.options[i].value === currentStatus) select.selectedIndex = i; }
-        document.getElementById('modal-admin-status').classList.remove('hidden');
-    }
-
-    function simpanStatusPesanan() {
-        const id = document.getElementById('admin-status-orderid').value;
-        const newStatus = document.getElementById('admin-status-select').value;
-        let index = globalOrders.findIndex(o => o.orderId === id);
-        if(index !== -1) {
-            globalOrders[index].status = newStatus; 
-            localStorage.setItem('gravion_global_orders', JSON.stringify(globalOrders));
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run.updateOrderStatusAdmin(id, newStatus);
-            }
-            renderAdminAllOrders(); 
-            renderOrderHistoryByFilter(); 
-            closeAdminModal('modal-admin-status'); 
-            showCustomAlert('Berhasil', `Status pesanan <b>${id}</b> diperbarui.`, 'success');
-        }
+        document.getElementById('profile-name').innerText = currentUser.name || "Pengguna";
+        document.getElementById('profile-phone').innerText = currentUser.phone || "-";
+        document.getElementById('profile-role-badge').innerText = (currentUser.role || 'guest').toUpperCase();
     }
 
     function filterByCabang(cabang) { currentCabangFilter = cabang; renderCabangDropdowns(); applyFilters(); }
     
     function applyFilters() {
-      const searchQuery = document.getElementById('global-search') ? document.getElementById('global-search').value : '';
+      const query = document.getElementById('global-search').value.toLowerCase();
       let filtered = masterData.filter(item => {
-        let itemCabangStr = getItemCabang(item).toLowerCase();
-        let matchCabang = (currentCabangFilter === 'Semua') || (itemCabangStr === currentCabangFilter.toLowerCase());
-        let matchQuery = matchFlexibleQuery(item.namaBarang || '', searchQuery);
+        let matchCabang = (currentCabangFilter === 'Semua') || (String(item.cabang).toLowerCase() === currentCabangFilter.toLowerCase());
+        let matchQuery = !query || String(item.namaBarang).toLowerCase().includes(query) || String(item.idBarang).toLowerCase().includes(query);
         return matchCabang && matchQuery;
       });
       renderCatalog(filtered);
     }
 
-    function handleSearchFocus() {
-        const collapsible = document.getElementById('collapsible-search-hide');
-        if (collapsible) collapsible.classList.add('hidden');
-    }
-
-    function handleSearchBlur() {
-        const collapsible = document.getElementById('collapsible-search-hide');
-        if (collapsible) collapsible.classList.remove('hidden');
-    }
-
-    function clearSearchInput() {
-        const searchInput = document.getElementById('global-search');
-        if (searchInput) {
-            searchInput.value = '';
-            document.getElementById('clear-search-btn').classList.add('hidden');
-            applyFilters();
-            const collapsible = document.getElementById('collapsible-search-hide');
-            if (collapsible) collapsible.classList.remove('hidden');
-        }
-    }
-
-    function handleSearch() {
-        const searchInput = document.getElementById('global-search');
-        const clearBtn = document.getElementById('clear-search-btn');
-        if (searchInput && searchInput.value.trim().length > 0) clearBtn.classList.remove('hidden');
-        else if (clearBtn) clearBtn.classList.add('hidden');
-        applyFilters();
-    }
+    function handleSearch() { applyFilters(); }
+    function clearSearchInput() { document.getElementById('global-search').value = ''; applyFilters(); }
 
     function renderCatalog(items) {
       const grid = document.getElementById('catalog-grid'); if (!grid) return; grid.innerHTML = ''; 
-      if (!items || items.length === 0) { grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku yang ditemukan.</p>'; return; }
+      if (!items || items.length === 0) { grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku ditemukan di Google Sheets.</p>'; return; }
       items.forEach((item) => {
-        let stock = item.stok || item.stock || 0; 
-        let rak = item.rak || item.lokasiRak || '-'; 
-        let imgUrl = item.image ? item.image : 'https://placehold.co/150x200/e2e8f0/94a3b8?text=No+Cover'; 
-        let itemCabangStr = getItemCabang(item);
-        
+        let imgUrl = item.image ? item.image : 'https://placehold.co/150x200?text=No+Cover'; 
         grid.insertAdjacentHTML('beforeend', `
-          <div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 relative group flex flex-col justify-between">
+          <div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 flex flex-col justify-between">
             <div>
-              <div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 flex items-center justify-center overflow-hidden relative">
-                <img src="${imgUrl}" alt="${item.namaBarang}" class="w-full h-full object-cover">
-                <div class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md text-white text-[7px] font-bold px-1.5 py-0.5 rounded shadow flex items-center gap-0.5 z-10 border border-white/20">
-                   <i class="fa-solid fa-bookmark text-[6px] text-amber-400"></i> ${rak}
-                </div>
-              </div>
-              <div class="space-y-0.5">
-                <h4 class="font-bold text-[9px] text-slate-800 line-clamp-2 leading-tight">${item.namaBarang}</h4>
-                <div class="flex items-center justify-between text-[7px] text-slate-400">
-                   <span class="truncate">${itemCabangStr}</span>
-                   <span class="font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 shrink-0 ml-1">Stok: ${stock}</span>
-                </div>
-              </div>
+              <div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 overflow-hidden relative"><img src="${imgUrl}" class="w-full h-full object-cover"></div>
+              <h4 class="font-bold text-[9px] text-slate-800 line-clamp-2">${item.namaBarang}</h4>
+              <p class="text-[8px] text-slate-400">${item.cabang} | Stok: ${item.stok}</p>
             </div>
-            <div class="flex items-center justify-between pt-1.5 mt-auto">
-               <span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span>
-               <button onclick="addToCart('${item.idBarang}', '${itemCabangStr}')" class="w-4 h-4 bg-goge-light text-goge-primary rounded-md flex items-center justify-center hover:bg-goge-primary hover:text-white transition-colors shrink-0 cursor-pointer"><i class="fa-solid fa-plus text-[8px]"></i></button>
-            </div>
+            <div class="flex items-center justify-between pt-1.5"><span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span></div>
           </div>
         `);
       });
     }
 
-    function addToCart(idBarang, cabang) { 
-      if (currentUser.role === 'guest') { showCustomAlert('Akses Terbatas', 'Silakan Masuk atau Daftar untuk berbelanja.', 'warning'); switchTab('login'); return; } 
-      let p = findMasterProduct(idBarang, cabang); 
-      let targetCabang = p ? getItemCabang(p) : String(cabang);
-      let existingItemIndex = cartData.findIndex(item => String(item.idBarang) === String(idBarang) && String(item.cabang).toLowerCase() === targetCabang.toLowerCase()); 
-      if (existingItemIndex !== -1) cartData[existingItemIndex].qty += 1; 
-      else cartData.push({ idBarang: idBarang, cabang: targetCabang, qty: 1, detailBarang: p }); 
-      saveCartToStorage(); 
-      updateCartBadge(); 
-      renderCartUI(); 
-    }
-    
-    function updateCartQty(idBarang, cabang, change) { 
-      let itemIndex = cartData.findIndex(item => String(item.idBarang) === String(idBarang) && String(item.cabang).toLowerCase() === String(cabang).toLowerCase()); 
-      if (itemIndex !== -1) { 
-          cartData[itemIndex].qty += change; 
-          if (cartData[itemIndex].qty <= 0) cartData.splice(itemIndex, 1); 
-      } 
-      saveCartToStorage(); 
-      updateCartBadge(); 
-      renderCartUI(); 
-    }
-
-    function updateCartBadge() { 
-      const badge = document.getElementById('cart-badge'); 
-      let totalItems = cartData.reduce((sum, item) => sum + (item.qty || 0), 0); 
-      if (totalItems > 0) { badge.innerText = totalItems; badge.classList.remove('hidden'); } 
-      else { badge.classList.add('hidden'); } 
-    }
-
-    function renderCartUI() {
-      const container = document.getElementById('cart-items-container'); 
-      if (cartData.length === 0) { 
-          container.innerHTML = `<div class="text-center text-slate-400 mt-10"><i class="fa-solid fa-cart-shopping text-4xl mb-3 text-slate-300"></i><p class="text-sm font-medium">Keranjang Anda masih kosong</p><button onclick="switchTab('catalog')" class="mt-4 px-4 py-2 bg-goge-light text-goge-primary rounded-xl font-bold text-xs cursor-pointer">Belanja Sekarang</button></div>`; 
-          return; 
-      }
-      container.innerHTML = ''; 
-      let itemsByCabang = {}; 
-      cartData.forEach(cartItem => { 
-          let cabangKey = cartItem.cabang || "Lainnya"; 
-          let p = findMasterProduct(cartItem.idBarang, cabangKey) || cartItem.detailBarang || { namaBarang: "Produk", harga: 0, image: "" }; 
-          if (!itemsByCabang[cabangKey]) itemsByCabang[cabangKey] = []; 
-          itemsByCabang[cabangKey].push({ ...cartItem, productDetail: p }); 
-      });
-
-      Object.keys(itemsByCabang).forEach(cabang => {
-          let cabangSubtotal = 0; let itemsHTML = '';
-          itemsByCabang[cabang].forEach(item => { 
-              let p = item.productDetail || { namaBarang: "Buku", harga: 0, image: "" }; 
-              let hargaItem = p.harga || 0; 
-              cabangSubtotal += hargaItem * item.qty; 
-              let imgUrl = p.image ? p.image : 'https://placehold.co/150x200?text=No+Cover'; 
-              itemsHTML += `<div class="flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border border-slate-100 mb-3"><div class="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 overflow-hidden"><img src="${imgUrl}" alt="${p.namaBarang}" class="w-full h-full object-cover"></div><div class="flex-1"><h4 class="font-bold text-sm text-slate-800 line-clamp-1">${p.namaBarang}</h4><span class="font-extrabold text-sm text-slate-800">Rp ${Number(hargaItem).toLocaleString('id-ID')}</span></div><div class="flex items-center gap-3 bg-slate-50 p-1.5 rounded-xl border border-slate-100"><button onclick="updateCartQty('${item.idBarang}', '${cabang}', -1)" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-red-500 font-bold cursor-pointer"><i class="fa-solid fa-minus text-[10px]"></i></button><span class="font-bold text-xs w-3 text-center">${item.qty}</span><button onclick="updateCartQty('${item.idBarang}', '${cabang}', 1)" class="w-6 h-6 bg-goge-light text-goge-primary rounded-lg flex items-center justify-center font-bold cursor-pointer"><i class="fa-solid fa-plus text-[10px]"></i></button></div></div>`; 
-          });
-          container.insertAdjacentHTML('beforeend', `<div class="mb-6"><h3 class="font-bold text-sm text-goge-primary mb-3 flex items-center gap-2"><i class="fa-solid fa-store"></i> ${cabang}</h3>${itemsHTML}<div class="bg-white rounded-2xl shadow-sm border border-slate-200 mt-2 overflow-hidden"><div class="p-4 bg-slate-50 flex justify-between items-center text-sm border-b border-slate-100"><span class="text-slate-500 font-medium">Subtotal Barang</span><span class="text-slate-800 font-bold">Rp ${cabangSubtotal.toLocaleString('id-ID')}</span></div><button onclick="openCheckoutModal('${cabang}')" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3.5 transition-all text-sm shadow-inner cursor-pointer">CHECKOUT PESANAN INI</button></div></div>`);
-      });
-    }
-
-    function openCheckoutModal(targetCabang) { 
-       document.getElementById('checkout-cabang-target').value = targetCabang; 
-       checkoutState.targetCabang = targetCabang; 
-       checkoutState.receiptBase64 = ""; 
-       if (currentUser.name && currentUser.name !== "Pengguna") document.getElementById('checkout-name').value = currentUser.name; 
-       if (currentUser.address) document.getElementById('checkout-address').value = currentUser.address;
-       updateCheckoutSummary(); 
-       const modal = document.getElementById('checkout-modal'); 
-       const content = document.getElementById('checkout-modal-content'); 
-       modal.classList.remove('hidden'); 
-       setTimeout(() => { content.classList.remove('translate-y-full'); content.classList.add('translate-y-0'); }, 10); 
-    }
-    
-    function closeCheckoutModal() { 
-        const modal = document.getElementById('checkout-modal'); 
-        const content = document.getElementById('checkout-modal-content'); 
-        content.classList.remove('translate-y-0'); 
-        content.classList.add('translate-y-full'); 
-        setTimeout(() => { modal.classList.add('hidden'); }, 300); 
-    }
-    
-    function updateCheckoutSummary() { 
-      const targetCabang = document.getElementById('checkout-cabang-target').value; 
-      const deliveryOpt = document.getElementById('checkout-delivery').value; 
-      let cabangSubtotal = 0; let cabangTotalQty = 0; 
-      cartData.forEach(c => { 
-          let cCabang = c.cabang || ""; 
-          if (cCabang.toLowerCase() === targetCabang.toLowerCase()) { 
-              let p = findMasterProduct(c.idBarang, cCabang) || c.detailBarang || { harga: 0 }; 
-              cabangSubtotal += (p.harga || 0) * c.qty; 
-              cabangTotalQty += c.qty; 
-          } 
-      }); 
-      let cabangOngkir = deliveryOpt === "Dikirim" ? defaultOngkir * (Math.floor((cabangTotalQty - 1) / 4) + 1 || 1) : 0; 
-      let cabangTotal = cabangSubtotal + cabangOngkir; 
-      checkoutState.subtotal = cabangSubtotal; 
-      checkoutState.ongkir = cabangOngkir; 
-      checkoutState.total = cabangTotal; 
-      document.getElementById('checkout-summary-subtotal').innerText = 'Rp ' + cabangSubtotal.toLocaleString('id-ID'); 
-      document.getElementById('checkout-summary-ongkir').innerText = 'Rp ' + cabangOngkir.toLocaleString('id-ID'); 
-      document.getElementById('checkout-summary-total').innerText = 'Rp ' + cabangTotal.toLocaleString('id-ID'); 
-    }
-
-    function proceedToPayment() { 
-        const nameInput = document.getElementById('checkout-name').value; 
-        if (!nameInput) { showCustomAlert('Perhatian', 'Isi Nama Penerima!', 'warning'); return; } 
-        currentUser.name = nameInput; 
-        closeCheckoutModal(); 
-        document.getElementById('customer-qris-img').src = qrisSettings.image; 
-        document.getElementById('customer-qris-name').innerText = qrisSettings.name;
-        document.getElementById('payment-total-amount').innerText = 'Rp ' + checkoutState.total.toLocaleString('id-ID'); 
-        resetReceiptUploadUI(); 
-        setTimeout(() => { 
-            const pModal = document.getElementById('payment-modal'); 
-            const pContent = document.getElementById('payment-modal-content'); 
-            pModal.classList.remove('hidden'); 
-            setTimeout(() => { pContent.classList.remove('translate-y-full'); pContent.classList.add('translate-y-0'); }, 10); 
-        }, 350); 
-    }
-    
-    function closePaymentModal() { 
-        const pModal = document.getElementById('payment-modal'); 
-        const pContent = document.getElementById('payment-modal-content'); 
-        pContent.classList.remove('translate-y-0'); 
-        pContent.classList.add('translate-y-full'); 
-        setTimeout(() => { pModal.classList.add('hidden'); }, 300); 
-    }
-
-    function backToCheckoutModal() { 
-        closePaymentModal(); 
-        setTimeout(() => { openCheckoutModal(checkoutState.targetCabang); }, 350); 
-    }
-    
-    function handleReceiptSelect(event) { 
-        const file = event.target.files[0]; 
-        if (!file) return; 
-        compressImage(file, 600, 'image/jpeg', 0.8, function(compressedBase64) {
-            checkoutState.receiptBase64 = compressedBase64; 
-            document.getElementById('upload-placeholder').classList.add('hidden'); 
-            const preview = document.getElementById('upload-preview'); 
-            preview.src = compressedBase64; 
-            preview.classList.remove('hidden'); 
-            document.getElementById('upload-success-text').classList.remove('hidden'); 
+    function renderCabangDropdowns() {
+        const filterContainer = document.getElementById('cabang-filter-container');
+        if(!filterContainer) return;
+        let html = `<div onclick="filterByCabang('Semua')" class="cursor-pointer shrink-0 text-center"><div class="w-10 h-10 rounded-xl flex items-center justify-center ${currentCabangFilter === 'Semua' ? 'bg-goge-primary text-white' : 'bg-white text-goge-primary'}"><i class="fa-solid fa-layer-group text-xs"></i></div><span class="text-[9px]">Semua</span></div>`;
+        cabangList.forEach(c => {
+            html += `<div onclick="filterByCabang('${c}')" class="cursor-pointer shrink-0 text-center"><div class="w-10 h-10 rounded-xl flex items-center justify-center ${currentCabangFilter === c ? 'bg-goge-primary text-white' : 'bg-white text-goge-primary'}"><i class="fa-solid fa-store text-xs"></i></div><span class="text-[9px] truncate max-w-[50px]">${c}</span></div>`;
         });
-    }
-    
-    function resetReceiptUploadUI() { 
-        document.getElementById('receipt-upload').value = ""; 
-        checkoutState.receiptBase64 = ""; 
-        document.getElementById('upload-placeholder').classList.remove('hidden'); 
-        document.getElementById('upload-preview').classList.add('hidden'); 
-        document.getElementById('upload-preview').src = "#"; 
-        document.getElementById('upload-success-text').classList.add('hidden'); 
+        filterContainer.innerHTML = html;
     }
 
-    function submitFinalOrder() {
-      if (!checkoutState.receiptBase64) { showCustomAlert('Bukti Kosong', 'Harap upload bukti pembayaran.', 'warning'); return; }
-      const btnSubmit = document.getElementById('btn-submit-order'); 
-      btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Proses...'; 
-      btnSubmit.disabled = true;
-      let itemsToCheckout = []; let remainingCart = []; 
-      cartData.forEach(c => { 
-          let cCabang = c.cabang || ""; 
-          if (cCabang.toLowerCase() === checkoutState.targetCabang.toLowerCase()) { 
-              let p = findMasterProduct(c.idBarang, cCabang) || c.detailBarang || { namaBarang: "Buku", harga: 0 }; 
-              itemsToCheckout.push({ idBarang: c.idBarang, namaBarang: p.namaBarang || "Buku", harga: p.harga || 0, qty: c.qty, cabang: cCabang }); 
-          } else { 
-              remainingCart.push(c); 
-          } 
-      });
-      
-      const orderData = { phone: currentUser.phone, name: document.getElementById('checkout-name').value, delivery: document.getElementById('checkout-delivery').value, totalOngkir: checkoutState.ongkir, items: itemsToCheckout, itemsJSON: JSON.stringify(itemsToCheckout), total: checkoutState.total };
-      let newId = 'ORD-' + Math.floor(Math.random()*100000); 
-      let payload = {...orderData, orderId: newId, status: "Menunggu Konfirmasi", date: new Date().toISOString()};
-      globalOrders.push(payload); 
-      localStorage.setItem('gravion_global_orders', JSON.stringify(globalOrders));
-
-      if (typeof google === 'undefined' || !google.script) {
-          setTimeout(() => { btnSubmit.innerHTML = 'Selesaikan Pembayaran'; btnSubmit.disabled = false; finishOrderUI(newId, remainingCart); }, 1000); 
-          return;
-      }
-      
-      google.script.run.withSuccessHandler(function(res) { 
-          btnSubmit.innerHTML = 'Selesaikan Pembayaran'; 
-          btnSubmit.disabled = false; 
-          if (res && res.status === "success") finishOrderUI(res.orderId || newId, remainingCart); 
-          else showCustomAlert('Error', 'Gagal memproses.', 'error'); 
-      }).withFailureHandler(function(err) { 
-          btnSubmit.innerHTML = 'Selesaikan Pembayaran'; 
-          btnSubmit.disabled = false; 
-          showCustomAlert('Error', err.message, 'error'); 
-      }).createNewOrder(orderData, checkoutState.receiptBase64); 
-    }
-
-    function finishOrderUI(orderId, remainingCart) { 
-        closePaymentModal(); 
-        showCustomAlert('Pesanan Berhasil!', `ID Pesanan:<br><span class="font-mono text-slate-800 font-bold bg-slate-100 px-2 py-1 rounded">${orderId}</span>`, 'success'); 
-        cartData = remainingCart; 
-        saveCartToStorage(); 
-        renderCartUI(); 
-        updateCartBadge(); 
-        switchTab('orders'); 
-        loadOrderHistory(); 
-    }
-
-    function loadOrderHistory() {
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-          if (currentUser.role === 'admin' || currentUser.role === 'owner') {
-             google.script.run.withSuccessHandler(res => { if(res.status==="success") { globalOrders = res.data; renderOrderHistoryByFilter(); } }).getAllOrdersForAdmin();
-          } else {
-             google.script.run.withSuccessHandler(res => { if(res.status==="success") { globalOrders = res.data; renderOrderHistoryByFilter(); } }).getCustomerOrders(currentUser.phone);
-          }
-      }
-      renderOrderHistoryByFilter(); 
-    }
-
-    function renderOrderHistoryByFilter() {
-      const container = document.getElementById('customer-orders-container'); 
-      if (!container) return;
-      container.innerHTML = '';
-      let cleanCurrentPhone = String(currentUser.phone || '').replace(/\D/g, '').replace(/^(62|0)+/, '');
-      let userOrders = globalOrders;
-      
-      if (currentUser.role === 'customer' || currentUser.role === 'guest') {
-          userOrders = globalOrders.filter(o => {
-              let cleanOrderPhone = String(o.phone || '').replace(/\D/g, '').replace(/^(62|0)+/, '');
-              return cleanOrderPhone === cleanCurrentPhone;
-          });
-      }
-      
-      let filtered = userOrders.filter(ord => { 
-          let s = ord.status.toLowerCase(); 
-          return currentOrderFilter === 'done' ? (s.includes('selesai') || s.includes('batal')) : (!s.includes('selesai') && !s.includes('batal')); 
-      });
-      
-      if (filtered.length === 0) { 
-          container.innerHTML = `<div class="text-center text-slate-400 mt-10"><i class="fa-solid fa-receipt text-4xl mb-3 text-slate-300"></i><p class="text-sm font-medium">Belum ada pesanan.</p></div>`; 
-          return; 
-      }
-      
-      filtered.slice().reverse().forEach(ord => {
-           let statC = ord.status.toLowerCase().includes('selesai') ? 'text-green-600 bg-green-50' : (ord.status.toLowerCase().includes('batal') ? 'text-red-500 bg-red-50' : 'text-orange-500 bg-orange-50');
-           let itemsListHtml = '';
-           if(ord.items && Array.isArray(ord.items)) {
-               ord.items.forEach(it => {
-                   itemsListHtml += `<div class="flex justify-between text-xs text-slate-600 py-1 border-b border-slate-50 last:border-b-0"><span>${it.namaBarang} (x${it.qty})</span><span class="font-medium">Rp ${Number((it.harga||0) * (it.qty||1)).toLocaleString('id-ID')}</span></div>`;
-               });
-           } else {
-               itemsListHtml = `<p class="text-xs text-slate-500">Detail barang tidak tersedia.</p>`;
-           }
-
-           let ongkirVal = Number(ord.totalOngkir || 0);
-           let receiptBtnHtml = '';
-           if(ord.receiptUrl) {
-               let directImgUrl = ord.receiptUrl;
-               if (directImgUrl.includes('drive.google.com')) {
-                   let matchId = directImgUrl.match(/\/d\/(.*?)\//) || directImgUrl.match(/id=(.*?)(&|$)/);
-                   if (matchId && matchId[1]) { directImgUrl = `https://lh3.googleusercontent.com/d/${matchId[1]}=s800`; }
-               }
-               receiptBtnHtml = `<button onclick="openReceiptModal('${directImgUrl}')" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-receipt"></i> Lihat Bukti Bayar</button>`;
-           } else {
-               receiptBtnHtml = `<span class="text-[10px] text-slate-400 italic">Tanpa bukti</span>`;
-           }
-
-           let waBtnHtml = '';
-           let cleanOrderPhoneLoop = String(ord.phone || '').replace(/\D/g, '').replace(/^(62|0)+/, '');
-           if(currentOrderFilter === 'active' && (cleanOrderPhoneLoop === cleanCurrentPhone || currentUser.role === 'admin' || currentUser.role === 'owner')) {
-               waBtnHtml = `
-               <div class="mt-3 pt-3 border-t border-slate-100">
-                   <button onclick="konfirmasiPesananViaWA('${ord.orderId}')" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl text-xs flex justify-center items-center gap-2 shadow-md shadow-green-500/20 transition-all cursor-pointer">
-                       <i class="fa-brands fa-whatsapp text-sm"></i> Konfirmasi Pesanan ke Admin
-                   </button>
-               </div>`;
-           }
-
-           container.insertAdjacentHTML('beforeend', `
-              <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-4 space-y-3">
-                 <div class="flex justify-between items-start border-b border-slate-100 pb-2.5">
-                    <div>
-                       <h4 class="font-bold text-xs text-slate-800">${ord.orderId}</h4>
-                       <p class="text-[10px] text-slate-400 mt-0.5"><i class="fa-solid fa-truck text-[9px] mr-1"></i> ${ord.delivery || 'Dikirim'}</p>
-                    </div>
-                    <span class="text-[9px] font-bold ${statC} px-2 py-0.5 rounded">${ord.status}</span>
-                 </div>
-                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Rincian Barang:</p>
-                    ${itemsListHtml}
-                 </div>
-                 <div class="space-y-1 text-xs px-1">
-                    <div class="flex justify-between text-slate-500"><span>Biaya Pengiriman (Ongkir)</span><span class="font-medium">Rp ${ongkirVal.toLocaleString('id-ID')}</span></div>
-                    <div class="flex justify-between text-sm font-extrabold text-slate-800 pt-1.5 border-t border-slate-100"><span>Total Tagihan</span><span class="text-goge-primary">Rp ${Number(ord.total).toLocaleString('id-ID')}</span></div>
-                 </div>
-                 <div class="flex justify-between items-center pt-2 border-t border-slate-100">
-                    ${receiptBtnHtml}
-                    <span class="text-[10px] text-slate-400 font-mono">${ord.phone}</span>
-                 </div>
-                 ${waBtnHtml}
-              </div>
-           `);
-      });
-    }
-
-    function openReceiptModal(url) {
-        document.getElementById('receipt-preview-img').src = url;
-        document.getElementById('modal-receipt-preview').classList.remove('hidden');
-    }
-
-    function closeReceiptModal() {
-        document.getElementById('modal-receipt-preview').classList.add('hidden');
-    }
-
-    function konfirmasiPesananViaWA(orderId) {
-        const ord = globalOrders.find(o => o.orderId === orderId);
-        if(!ord) return;
-        let barangList = "";
-        if(ord.items) { ord.items.forEach(item => { barangList += `- ${item.namaBarang} (x${item.qty})\n`; }); }
-        let textMsg = `Halo Admin Gravion, saya sudah melakukan pembayaran untuk pesanan berikut:\n\n*No Pesanan:* ${ord.orderId}\n*Nama:* ${ord.name}\n*Barang:*\n${barangList}\n*Ongkir:* Rp ${Number(ord.totalOngkir || 0).toLocaleString('id-ID')}\n*Total Pembayaran:* Rp ${Number(ord.total).toLocaleString('id-ID')}\n\nMohon pesanan segera diproses. Terima kasih!`;
-        let targetWa = "6281234567890";
-        if (Array.isArray(adminWhatsAppNumbers) && adminWhatsAppNumbers.length > 0) {
-            targetWa = adminWhatsAppNumbers[currentWaIndex % adminWhatsAppNumbers.length];
-            currentWaIndex = (currentWaIndex + 1) % adminWhatsAppNumbers.length;
-        }
-        window.open(`https://wa.me/${targetWa}?text=${encodeURIComponent(textMsg)}`, '_blank');
-    }
-
-    function setOrderFilter(ft) { 
-        currentOrderFilter = ft; 
-        let activeClass = "flex-1 text-center font-bold text-sm text-goge-primary border-b-2 border-goge-primary pb-3 cursor-pointer";
-        let inactiveClass = "flex-1 text-center font-semibold text-sm text-slate-400 pb-3 cursor-pointer hover:text-slate-600 border-b-2 border-transparent";
-        document.getElementById('tab-order-active').className = (ft === 'active') ? activeClass : inactiveClass; 
-        document.getElementById('tab-order-done').className = (ft === 'done') ? activeClass : inactiveClass; 
-        renderOrderHistoryByFilter(); 
-    }
-
-    function saveCartToStorage() { 
-        if (currentUser && currentUser.phone) localStorage.setItem('gravion_cart_' + currentUser.phone, JSON.stringify(cartData)); 
-        else localStorage.setItem('gravion_cart_guest', JSON.stringify(cartData)); 
-    }
-
-    function loadCartFromStorage() { 
-        let savedKey = (currentUser && currentUser.phone) ? ('gravion_cart_' + currentUser.phone) : 'gravion_cart_guest'; 
-        let saved = localStorage.getItem(savedKey); 
-        if (saved) { try { let parsed = JSON.parse(saved); cartData = Array.isArray(parsed) ? parsed : []; } catch(e) { cartData = []; } } 
-        else { cartData = []; } 
-        updateCartBadge(); 
-    }
-
-    function matchFlexibleQuery(text, query) {
-        if (!query) return true;
-        const cleanText = String(text || '').toLowerCase(); 
-        const words = String(query).toLowerCase().trim().split(/\s+/);
-        return words.every(word => cleanText.includes(word));
+    function renderAdminMasterList(items) {
+        const list = document.getElementById('admin-master-list'); if(!list) return; list.innerHTML = '';
+        if(items.length === 0) { list.innerHTML = '<p class="text-center text-xs text-slate-400 py-6">Belum ada data barang.</p>'; return; }
+        items.forEach(item => {
+            list.insertAdjacentHTML('beforeend', `<div class="bg-white p-3 rounded-xl shadow-sm border"><h4 class="font-bold text-sm">${item.namaBarang}</h4><p class="text-xs text-slate-500">Cabang: ${item.cabang} | Stok: ${item.stok} | Rp ${Number(item.harga).toLocaleString('id-ID')}</p></div>`);
+        });
     }
 
     function showCustomAlert(title, message, type = 'info') {
         const modal = document.getElementById('custom-alert'); 
-        const content = document.getElementById('custom-alert-content'); 
-        const iconContainer = document.getElementById('custom-alert-icon');
+        const content = document.getElementById('custom-alert-content');
         document.getElementById('custom-alert-title').innerText = title; 
-        document.getElementById('custom-alert-message').innerHTML = String(message).replace(/\n/g, '<br>');
-        if (type === 'success') iconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-5xl text-goge-primary drop-shadow-md"></i>';
-        else if (type === 'warning' || type === 'error') iconContainer.innerHTML = '<i class="fa-solid fa-circle-exclamation text-5xl text-red-500 drop-shadow-md"></i>';
-        else iconContainer.innerHTML = '<i class="fa-solid fa-circle-info text-5xl text-blue-500 drop-shadow-md"></i>';
-        modal.classList.remove('hidden'); 
+        document.getElementById('custom-alert-message').innerHTML = message;
+        modal.classList.remove('hidden');
         setTimeout(() => { content.classList.remove('scale-95', 'opacity-0'); content.classList.add('scale-100', 'opacity-100'); }, 10);
     }
-    
-    function closeCustomAlert() { 
-        const modal = document.getElementById('custom-alert'); 
-        const content = document.getElementById('custom-alert-content'); 
-        content.classList.remove('scale-100', 'opacity-100'); 
-        content.classList.add('scale-95', 'opacity-0'); 
-        setTimeout(() => { modal.classList.add('hidden'); }, 200); 
-    }
-    
-    function openAdminModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
-    function closeAdminModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
-    
-    function tanyaAdmin() {
-        let targetWa = "6281234567890";
-        if (Array.isArray(adminWhatsAppNumbers) && adminWhatsAppNumbers.length > 0) {
-            targetWa = adminWhatsAppNumbers[currentWaIndex % adminWhatsAppNumbers.length];
-            currentWaIndex = (currentWaIndex + 1) % adminWhatsAppNumbers.length;
-        }
-        const textMsg = "Halo Admin Gravion, saya ingin bertanya mengenai...";
-        window.open(`https://wa.me/${targetWa}?text=${encodeURIComponent(textMsg)}`, '_blank');
-    }
+    function closeCustomAlert() { document.getElementById('custom-alert').classList.add('hidden'); }
+    function loadCartFromStorage() {}
 
     function switchTab(tabId) {
-      const restrictedTabs = ['cart', 'orders', 'profile', 'settings', 'admin-master', 'admin-cabang', 'admin-orders', 'admin-qris', 'admin-users', 'admin-promo', 'admin-logo'];
-      if (currentUser.role === 'guest' && restrictedTabs.includes(tabId)) { showCustomAlert('Akses Terbatas', 'Silakan Masuk terlebih dahulu.', 'warning'); tabId = 'login'; }
-      if (currentUser.role === 'customer' && (tabId.includes('admin') || tabId === 'settings')) { showCustomAlert('Akses Ditolak', 'Hanya Admin/Owner yang dapat membuka menu ini.', 'error'); return; }
-
-      const sections = ['content-login', 'content-catalog', 'content-cart', 'content-orders', 'content-profile', 'content-settings', 'content-admin-master', 'content-admin-cabang', 'content-admin-orders', 'content-admin-qris', 'content-admin-users', 'content-admin-promo', 'content-admin-logo'];
-      sections.forEach(id => { const el = document.getElementById(id); if (id !== 'content-catalog') { if (el) { el.classList.add('hidden'); el.classList.remove('flex', 'block'); } } });
-
-      const catalogSection = document.getElementById('content-catalog');
-      if (tabId === 'catalog') {
-          catalogSection.classList.remove('hidden');
-          catalogSection.classList.add('block');
-      } else {
-          catalogSection.classList.add('hidden');
-          catalogSection.classList.remove('block');
-          const target = document.getElementById('content-' + tabId);
-          if (target) { 
-              target.classList.remove('hidden');
-              if (tabId === 'login') target.classList.add('flex'); else target.classList.add('block');
-              if (tabId === 'cart') renderCartUI(); 
-              if (tabId === 'admin-cabang') renderCabangDropdowns();
-              if (tabId === 'admin-qris') populateAdminQrisData();
-              if (tabId === 'admin-promo') populateAdminPromoData();
-              if (tabId === 'admin-logo') populateAdminLogoData();
-              if (tabId === 'admin-orders') renderAdminAllOrders();
-              if (tabId === 'admin-users') renderAdminUsers(); 
-              if (tabId === 'admin-master') { const searchInput = document.getElementById('admin-search-barang'); if (searchInput) searchInput.value = ''; renderAdminMasterList(masterData); }
-          }
+      if (currentUser.role === 'guest' && ['cart', 'orders', 'profile', 'settings'].includes(tabId)) { 
+          showCustomAlert('Akses Terbatas', 'Silakan Masuk terlebih dahulu.', 'warning'); 
+          tabId = 'login'; 
       }
-      
-      if (tabId === 'orders') loadOrderHistory();
+      const sections = ['content-login', 'content-catalog', 'content-cart', 'content-orders', 'content-profile', 'content-settings', 'content-admin-master'];
+      sections.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
 
-      const bottomNav = document.getElementById('bottom-nav');
-      if (tabId === 'login') { bottomNav.classList.add('hidden'); bottomNav.classList.remove('flex'); } 
-      else {
-        bottomNav.classList.remove('hidden'); bottomNav.classList.add('flex');
-        const navIds = ['nav-catalog', 'nav-cart', 'nav-orders', 'nav-profile', 'hidden-desktop-settings'];
-        navIds.forEach(id => { const el = document.getElementById(id); if (el) { el.classList.remove('text-goge-primary'); el.classList.add('text-slate-400'); } });
-        let activeTab = tabId; if (tabId.startsWith('admin-')) activeTab = 'hidden-desktop-settings';
-        const activeNav = document.getElementById('nav-' + activeTab) || document.getElementById(activeTab);
-        if (activeNav) { activeNav.classList.replace('text-slate-400', 'text-goge-primary'); }
+      const target = document.getElementById('content-' + tabId);
+      if (target) {
+          target.classList.remove('hidden');
+          if (tabId === 'login') target.classList.add('flex'); else target.classList.add('block');
       }
+      document.getElementById('bottom-nav').classList.toggle('hidden', tabId === 'login');
     }
   </script>
 </body>
