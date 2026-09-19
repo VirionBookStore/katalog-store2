@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>VIRION Book Online - Katalog & Pembelian</title>
+  <title>Gravion Book Online - Katalog & Pembelian</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -14,7 +14,6 @@
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Tambahan: Library HTML5-QRCode untuk Barcode/QR Scanner -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
   <style>
@@ -63,7 +62,6 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Custom Style Scanner */
     #reader { width: 100%; border-radius: 1rem; overflow: hidden; border: none !important; }
     #reader video { object-fit: cover; }
     #html5-qrcode-button-camera-stop { background: #ef4444; color: white; padding: 8px 16px; border-radius: 8px; margin-top: 10px; font-weight: bold; font-size: 12px; }
@@ -220,7 +218,7 @@
            <i id="login-logo-icon" class="fa-solid fa-book-open text-4xl text-goge-primary relative"></i>
            <img id="login-logo-img" src="" alt="Logo" class="w-full h-full object-contain hidden">
         </div>
-        <h1 class="text-3xl font-extrabold text-white mb-1 tracking-wide text-center">VIRION</h1>
+        <h1 class="text-3xl font-extrabold text-white mb-1 tracking-wide text-center">GRAVION</h1>
         
         <div class="flex bg-black/30 rounded-full p-1 w-full max-w-[240px] mt-4 mb-6 relative">
             <div id="auth-bg-slider" class="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-goge-primary rounded-full transition-all duration-300"></div>
@@ -257,7 +255,7 @@
                 <i id="header-logo-icon" class="fa-solid fa-book-open text-sm"></i>
                 <img id="header-logo-img" src="" alt="Logo" class="w-full h-full object-contain hidden">
              </div>
-             <span class="font-bold text-base tracking-wide">VIRION</span>
+             <span class="font-bold text-base tracking-wide">GRAVION</span>
           </div>
           <div id="top-auth-btn" onclick="switchTab('login')" class="flex items-center gap-2 text-xs bg-white/20 pl-2 pr-3 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors max-w-[170px]">
             <div class="w-6 h-6 rounded-full overflow-hidden bg-white/30 flex items-center justify-center shrink-0 border border-white/50" id="top-auth-avatar-box">
@@ -342,7 +340,7 @@
           </div>
           <input type="file" id="profile-avatar-input" accept="image/*" onchange="handleProfileAvatarUpload(event)">
         </div>
-        <h3 id="profile-name" class="font-bold text-xl text-white tracking-wide">Pengguna VIRION</h3>
+        <h3 id="profile-name" class="font-bold text-xl text-white tracking-wide">Pengguna Gravion</h3>
         <p id="profile-phone" class="text-sm text-slate-300 mt-0.5 font-medium">-</p>
         <div class="mt-2 inline-block bg-white/20 text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider" id="profile-role-badge">CUSTOMER</div>
       </div>
@@ -390,7 +388,7 @@
 
          <div onclick="switchTab('admin-logo')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
             <div class="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-icons"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Pengaturan Logo Website</h4><p class="text-[10px] text-slate-400">Ganti logo di samping teks VIRION</p></div>
+            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Pengaturan Logo Website</h4><p class="text-[10px] text-slate-400">Ganti logo di samping teks GRAVION</p></div>
             <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
          </div>
 
@@ -581,25 +579,34 @@
     // =========================================================================================
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyQUSYY8aBPDCEp0l9g-fBt5s0X84XL277swqe92H9kRT2mtPpVqbqVGWJoFOoaznUMvA/exec"; 
 
-    // Helper Fungsi untuk memanggil GAS REST API dengan fetch()
+    // Helper Fungsi untuk memanggil GAS REST API dengan fetch() (Telah Diperbaiki untuk Bypass CORS)
     async function apiCall(actionName, payloadData = {}) {
         if (GAS_URL === "URL_WEB_APP_GAS_ANDA_DISINI" || !GAS_URL) {
             console.error("URL GAS Belum Di-setting");
+            showCustomAlert("Setup Dibutuhkan", "URL database belum di-setting pada file. Silakan masukkan URL Google Apps Script Anda.", "error");
             return { status: "error", message: "Aplikasi belum terhubung dengan database (URL kosong)." };
         }
         
         try {
-            // Menggunakan content-type text/plain menghindari pre-flight OPTIONS issue di GAS
             const response = await fetch(GAS_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                redirect: 'follow',
                 body: JSON.stringify({ action: actionName, payload: payloadData })
             });
-            const data = await response.json();
-            return data;
+            
+            const textData = await response.text(); 
+            
+            try {
+                return JSON.parse(textData);
+            } catch (parseError) {
+                console.error(`Gagal parsing respons JSON [${actionName}]:`, textData);
+                return { status: "error", message: "Server merespons data yang tidak dapat diproses (Bukan JSON). Pastikan Deploy Code.gs sudah terbaru." };
+            }
+
         } catch (error) {
-            console.error(`Error in API call [${actionName}]:`, error);
-            throw new Error("Gagal terhubung ke server.");
+            console.error(`Fetch API Error [${actionName}]:`, error);
+            return { status: "error", message: "Gagal memuat dari server. Cek koneksi atau link Google Apps Script Anda." };
         }
     }
 
@@ -617,7 +624,7 @@
     let checkoutState = { targetCabang: "", subtotal: 0, ongkir: 0, total: 0, receiptBase64: "" };
     let currentOrderFilter = 'active';
 
-    let cabangList = ["Toko Miko", "Pam Miko", "Toko Pusat", "New Store"];
+    let cabangList = ["Toko Miko", "Pam Miko", "Pam MIM", "New"];
     let qrisSettings = { image: "https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg", name: "TOKO BUKU VIRION" };
     
     let storeLogoSettings = { type: "icon", value: "fa-solid fa-book-open" };
@@ -723,43 +730,51 @@
     // INITIALIZATION & FETCHING DATA PADA SAAT LOAD MENGGUNAKAN fetch API
     // ==============================================================================
     document.addEventListener('DOMContentLoaded', async function() {
-        let savedUser = localStorage.getItem('VIRION_user');
+        let savedUser = localStorage.getItem('gravion_user');
         if (savedUser) { try { let parsed = JSON.parse(savedUser); if (parsed && parsed.role) currentUser = parsed; } catch(e){} }
         
-        let savedCabang = localStorage.getItem('VIRION_cabang_list');
+        let savedCabang = localStorage.getItem('gravion_cabang_list');
         if(savedCabang) { try { cabangList = JSON.parse(savedCabang); } catch(e){} }
         
-        let savedQris = localStorage.getItem('VIRION_qris');
+        let savedQris = localStorage.getItem('gravion_qris');
         if(savedQris) { try { qrisSettings = JSON.parse(savedQris); } catch(e){} }
         
-        let savedWaNums = localStorage.getItem('VIRION_admin_wa');
+        let savedWaNums = localStorage.getItem('gravion_admin_wa');
         if(savedWaNums) { try { adminWhatsAppNumbers = JSON.parse(savedWaNums); } catch(e){} }
 
-        let savedPromo = localStorage.getItem('VIRION_promo_banner');
+        let savedPromo = localStorage.getItem('gravion_promo_banner');
         if(savedPromo) { try { promoBannerSettings = JSON.parse(savedPromo); } catch(e){} }
         applyPromoBannerUI();
 
-        let savedLogo = localStorage.getItem('VIRION_store_logo');
+        let savedLogo = localStorage.getItem('gravion_store_logo');
         if(savedLogo) { try { storeLogoSettings = JSON.parse(savedLogo); } catch(e){} }
         applyStoreLogoUI();
 
         updateAuthUI(); loadCartFromStorage(); renderCabangDropdowns();
 
         if (GAS_URL === "URL_WEB_APP_GAS_ANDA_DISINI") {
-            showCustomAlert("Setup Dibutuhkan", "Harap masukkan URL Google Apps Script Anda ke variabel GAS_URL di dalam file HTML.", "warning");
+            // Notifikasi kalau user belum setup URL
             onDataLoaded({ status: "success", data: [] });
+            showCustomAlert("Setup Dibutuhkan", "Harap masukkan URL Web App Google Apps Script Anda ke dalam file HTML bagian GAS_URL.", "warning");
         } else {
-            // Load Data asinkronous
+            // Indikator loading UI sementara (mengganti spinner bawaan jika lama)
+            const grid = document.getElementById('catalog-grid');
+            if(grid) grid.innerHTML = '<div class="col-span-3 md:col-span-8 text-center text-slate-400 py-10 text-sm font-medium"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-goge-primary"></i><br>Sedang menghubungi Database...</div>';
+
             try {
                 // 1. Get Master Items
                 const masterRes = await apiCall("getOptimizedMasterItems");
+                if(masterRes.status === "error") {
+                    console.error("Backend Response Error:", masterRes.message);
+                    showCustomAlert("Gagal Memuat Katalog", masterRes.message, "error");
+                }
                 onDataLoaded(masterRes);
 
                 // 2. Get Users (Bg load)
                 apiCall("getAllUsers").then(res => {
                     if(res && res.status === "success" && res.data) {
                         globalUsers = res.data;
-                        localStorage.setItem('VIRION_global_users', JSON.stringify(globalUsers));
+                        localStorage.setItem('gravion_global_users', JSON.stringify(globalUsers));
                     }
                 });
 
@@ -768,21 +783,27 @@
                     if(res && res.status === "success" && res.data) {
                         if(res.data.waNumbers) {
                             adminWhatsAppNumbers = res.data.waNumbers;
-                            localStorage.setItem('VIRION_admin_wa', JSON.stringify(adminWhatsAppNumbers));
+                            localStorage.setItem('gravion_admin_wa', JSON.stringify(adminWhatsAppNumbers));
                         }
                         if(res.data.promoBanner) {
                             promoBannerSettings = res.data.promoBanner;
-                            localStorage.setItem('VIRION_promo_banner', JSON.stringify(promoBannerSettings));
+                            localStorage.setItem('gravion_promo_banner', JSON.stringify(promoBannerSettings));
                             applyPromoBannerUI();
                         }
                         if(res.data.storeLogo) {
                             storeLogoSettings = res.data.storeLogo;
-                            localStorage.setItem('VIRION_store_logo', JSON.stringify(storeLogoSettings));
+                            localStorage.setItem('gravion_store_logo', JSON.stringify(storeLogoSettings));
                             applyStoreLogoUI();
                         }
                         if(res.data.qrisSettings) {
                             qrisSettings = res.data.qrisSettings;
-                            localStorage.setItem('VIRION_qris', JSON.stringify(qrisSettings));
+                            localStorage.setItem('gravion_qris', JSON.stringify(qrisSettings));
+                        }
+                        // SINKRONISASI DATA CABANG DARI GOOGLE SHEET
+                        if(res.data.cabangList) {
+                            cabangList = res.data.cabangList;
+                            localStorage.setItem('gravion_cabang_list', JSON.stringify(cabangList));
+                            renderCabangDropdowns();
                         }
                     }
                 });
@@ -826,7 +847,7 @@
 
     async function resetDefaultLogo() {
         storeLogoSettings = { type: "icon", value: "fa-solid fa-book-open" };
-        localStorage.setItem('VIRION_store_logo', JSON.stringify(storeLogoSettings));
+        localStorage.setItem('gravion_store_logo', JSON.stringify(storeLogoSettings));
         applyStoreLogoUI(); populateAdminLogoData(); showCustomAlert('Berhasil', 'Logo dikembalikan ke ikon default.', 'success');
         apiCall("saveStoreSettings", { settingsObj: { storeLogo: storeLogoSettings } });
     }
@@ -836,7 +857,7 @@
         if (tempLogoBase64) {
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengunggah ke Drive...'; btn.disabled = true;
             try {
-                const res = await apiCall("uploadImageToDrive", { base64Data: tempLogoBase64, filename: 'Logo_VIRION', folderName: 'VIRION_Store_Images' });
+                const res = await apiCall("uploadImageToDrive", { base64Data: tempLogoBase64, filename: 'Logo_Gravion', folderName: 'Gravion_Store_Images' });
                 if(res.status === 'success') { storeLogoSettings = { type: "image", value: res.url }; finalizeSimpanLogo(btn); } 
                 else throw new Error("Gagal");
             } catch(e) {
@@ -847,7 +868,7 @@
     }
     
     function finalizeSimpanLogo(btn) {
-        localStorage.setItem('VIRION_store_logo', JSON.stringify(storeLogoSettings)); applyStoreLogoUI(); tempLogoBase64 = ""; 
+        localStorage.setItem('gravion_store_logo', JSON.stringify(storeLogoSettings)); applyStoreLogoUI(); tempLogoBase64 = ""; 
         if (btn) { btn.innerHTML = '<i class="fa-solid fa-save"></i> Simpan Logo'; btn.disabled = false; }
         showCustomAlert('Berhasil', 'Logo website berhasil diperbarui.', 'success');
         apiCall("saveStoreSettings", { settingsObj: { storeLogo: storeLogoSettings } });
@@ -867,7 +888,7 @@
         if (tempPromoBase64) {
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengunggah...'; btn.disabled = true;
             try {
-                const res = await apiCall("uploadImageToDrive", { base64Data: tempPromoBase64, filename: 'Banner_Promo', folderName: 'VIRION_Store_Images' });
+                const res = await apiCall("uploadImageToDrive", { base64Data: tempPromoBase64, filename: 'Banner_Promo', folderName: 'Gravion_Store_Images' });
                 if(res.status === 'success') { promoBannerSettings = { image: res.url, badge: badge, title: title }; finalizeSimpanPromo(btn); } 
                 else throw new Error("Gagal");
             } catch(err) {
@@ -877,7 +898,7 @@
     }
     
     function finalizeSimpanPromo(btn) {
-        localStorage.setItem('VIRION_promo_banner', JSON.stringify(promoBannerSettings)); applyPromoBannerUI(); tempPromoBase64 = ""; 
+        localStorage.setItem('gravion_promo_banner', JSON.stringify(promoBannerSettings)); applyPromoBannerUI(); tempPromoBase64 = ""; 
         if (btn) { btn.innerHTML = '<i class="fa-solid fa-save"></i> Terapkan Banner Promo'; btn.disabled = false; }
         showCustomAlert('Berhasil', 'Banner promo diperbarui.', 'success');
         apiCall("saveStoreSettings", { settingsObj: { promoBanner: promoBannerSettings } });
@@ -926,14 +947,14 @@
       try {
           const res = await apiCall("verifyLogin", { username: phoneInput, password: passInput });
           btnSubmit.innerHTML = 'MASUK'; btnSubmit.disabled = false;
-          if(res.status === 'success') { currentUser = res.data; localStorage.setItem('VIRION_user', JSON.stringify(currentUser)); updateAuthUI(); loadCartFromStorage(); switchTab('catalog'); showCustomAlert('Berhasil Masuk', `Selamat datang kembali, <b>${currentUser.name}</b>.`, 'success'); } 
+          if(res.status === 'success') { currentUser = res.data; localStorage.setItem('gravion_user', JSON.stringify(currentUser)); updateAuthUI(); loadCartFromStorage(); switchTab('catalog'); showCustomAlert('Berhasil Masuk', `Selamat datang kembali, <b>${currentUser.name}</b>.`, 'success'); } 
           else showCustomAlert('Gagal Masuk', res.message, 'error');
       } catch(err) {
           btnSubmit.innerHTML = 'MASUK'; btnSubmit.disabled = false; showCustomAlert('Error Server', err.message, 'error');
       }
     }
     
-    function handleLogout() { currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" }; localStorage.removeItem('VIRION_user'); document.getElementById('login-phone').value = ''; document.getElementById('login-password').value = ''; loadCartFromStorage(); updateAuthUI(); switchTab('catalog'); }
+    function handleLogout() { currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" }; localStorage.removeItem('gravion_user'); document.getElementById('login-phone').value = ''; document.getElementById('login-password').value = ''; loadCartFromStorage(); updateAuthUI(); switchTab('catalog'); }
 
     function updateAuthUI() {
         if (!currentUser) currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" };
@@ -950,14 +971,14 @@
 
     function renderUserProfileView() {
         const phoneEl = document.getElementById('profile-phone'); const nameEl = document.getElementById('profile-name'); const editNameEl = document.getElementById('edit-profile-name'); const editAddressEl = document.getElementById('edit-profile-address'); const roleBadge = document.getElementById('profile-role-badge');
-        if(phoneEl) phoneEl.innerText = currentUser.phone || "-"; if(nameEl) nameEl.innerText = currentUser.name || "Pengguna VIRION"; if(editNameEl) editNameEl.value = currentUser.name && currentUser.name !== "Pengguna" && currentUser.name !== "Pengguna VIRION" ? currentUser.name : ""; if(editAddressEl) editAddressEl.value = currentUser.address || ""; if(roleBadge) roleBadge.innerText = (currentUser.role || 'guest').toUpperCase();
+        if(phoneEl) phoneEl.innerText = currentUser.phone || "-"; if(nameEl) nameEl.innerText = currentUser.name || "Pengguna Gravion"; if(editNameEl) editNameEl.value = currentUser.name && currentUser.name !== "Pengguna" && currentUser.name !== "Pengguna Gravion" ? currentUser.name : ""; if(editAddressEl) editAddressEl.value = currentUser.address || ""; if(roleBadge) roleBadge.innerText = (currentUser.role || 'guest').toUpperCase();
         const avatarImg = document.getElementById('profile-avatar-img'); const avatarPlaceholder = document.getElementById('profile-avatar-placeholder');
         if (avatarImg && avatarPlaceholder) { if (currentUser.avatar) { avatarImg.src = currentUser.avatar; avatarImg.classList.remove('hidden'); avatarPlaceholder.classList.add('hidden'); } else { avatarImg.classList.add('hidden'); avatarPlaceholder.classList.remove('hidden'); } }
     }
 
-    function saveUserProfileData() { const newName = document.getElementById('edit-profile-name').value.trim(); const newAddress = document.getElementById('edit-profile-address').value.trim(); if (!newName) { showCustomAlert('Perhatian', 'Nama tidak boleh kosong.', 'warning'); return; } currentUser.name = newName; currentUser.address = newAddress; localStorage.setItem('VIRION_user', JSON.stringify(currentUser)); updateAuthUI(); showCustomAlert('Berhasil', 'Data diperbarui.', 'success'); }
+    function saveUserProfileData() { const newName = document.getElementById('edit-profile-name').value.trim(); const newAddress = document.getElementById('edit-profile-address').value.trim(); if (!newName) { showCustomAlert('Perhatian', 'Nama tidak boleh kosong.', 'warning'); return; } currentUser.name = newName; currentUser.address = newAddress; localStorage.setItem('gravion_user', JSON.stringify(currentUser)); updateAuthUI(); showCustomAlert('Berhasil', 'Data diperbarui.', 'success'); }
 
-    function handleProfileAvatarUpload(event) { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, 'image/jpeg', 0.8, function(compressedBase64) { currentUser.avatar = compressedBase64; localStorage.setItem('VIRION_user', JSON.stringify(currentUser)); updateAuthUI(); showCustomAlert('Foto Diperbarui', 'Foto berhasil diubah.', 'success'); }); }
+    function handleProfileAvatarUpload(event) { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, 'image/jpeg', 0.8, function(compressedBase64) { currentUser.avatar = compressedBase64; localStorage.setItem('gravion_user', JSON.stringify(currentUser)); updateAuthUI(); showCustomAlert('Foto Diperbarui', 'Foto berhasil diubah.', 'success'); }); }
 
     function renderAdminMasterList(items) {
         const listContainer = document.getElementById('admin-master-list'); if (!listContainer) return; 
@@ -1040,13 +1061,13 @@
         const val = document.getElementById('admin-whatsapp-input').value.trim(); if(!val) return showCustomAlert('Perhatian', 'Masukkan minimal satu nomor WhatsApp.', 'warning');
         let nums = val.split(',').map(n => n.trim().replace(/\D/g, '')).filter(Boolean);
         if(nums.length === 0) return showCustomAlert('Format Salah', 'Format nomor tidak valid.', 'error'); if(nums.length > 5) return showCustomAlert('Batas', 'Maksimal 5 nomor.', 'warning');
-        adminWhatsAppNumbers = nums; localStorage.setItem('VIRION_admin_wa', JSON.stringify(adminWhatsAppNumbers)); showCustomAlert('Berhasil', `Disimpan (${adminWhatsAppNumbers.length} nomor).`, 'success');
+        adminWhatsAppNumbers = nums; localStorage.setItem('gravion_admin_wa', JSON.stringify(adminWhatsAppNumbers)); showCustomAlert('Berhasil', `Disimpan (${adminWhatsAppNumbers.length} nomor).`, 'success');
         apiCall("saveStoreSettings", { settingsObj: { waNumbers: adminWhatsAppNumbers } });
     }
 
     function changeUserRole(phone, newRole) {
         let userIndex = globalUsers.findIndex(u => u.phone === phone);
-        if(userIndex !== -1) { globalUsers[userIndex].role = newRole; localStorage.setItem('VIRION_global_users', JSON.stringify(globalUsers)); apiCall("updateUserRoleSheet", { phone, newRole }); showCustomAlert('Role Diperbarui', `Role ${phone} diubah.`, 'success'); }
+        if(userIndex !== -1) { globalUsers[userIndex].role = newRole; localStorage.setItem('gravion_global_users', JSON.stringify(globalUsers)); apiCall("updateUserRoleSheet", { phone, newRole }); showCustomAlert('Role Diperbarui', `Role ${phone} diubah.`, 'success'); }
     }
 
     function renderCabangDropdowns() {
@@ -1058,8 +1079,33 @@
         if(filterContainer) { let activeStyle = "bg-goge-primary text-white"; let inactiveStyle = "bg-white text-goge-primary"; let html = `<div onclick="filterByCabang('Semua')" class="flex flex-col items-center gap-1 cursor-pointer shrink-0"><div class="w-11 h-11 rounded-xl shadow-sm flex items-center justify-center text-sm border border-slate-200 transition-colors ${currentCabangFilter === 'Semua' ? activeStyle : inactiveStyle}"><i class="fa-solid fa-layer-group"></i></div><span class="text-[9px] font-semibold ${currentCabangFilter === 'Semua' ? 'text-goge-primary' : 'text-slate-500'}">Semua</span></div>`; cabangList.forEach(c => { let isActive = currentCabangFilter === c; html += `<div onclick="filterByCabang('${c}')" class="flex flex-col items-center gap-1 cursor-pointer shrink-0"><div class="w-11 h-11 rounded-xl shadow-sm flex items-center justify-center text-sm border border-slate-200 transition-colors ${isActive ? activeStyle : inactiveStyle}"><i class="fa-solid fa-store"></i></div><span class="text-[9px] font-semibold truncate max-w-[60px] text-center ${isActive ? 'text-goge-primary' : 'text-slate-500'}">${c}</span></div>`; }); filterContainer.innerHTML = html; }
     }
 
-    function tambahCabangAdmin() { const input = document.getElementById('new-cabang-input'); const val = input.value.trim(); if(!val) return showCustomAlert('Perhatian', 'Nama cabang kosong.', 'warning'); if(cabangList.includes(val)) return showCustomAlert('Perhatian', 'Cabang sudah ada.', 'warning'); cabangList.push(val); localStorage.setItem('VIRION_cabang_list', JSON.stringify(cabangList)); input.value = ''; renderCabangDropdowns(); showCustomAlert('Berhasil', `Cabang <b>${val}</b> ditambahkan.`, 'success'); }
-    function hapusCabangAdmin(namaCabang) { cabangList = cabangList.filter(c => c !== namaCabang); localStorage.setItem('VIRION_cabang_list', JSON.stringify(cabangList)); if(currentCabangFilter === namaCabang) filterByCabang('Semua'); else renderCabangDropdowns(); }
+    // ========== PERUBAHAN FUNGSI TAMBAH DAN HAPUS CABANG ============
+    function tambahCabangAdmin() { 
+        const input = document.getElementById('new-cabang-input'); 
+        const val = input.value.trim(); 
+        if(!val) return showCustomAlert('Perhatian', 'Nama cabang kosong.', 'warning'); 
+        if(cabangList.includes(val)) return showCustomAlert('Perhatian', 'Cabang sudah ada.', 'warning'); 
+        
+        cabangList.push(val); 
+        localStorage.setItem('gravion_cabang_list', JSON.stringify(cabangList)); 
+        input.value = ''; 
+        renderCabangDropdowns(); 
+        showCustomAlert('Berhasil', `Cabang <b>${val}</b> ditambahkan.`, 'success'); 
+        
+        // SINKRON KE GOOGLE SHEET (Agar user lain ikut ter-update)
+        apiCall("saveStoreSettings", { settingsObj: { cabangList: cabangList } });
+    }
+    
+    function hapusCabangAdmin(namaCabang) { 
+        cabangList = cabangList.filter(c => c !== namaCabang); 
+        localStorage.setItem('gravion_cabang_list', JSON.stringify(cabangList)); 
+        if(currentCabangFilter === namaCabang) filterByCabang('Semua'); 
+        else renderCabangDropdowns(); 
+        
+        // SINKRON KE GOOGLE SHEET (Agar user lain ikut ter-update)
+        apiCall("saveStoreSettings", { settingsObj: { cabangList: cabangList } });
+    }
+    // ================================================================
 
     function populateAdminQrisData() { document.getElementById('admin-qris-preview').src = qrisSettings.image; document.getElementById('admin-qris-name').value = qrisSettings.name; }
     function handleAdminQrisUpload(event) { const file = event.target.files[0]; if (!file) return; compressImage(file, 500, 'image/jpeg', 0.8, function(compressedBase64) { document.getElementById('admin-qris-preview').src = compressedBase64; tempQrisBase64 = compressedBase64; }); }
@@ -1070,7 +1116,7 @@
         if (tempQrisBase64) {
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengunggah...'; btn.disabled = true;
             try {
-                const res = await apiCall("uploadImageToDrive", { base64Data: tempQrisBase64, filename: 'QRIS_Barcode', folderName: 'VIRION_Store_Images' });
+                const res = await apiCall("uploadImageToDrive", { base64Data: tempQrisBase64, filename: 'QRIS_Barcode', folderName: 'Gravion_Store_Images' });
                 if(res.status === 'success') { qrisSettings = { image: res.url, name: name }; finalizeSimpanQris(btn); } 
                 else throw new Error("Gagal");
             } catch(e) { btn.innerHTML = '<i class="fa-solid fa-save"></i> Terapkan Pengaturan'; btn.disabled = false; showCustomAlert('Error Upload', 'Gagal mengunggah QRIS.', 'error'); }
@@ -1078,7 +1124,7 @@
     }
     
     function finalizeSimpanQris(btn) {
-        localStorage.setItem('VIRION_qris', JSON.stringify(qrisSettings)); tempQrisBase64 = ""; 
+        localStorage.setItem('gravion_qris', JSON.stringify(qrisSettings)); tempQrisBase64 = ""; 
         if (btn) { btn.innerHTML = '<i class="fa-solid fa-save"></i> Terapkan Pengaturan'; btn.disabled = false; }
         showCustomAlert('Tersimpan', 'Pengaturan QRIS berhasil diperbarui.', 'success');
         apiCall("saveStoreSettings", { settingsObj: { qrisSettings: qrisSettings } });
@@ -1113,7 +1159,7 @@
         
         let index = globalOrders.findIndex(o => o.orderId === id);
         if(index !== -1) {
-            globalOrders[index].status = newStatus; localStorage.setItem('VIRION_global_orders', JSON.stringify(globalOrders));
+            globalOrders[index].status = newStatus; localStorage.setItem('gravion_global_orders', JSON.stringify(globalOrders));
             apiCall("updateOrderStatusAdmin", { orderId: id, newStatus: newStatus });
             
             btn.disabled = false; btn.innerHTML = "Simpan";
@@ -1228,7 +1274,7 @@
       const orderData = { phone: currentUser.phone, name: document.getElementById('checkout-name').value, delivery: document.getElementById('checkout-delivery').value, totalOngkir: checkoutState.ongkir, items: itemsToCheckout, itemsJSON: JSON.stringify(itemsToCheckout), total: checkoutState.total };
       let newId = 'ORD-' + Math.floor(Math.random()*100000); 
       let payload = {...orderData, orderId: newId, status: "Menunggu Konfirmasi", date: new Date().toISOString()};
-      globalOrders.push(payload); localStorage.setItem('VIRION_global_orders', JSON.stringify(globalOrders));
+      globalOrders.push(payload); localStorage.setItem('gravion_global_orders', JSON.stringify(globalOrders));
 
       try {
           const res = await apiCall("createNewOrder", { orderData, receiptBase64: checkoutState.receiptBase64 });
@@ -1285,7 +1331,7 @@
     function konfirmasiPesananViaWA(orderId) {
         const ord = globalOrders.find(o => o.orderId === orderId); if(!ord) return;
         let barangList = ""; if(ord.items) { ord.items.forEach(item => { barangList += `- ${item.namaBarang} (x${item.qty})\n`; }); }
-        let textMsg = `Halo Admin VIRION, saya sudah melakukan pembayaran untuk pesanan berikut:\n\n*No Pesanan:* ${ord.orderId}\n*Nama:* ${ord.name}\n*Barang:*\n${barangList}\n*Ongkir:* Rp ${Number(ord.totalOngkir || 0).toLocaleString('id-ID')}\n*Total Pembayaran:* Rp ${Number(ord.total).toLocaleString('id-ID')}\n\nMohon pesanan saya segera diproses. Terima kasih!`;
+        let textMsg = `Halo Admin Gravion, saya sudah melakukan pembayaran untuk pesanan berikut:\n\n*No Pesanan:* ${ord.orderId}\n*Nama:* ${ord.name}\n*Barang:*\n${barangList}\n*Ongkir:* Rp ${Number(ord.totalOngkir || 0).toLocaleString('id-ID')}\n*Total Pembayaran:* Rp ${Number(ord.total).toLocaleString('id-ID')}\n\nMohon pesanan saya segera diproses. Terima kasih!`;
         
         let targetWa = "6281234567890";
         if (Array.isArray(adminWhatsAppNumbers) && adminWhatsAppNumbers.length > 0) { targetWa = adminWhatsAppNumbers[currentWaIndex % adminWhatsAppNumbers.length]; currentWaIndex = (currentWaIndex + 1) % adminWhatsAppNumbers.length; }
@@ -1299,8 +1345,8 @@
         renderOrderHistoryByFilter(); 
     }
 
-    function saveCartToStorage() { if (currentUser && currentUser.phone) localStorage.setItem('VIRION_cart_' + currentUser.phone, JSON.stringify(cartData)); else localStorage.setItem('VIRION_cart_guest', JSON.stringify(cartData)); }
-    function loadCartFromStorage() { let savedKey = (currentUser && currentUser.phone) ? ('VIRION_cart_' + currentUser.phone) : 'VIRION_cart_guest'; let saved = localStorage.getItem(savedKey); if (saved) { try { let parsed = JSON.parse(saved); cartData = Array.isArray(parsed) ? parsed : []; } catch(e) { cartData = []; } } else { cartData = []; } updateCartBadge(); }
+    function saveCartToStorage() { if (currentUser && currentUser.phone) localStorage.setItem('gravion_cart_' + currentUser.phone, JSON.stringify(cartData)); else localStorage.setItem('gravion_cart_guest', JSON.stringify(cartData)); }
+    function loadCartFromStorage() { let savedKey = (currentUser && currentUser.phone) ? ('gravion_cart_' + currentUser.phone) : 'gravion_cart_guest'; let saved = localStorage.getItem(savedKey); if (saved) { try { let parsed = JSON.parse(saved); cartData = Array.isArray(parsed) ? parsed : []; } catch(e) { cartData = []; } } else { cartData = []; } updateCartBadge(); }
 
     function matchFlexibleQuery(text, query) {
         if (!query) return true;
@@ -1321,7 +1367,7 @@
     
     function tanyaAdmin() {
         let targetWa = "6281234567890"; if (Array.isArray(adminWhatsAppNumbers) && adminWhatsAppNumbers.length > 0) { targetWa = adminWhatsAppNumbers[currentWaIndex % adminWhatsAppNumbers.length]; currentWaIndex = (currentWaIndex + 1) % adminWhatsAppNumbers.length; }
-        const textMsg = "Halo Admin VIRION, saya ingin bertanya mengenai...";
+        const textMsg = "Halo Admin Gravion, saya ingin bertanya mengenai...";
         window.open(`https://wa.me/${targetWa}?text=${encodeURIComponent(textMsg)}`, '_blank');
     }
 
@@ -1360,3 +1406,4 @@
   </script>
 </body>
 </html>
+```eof
