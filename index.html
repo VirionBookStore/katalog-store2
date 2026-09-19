@@ -1,373 +1,509 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Gravion Book Online - Katalog & Pembelian</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: { extend: { fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'], }, colors: { goge: { primary: '#1A6B52', dark: '#13503D', light: '#E8F5E9', bg: '#F8FAFC', navy: '#1E293B' } } } }
-    }
-  </script>
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Pustaka HTML5 QR Code Scanner -->
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<!-- Modal Scanner Kamera -->
+<div id="modal-scanner" class="fixed inset-0 bg-black/80 z-[115] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+   <div class="bg-white rounded-3xl w-full max-w-[360px] p-5 relative text-center shadow-2xl">
+      <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+         <h3 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-qrcode text-goge-primary mr-1"></i> Scan Barcode / QR Buku</h3>
+         <button onclick="closeScannerModal()" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-xs"></i></button>
+      </div>
+      <div id="reader" class="w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 mb-4 min-h-[250px]"></div>
+      <p class="text-[11px] text-slate-500 mb-3">Arahkan kamera ke barcode atau QR Code pada buku.</p>
+      <button onclick="closeScannerModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs cursor-pointer">Tutup Scanner</button>
+   </div>
+</div>
 
-  <style>
-    body { background-color: #e2e8f0; -webkit-tap-highlight-color: transparent; }
-    .app-container { max-width: 414px; margin: 0 auto; background-color: #F8FAFC; min-height: 100vh; position: relative; overflow-x: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.1); padding-bottom: 80px; }
+<!-- Custom Alert Modal -->
+<div id="custom-alert" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-5 backdrop-blur-sm transition-opacity">
+   <div id="custom-alert-content" class="bg-white rounded-3xl w-full max-w-[320px] p-6 text-center transform transition-all scale-95 opacity-0 shadow-2xl">
+      <div id="custom-alert-icon" class="mb-4 flex justify-center"></div>
+      <h3 id="custom-alert-title" class="text-lg font-extrabold text-slate-800 mb-2">Pemberitahuan</h3>
+      <p id="custom-alert-message" class="text-sm text-slate-500 mb-6 leading-relaxed">Pesan disini</p>
+      <button onclick="closeCustomAlert()" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm hover:bg-goge-dark transition-all shadow-lg shadow-goge-primary/30 cursor-pointer">MENGERTI</button>
+   </div>
+</div>
+
+<!-- Custom Exit Confirmation Modal -->
+<div id="custom-exit-modal" class="fixed inset-0 bg-black/70 z-[120] hidden flex items-center justify-center p-5 backdrop-blur-sm transition-opacity">
+   <div id="custom-exit-content" class="bg-white rounded-3xl w-full max-w-[320px] p-6 text-center transform transition-all scale-95 opacity-0 shadow-2xl">
+      <div class="mb-4 flex justify-center">
+         <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-2xl shadow-inner">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+         </div>
+      </div>
+      <h3 class="text-lg font-extrabold text-slate-800 mb-2">Konfirmasi Keluar</h3>
+      <p class="text-sm text-slate-500 mb-6 leading-relaxed">Apakah Anda yakin ingin keluar?</p>
+      <div class="flex gap-2">
+         <button onclick="cancelExitAction()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl text-sm transition-all cursor-pointer">Batal</button>
+         <button onclick="confirmExitAction()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-red-500/30 transition-all cursor-pointer">Keluar</button>
+      </div>
+   </div>
+</div>
+
+<!-- Floating WhatsApp Button -->
+<a href="#" onclick="tanyaAdmin()" class="fixed bottom-[90px] right-5 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-500/40 z-[95] hover:bg-green-600 transition-transform hover:scale-105 cursor-pointer">
+   <i class="fa-brands fa-whatsapp text-3xl"></i>
+</a>
+
+<!-- Modal Admin Master Barang -->
+<div id="modal-admin-barang" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+   <div class="bg-white rounded-3xl w-full max-w-sm p-6 transform transition-all shadow-2xl relative">
+      <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-box text-blue-500 mr-2"></i>Data Barang</h3>
+      <div class="space-y-3">
+         <input type="hidden" id="admin-input-idbarang" value="">
+         <div><label class="text-xs font-bold text-slate-500">Nama Buku</label><input type="text" id="admin-input-namabarang" placeholder="Masukkan nama..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
+         <div>
+            <label class="text-xs font-bold text-slate-500">Pilih Cabang</label>
+            <select id="admin-input-cabangbarang" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></select>
+         </div>
+         <div class="flex gap-2">
+            <div class="flex-1"><label class="text-xs font-bold text-slate-500">Stok (Sistem)</label><input type="number" id="admin-input-stok" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
+            <div class="flex-1"><label class="text-xs font-bold text-slate-500">Lokasi Rak</label><input type="text" id="admin-input-rak" placeholder="Cth: A-01" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
+         </div>
+         <div><label class="text-xs font-bold text-slate-500">Harga (Rp)</label><input type="number" id="admin-input-hargabarang" placeholder="Contoh: 50000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
+         <div class="pt-3 flex gap-2">
+            <button type="button" onclick="closeAdminModal('modal-admin-barang')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm cursor-pointer">Batal</button>
+            <button type="button" onclick="simpanDataBarangMaster()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md cursor-pointer">Simpan Data</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Modal Status Pesanan Admin -->
+<div id="modal-admin-status" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+  <div class="bg-white rounded-3xl w-full max-w-[320px] p-6 transform transition-all shadow-2xl relative">
+     <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2">Ubah Status Pesanan</h3>
+     <input type="hidden" id="admin-status-orderid">
+     <div class="space-y-3">
+        <select id="admin-status-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-goge-primary">
+           <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
+           <option value="Diproses">Diproses</option>
+           <option value="Dikirim">Dikirim</option>
+           <option value="Siap Diambil">Siap Diambil</option>
+           <option value="Selesai">Selesai</option>
+           <option value="Dibatalkan">Dibatalkan</option>
+        </select>
+        <div class="pt-2 flex gap-2">
+           <button onclick="closeAdminModal('modal-admin-status')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-sm cursor-pointer">Batal</button>
+           <button onclick="simpanStatusPesanan()" class="flex-1 bg-goge-primary text-white font-bold py-2.5 rounded-xl text-sm shadow-md cursor-pointer">Simpan</button>
+        </div>
+     </div>
+  </div>
+</div>
+
+<!-- Modal Checkout -->
+<div id="checkout-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end justify-center sm:items-center">
+  <div id="checkout-modal-content" class="bg-white w-full max-w-[414px] rounded-t-3xl sm:rounded-3xl p-5 transform transition-transform translate-y-full">
+    <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-slate-800">Detail Pengiriman</h3><button onclick="closeCheckoutModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="space-y-4">
+      <input type="hidden" id="checkout-cabang-target" value="">
+      <div><label class="block text-xs font-bold text-slate-500 mb-1">Nama Penerima</label><input type="text" id="checkout-name" placeholder="Misal: Budi Santoso" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-goge-primary"></div>
+      <div><label class="block text-xs font-bold text-slate-500 mb-1">Alamat Pengiriman</label><textarea id="checkout-address" placeholder="Alamat lengkap..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-goge-primary h-20 resize-none"></textarea></div>
+      <div><label class="block text-xs font-bold text-slate-500 mb-1">Opsi Pengiriman</label><select id="checkout-delivery" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-goge-primary appearance-none cursor-pointer" onchange="updateCheckoutSummary()"><option value="Dikirim">Dikirim ke Alamat</option><option value="Ambil Sendiri">Ambil di Toko (Bebas Ongkir)</option></select></div>
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mt-2 space-y-1">
+         <div class="flex justify-between text-xs text-slate-500"><span>Subtotal Barang</span><span id="checkout-summary-subtotal" class="font-bold text-slate-700">Rp 0</span></div>
+         <div class="flex justify-between text-xs text-slate-500"><span>Biaya Pengiriman</span><span id="checkout-summary-ongkir" class="font-bold text-slate-700">Rp 0</span></div>
+         <div class="flex justify-between text-sm pt-1 mt-1 border-t border-slate-200"><span class="font-bold text-slate-700">Total Tagihan</span><span id="checkout-summary-total" class="font-extrabold text-goge-primary">Rp 0</span></div>
+      </div>
+      <div class="pt-2"><button onclick="proceedToPayment()" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 transition-all text-sm flex justify-center items-center gap-2 cursor-pointer">Pilih Pembayaran <i class="fa-solid fa-arrow-right"></i></button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pembayaran QRIS -->
+<div id="payment-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-end justify-center sm:items-center">
+  <div id="payment-modal-content" class="bg-white w-full max-w-[414px] rounded-t-3xl sm:rounded-3xl p-5 transform transition-transform translate-y-full max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center mb-5 pb-3 border-b border-slate-100"><button onclick="backToCheckoutModal()" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 rounded-full mr-2 -ml-2 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg text-slate-800">Pembayaran QRIS</h3><button onclick="closePaymentModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 ml-auto -mr-2 cursor-pointer"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="space-y-5 text-center">
+      <div><p class="text-xs text-slate-500 font-medium mb-1">Total Tagihan</p><h2 id="payment-total-amount" class="text-3xl font-extrabold text-goge-primary">Rp 0</h2></div>
+      <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-4 flex flex-col items-center justify-center relative mx-4">
+         <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="h-6 mb-3">
+         <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-2">
+             <img id="customer-qris-img" src="" alt="QR Code" class="w-40 h-40 object-contain">
+         </div>
+         <p id="customer-qris-name" class="text-[10px] text-slate-400 font-bold uppercase"></p>
+      </div>
+      <div class="text-left px-2">
+         <label class="block text-xs font-bold text-slate-600 mb-2">Upload Bukti Transfer <span class="text-red-500">*</span></label>
+         <label for="receipt-upload" class="flex flex-col items-center justify-center w-full h-24 bg-goge-light/50 border border-goge-primary/30 rounded-xl cursor-pointer hover:bg-goge-light transition-colors group relative overflow-hidden">
+            <div id="upload-placeholder" class="flex flex-col items-center justify-center"><i class="fa-solid fa-cloud-arrow-up text-xl text-goge-primary mb-1"></i><p class="text-[11px] font-medium text-goge-dark">Ketuk untuk memilih foto/screenshot</p></div>
+            <img id="upload-preview" src="#" alt="Preview" class="absolute inset-0 w-full h-full object-cover hidden opacity-50 group-hover:opacity-30">
+            <div id="upload-success-text" class="absolute inset-0 hidden flex items-center justify-center bg-goge-primary/90 text-white text-xs font-bold gap-2"><i class="fa-solid fa-check-circle"></i> Bukti Terpilih</div>
+         </label>
+         <input type="file" id="receipt-upload" accept="image/*" onchange="handleReceiptSelect(event)">
+      </div>
+      <div class="pt-4 pb-2 border-t border-slate-100"><button id="btn-submit-order" onclick="submitFinalOrder()" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 transition-all text-sm flex justify-center items-center gap-2 cursor-pointer">Selesaikan Pembayaran</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pratinjau Bukti Bayar -->
+<div id="modal-receipt-preview" class="fixed inset-0 bg-black/80 z-[110] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+   <div class="bg-white rounded-3xl w-full max-w-[360px] p-5 relative text-center">
+      <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+         <h3 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-receipt text-goge-primary mr-1"></i> Bukti Pembayaran</h3>
+         <button onclick="closeReceiptModal()" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-xs"></i></button>
+      </div>
+      <div class="w-full h-80 bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-200 mb-4">
+         <img id="receipt-preview-img" src="" alt="Bukti Transfer" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='https://placehold.co/300x300?text=Gagal+Memuat+Gambar';">
+      </div>
+      <button onclick="closeReceiptModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs cursor-pointer">Tutup</button>
+   </div>
+</div>
+
+<!-- Halaman Login / Pendaftaran -->
+<section id="content-login" class="min-h-screen login-bg flex flex-col justify-center items-center p-6 fade-in hidden z-50 relative overflow-y-auto pt-10 pb-20">
+  <div class="w-full max-w-sm flex flex-col items-center">
+    <div id="login-logo-container" class="bg-white p-4 rounded-3xl mb-2 shadow-lg flex items-center justify-center w-16 h-16 overflow-hidden">
+       <i id="login-logo-icon" class="fa-solid fa-book-open text-4xl text-goge-primary relative"></i>
+       <img id="login-logo-img" src="" alt="Logo" class="w-full h-full object-contain hidden">
+    </div>
+    <h1 class="text-3xl font-extrabold text-white mb-1 tracking-wide text-center">GRAVION</h1>
     
-    @media (min-width: 768px) {
-      .app-container {
-        max-width: 1536px !important;
-        border-radius: 1.5rem;
-        margin: 2rem auto;
-        min-height: calc(100vh - 4rem);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        padding-bottom: 4rem;
-      }
-      .desktop-grid-catalog {
-        display: grid !important;
-        grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
-        gap: 0.75rem !important;
-      }
-      .desktop-header-fixed {
-        max-width: 1536px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        border-bottom-left-radius: 1.5rem;
-        border-bottom-right-radius: 1.5rem;
-      }
-      .desktop-nav-fixed {
-        max-width: 1536px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        border-top-left-radius: 1.5rem;
-        border-top-right-radius: 1.5rem;
-      }
-      .desktop-content-max {
-        max-width: 1480px;
-        margin: 0 auto;
-      }
-    }
-
-    ::-webkit-scrollbar { width: 0px; background: transparent; }
-    .fade-in { animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .login-bg { background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?q=80&w=1000&auto=format&fit=crop') center/cover; }
-    input[type="file"] { display: none; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  </style>
-</head>
-<body class="text-slate-800">
-
-  <div class="app-container">
-
-    <!-- Modal Scanner Kamera -->
-    <div id="modal-scanner" class="fixed inset-0 bg-black/80 z-[115] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-       <div class="bg-white rounded-3xl w-full max-w-[360px] p-5 relative text-center shadow-2xl">
-          <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-             <h3 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-qrcode text-goge-primary mr-1"></i> Scan Barcode / QR Buku</h3>
-             <button onclick="closeScannerModal()" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-xs"></i></button>
-          </div>
-          <div id="reader" class="w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 mb-4 min-h-[250px]"></div>
-          <p class="text-[11px] text-slate-500 mb-3">Arahkan kamera ke barcode atau QR Code pada buku.</p>
-          <button onclick="closeScannerModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs cursor-pointer">Tutup Scanner</button>
-       </div>
+    <div class="flex bg-black/30 rounded-full p-1 w-full max-w-[240px] mt-4 mb-6 relative">
+        <div id="auth-bg-slider" class="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-goge-primary rounded-full transition-all duration-300"></div>
+        <button onclick="toggleAuthMode('login')" id="btn-tab-login" class="flex-1 text-white text-xs font-bold py-2 relative z-10">MASUK</button>
+        <button onclick="toggleAuthMode('register')" id="btn-tab-register" class="flex-1 text-white/70 text-xs font-bold py-2 relative z-10 transition-colors">DAFTAR</button>
     </div>
 
-    <!-- Custom Alert Modal -->
-    <div id="custom-alert" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-5 backdrop-blur-sm transition-opacity">
-       <div id="custom-alert-content" class="bg-white rounded-3xl w-full max-w-[320px] p-6 text-center transform transition-all scale-95 opacity-0 shadow-2xl">
-          <div id="custom-alert-icon" class="mb-4 flex justify-center"></div>
-          <h3 id="custom-alert-title" class="text-lg font-extrabold text-slate-800 mb-2">Pemberitahuan</h3>
-          <p id="custom-alert-message" class="text-sm text-slate-500 mb-6 leading-relaxed">Pesan disini</p>
-          <button onclick="closeCustomAlert()" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm hover:bg-goge-dark transition-all shadow-lg shadow-goge-primary/30 cursor-pointer">MENGERTI</button>
-       </div>
+    <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="w-full space-y-4">
+      <div class="relative"><input type="text" id="login-phone" placeholder="No. HP / Username" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
+      <div class="relative"><input type="password" id="login-password" placeholder="Password" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
+      <button type="submit" id="btn-submit-login" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 transition-all text-sm cursor-pointer mt-2 flex justify-center items-center gap-2">MASUK</button>
+    </form>
+
+    <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="w-full space-y-4 hidden">
+      <div class="bg-blue-500/20 border border-blue-400 text-white text-[10px] p-3 rounded-xl mb-2 text-center backdrop-blur-sm">
+         <i class="fa-solid fa-circle-info mr-1"></i> Wajib mendaftar bagi customer baru. No HP digunakan sebagai Username.
+      </div>
+      <div><input type="number" id="reg-phone" placeholder="No. HP WhatsApp Aktif" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
+      <div><input type="text" id="reg-name" placeholder="Nama Lengkap" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
+      <div><textarea id="reg-address" placeholder="Alamat Pengiriman Lengkap" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium h-20 resize-none"></textarea></div>
+      <div><input type="password" id="reg-password" placeholder="Buat Password" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
+      <button type="submit" id="btn-submit-register" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-500/30 transition-all text-sm cursor-pointer mt-2 flex justify-center items-center gap-2">DAFTAR SEKARANG</button>
+    </form>
+
+    <div class="text-center pt-1 mt-6"><button type="button" onclick="switchTab('catalog')" class="text-white/80 text-xs font-bold hover:text-white transition-colors cursor-pointer"><i class="fa-solid fa-arrow-left"></i> Kembali ke Katalog Tampilan Saja</button></div>
+  </div>
+</section>
+
+<!-- Halaman Utama Katalog -->
+<section id="content-catalog" class="fade-in block">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-30 bg-goge-primary rounded-b-2xl pt-4 pb-3 px-5 shadow-md space-y-2.5 desktop-header-fixed md:px-10">
+    <div class="flex justify-between items-center text-white">
+      <div class="flex items-center gap-2">
+         <div id="header-logo-wrapper" class="w-7 h-7 flex items-center justify-center bg-white/20 rounded-lg overflow-hidden">
+            <i id="header-logo-icon" class="fa-solid fa-book-open text-sm"></i>
+            <img id="header-logo-img" src="" alt="Logo" class="w-full h-full object-contain hidden">
+         </div>
+         <span class="font-bold text-base tracking-wide">GRAVION</span>
+      </div>
+      <div id="top-auth-btn" onclick="switchTab('login')" class="flex items-center gap-2 text-xs bg-white/20 pl-2 pr-3 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors max-w-[170px]">
+        <div class="w-6 h-6 rounded-full overflow-hidden bg-white/30 flex items-center justify-center shrink-0 border border-white/50" id="top-auth-avatar-box">
+          <i class="fa-solid fa-user text-white text-[10px]" id="top-auth-icon"></i>
+        </div>
+        <span class="font-bold truncate text-[11px]" id="top-auth-text">Masuk / Daftar</span>
+      </div>
     </div>
 
-    <!-- Floating WhatsApp Button -->
-    <a href="#" onclick="tanyaAdmin()" class="fixed bottom-[90px] right-5 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-500/40 z-[95] hover:bg-green-600 transition-transform hover:scale-105 cursor-pointer">
-       <i class="fa-brands fa-whatsapp text-3xl"></i>
-    </a>
-
-    <!-- Katalog Tampilan Utama (Termasuk Header dengan Tombol Scan) -->
-    <section id="content-catalog" class="fade-in block">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-30 bg-goge-primary rounded-b-2xl pt-4 pb-3 px-5 shadow-md space-y-2.5 desktop-header-fixed md:px-10">
-        <div class="flex justify-between items-center text-white">
-          <div class="flex items-center gap-2">
-             <div id="header-logo-wrapper" class="w-7 h-7 flex items-center justify-center bg-white/20 rounded-lg overflow-hidden">
-                <i id="header-logo-icon" class="fa-solid fa-book-open text-sm"></i>
-             </div>
-             <span class="font-bold text-base tracking-wide">GRAVION</span>
-          </div>
-        </div>
-        
-        <!-- Kolom Pencarian + Tombol Scan Barcode -->
-        <div class="relative flex items-center gap-2">
-           <div class="relative flex-1">
-              <i class="fa-solid fa-search absolute left-4 top-3 text-slate-400 text-xs"></i>
-              <input type="text" id="global-search" oninput="handleSearch()" onfocus="handleSearchFocus()" onblur="handleSearchBlur()" placeholder="Cari Buku / Scan Barcode..." class="w-full bg-white rounded-xl pl-9 pr-9 py-2 text-xs focus:outline-none shadow-sm text-slate-700 font-medium placeholder-slate-400">
-              <button id="clear-search-btn" onclick="clearSearchInput()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 hidden cursor-pointer text-xs"><i class="fa-solid fa-xmark"></i></button>
-           </div>
-           <!-- Tombol Pemicu Kamera Scanner -->
-           <button onclick="openScannerModal()" class="bg-white text-goge-primary px-3 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-goge-light transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="Scan Barcode">
-              <i class="fa-solid fa-camera text-sm"></i>
-           </button>
-        </div>
-      </div>
-
-      <div class="pt-[110px] px-3 space-y-4 md:px-6 md:pt-[130px] desktop-content-max">
-        <div id="collapsible-search-hide" class="space-y-4 transition-all duration-300">
-          <div class="bg-goge-primary/10 p-3 rounded-2xl border border-goge-primary/20">
-            <p class="text-[10px] font-bold text-goge-primary mb-2 text-center uppercase tracking-wider">Pilih Cabang Toko</p>
-            <div id="cabang-filter-container" class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar justify-start md:justify-center"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between mb-2"><h3 class="font-bold text-sm text-slate-800">Katalog Produk</h3></div>
-          <div id="catalog-grid" class="grid grid-cols-3 gap-2 pb-4 desktop-grid-catalog">
-             <div class="col-span-3 md:col-span-8 text-center text-slate-400 py-10 text-sm font-medium"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-goge-primary"></i><br>Memuat Produk dari Database...</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
+    <!-- Kolom Pencarian + Tombol Scan Kamera -->
+    <div class="relative flex items-center gap-2">
+       <div class="relative flex-1">
+          <i class="fa-solid fa-search absolute left-4 top-3 text-slate-400 text-xs"></i>
+          <input type="text" id="global-search" oninput="handleSearch()" onfocus="handleSearchFocus()" onblur="handleSearchBlur()" placeholder="Cari Buku / Scan Barcode..." class="w-full bg-white rounded-xl pl-9 pr-9 py-2 text-xs focus:outline-none shadow-sm text-slate-700 font-medium placeholder-slate-400">
+          <button id="clear-search-btn" onclick="clearSearchInput()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 hidden cursor-pointer text-xs"><i class="fa-solid fa-xmark"></i></button>
+       </div>
+       <!-- Tombol Pemicu Kamera Scanner -->
+       <button onclick="openScannerModal()" class="bg-white text-goge-primary px-3 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-goge-light transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="Scan Barcode">
+          <i class="fa-solid fa-camera text-sm"></i>
+       </button>
+    </div>
   </div>
 
-  <script>
-    // URL Web App Google Apps Script Anda (Ganti dengan URL /exec Anda)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxRuFR-cVhRMPjbyOocCjLgiglWg-sTB9DuiIwjZlw0k57T7MemmUuj1qTgDjx2sm_K/exec";
+  <div class="pt-[110px] px-3 space-y-4 md:px-6 md:pt-[130px] desktop-content-max">
+    <div id="collapsible-search-hide" class="space-y-4 transition-all duration-300">
+      <div class="bg-goge-primary/10 p-3 rounded-2xl border border-goge-primary/20">
+        <p class="text-[10px] font-bold text-goge-primary mb-2 text-center uppercase tracking-wider">Pilih Cabang Toko</p>
+        <div id="cabang-filter-container" class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar justify-start md:justify-center"></div>
+      </div>
 
-    let masterData = [];
-    let currentCabangFilter = 'Semua';
-    let cabangList = ["Toko Miko", "Pam Miko", "Toko Pusat", "New Store"];
-    let html5QrCode = null;
+      <div class="bg-slate-800 rounded-2xl overflow-hidden shadow-lg relative flex items-center p-0 md:h-36">
+        <div class="p-5 flex-1 relative z-10 md:p-6">
+           <span id="promo-badge-text" class="inline-block bg-yellow-400 text-slate-900 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase mb-1">PROMO MINGGU INI!</span>
+           <h2 id="promo-title-text" class="text-white text-lg font-extrabold leading-tight mb-1 md:text-xl">Spesial Diskon<br>Buku Populer</h2>
+        </div>
+        <div class="w-1/2 h-full absolute right-0">
+           <img id="promo-banner-img" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop" class="w-full h-full object-cover rounded-l-3xl opacity-80" alt="Promo">
+           <div class="absolute inset-0 bg-gradient-to-r from-slate-800 to-transparent"></div>
+        </div>
+      </div>
+    </div>
 
-    document.addEventListener('DOMContentLoaded', function() {
-        fetchMasterDataFromGAS();
-    });
+    <div>
+      <div class="flex items-center justify-between mb-2"><h3 class="font-bold text-sm text-slate-800">Katalog Produk</h3></div>
+      <div id="catalog-grid" class="grid grid-cols-3 gap-2 pb-4 desktop-grid-catalog">
+         <div class="col-span-3 md:col-span-8 text-center text-slate-400 py-10 text-sm font-medium"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-goge-primary"></i><br>Memuat Produk dari Google Sheets...</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    // Mengambil data barang langsung dari Google Apps Script secara asynchronous (JSONP/Fetch)
-    function fetchMasterDataFromGAS() {
-        fetch(GAS_API_URL)
-            .then(res => res.text())
-            .then(text => {
-                // Karena GAS mengembalikan halaman HTML Web App, kita ambil data master melalui pemanggilan fungsi atau endpoint khusus, 
-                // Atau jika Anda menggunakan script, pastikan memuat data optimasi:
-                // Cara paling mudah di GitHub Pages adalah melakukan fetch ke endpoint dengan parameter atau memuat data dummy/cache jika diperlukan.
-            })
-            .catch(err => {
-                console.warn("Gagal memuat langsung, menggunakan simulasi data / contoh lokal.");
-            });
+<!-- Halaman Keranjang -->
+<section id="content-cart" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3 rounded-b-2xl shadow-md"><button onclick="switchTab('catalog')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Keranjang Saya</h2></div>
+  <div id="cart-items-container" class="pt-[88px] px-5 pb-24 space-y-4"></div>
+</section>
 
-        // Alternatif jembatan aman jika menggunakan google.script.run (hanya aktif di dalam Google environment):
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-            google.script.run.withSuccessHandler(onDataLoaded).getOptimizedMasterItems();
-        } else {
-            // Contoh data dummy/fallback jika diakses murni statis di GitHub Pages sebelum terhubung penuh
-            onDataLoaded({
-                status: "success",
-                data: [
-                    { idBarang: "B001", namaBarang: "The Extraordinary Adventure of Arsene Lupin", cabang: "Toko Pusat", stok: 10, rak: "A-01", harga: 75000, image: "" },
-                    { idBarang: "B002", namaBarang: "Perempuan Patah Hati", cabang: "Toko Miko", stok: 5, rak: "B-02", harga: 85000, image: "" }
-                ]
-            });
-        }
-    }
+<!-- Halaman Riwayat Pesanan -->
+<section id="content-orders" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50">
+    <div class="bg-goge-primary text-white p-4 flex items-center gap-3 shadow-md"><button onclick="switchTab('profile')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Riwayat Pesanan</h2></div>
+    <div class="flex px-5 pt-4 bg-white border-b border-slate-200 shadow-sm rounded-b-2xl">
+      <div id="tab-order-active" onclick="setOrderFilter('active')" class="flex-1 text-center font-bold text-sm text-goge-primary border-b-2 border-goge-primary pb-3 cursor-pointer">Sedang Berjalan</div>
+      <div id="tab-order-done" onclick="setOrderFilter('done')" class="flex-1 text-center font-semibold text-sm text-slate-400 pb-3 cursor-pointer hover:text-slate-600 border-b-2 border-transparent">Selesai</div>
+    </div>
+  </div>
+  <div id="customer-orders-container" class="pt-[140px] px-5 pb-24 space-y-4"></div>
+</section>
 
-    function onDataLoaded(response) {
-        try {
-            if (typeof response === 'string') response = JSON.parse(response);
-            if (Array.isArray(response)) masterData = response;
-            else if (response && response.status === "success" && Array.isArray(response.data)) { masterData = response.data; }
-            else masterData = [];
-        } catch (e) { masterData = []; }
-        
-        renderCabangDropdowns();
-        applyFilters();
-    }
+<!-- Halaman Profil Pengguna -->
+<section id="content-profile" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="bg-slate-800 rounded-b-[2.5rem] pt-10 pb-10 px-5 text-center shadow-lg relative">
+    <div class="relative inline-block mb-3">
+      <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto shadow-inner overflow-hidden border-4 border-goge-primary/30 relative group cursor-pointer" onclick="document.getElementById('profile-avatar-input').click()">
+        <img id="profile-avatar-img" src="" class="w-full h-full object-cover hidden">
+        <i id="profile-avatar-placeholder" class="fa-solid fa-user text-4xl text-slate-300"></i>
+        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <i class="fa-solid fa-camera text-white text-lg"></i>
+        </div>
+      </div>
+      <input type="file" id="profile-avatar-input" accept="image/*" onchange="handleProfileAvatarUpload(event)">
+    </div>
+    <h3 id="profile-name" class="font-bold text-xl text-white tracking-wide">Pengguna Gravion</h3>
+    <p id="profile-phone" class="text-sm text-slate-300 mt-0.5 font-medium">-</p>
+    <div class="mt-2 inline-block bg-white/20 text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider" id="profile-role-badge">CUSTOMER</div>
+  </div>
 
-    // --- FUNGSI SCANNER KAMERA (HTML5-QRCODE) ---
-    function openScannerModal() {
-        document.getElementById('modal-scanner').classList.remove('hidden');
-        
-        // Memulai pemindaian kamera belakang (environment)
-        setTimeout(() => {
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("reader");
-            }
-            html5QrCode.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 150 }
-                },
-                (decodedText, decodedResult) => {
-                    // Ketika Barcode/QR berhasil dibaca:
-                    handleScanSuccess(decodedText);
-                },
-                (errorMessage) => {
-                    // Scanning error or searching frame, abaikan agar tidak mengganggu console
-                }
-            ).catch(err => {
-                showCustomAlert("Akses Kamera Ditolak", "Pastikan Anda memberikan izin akses kamera pada browser.", "error");
-                closeScannerModal();
-            });
-        }, 300);
-    }
+  <div class="px-5 pt-6 pb-24 space-y-4">
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
+       <h4 class="font-bold text-sm text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2"><i class="fa-solid fa-user-pen text-goge-primary"></i> Edit Data Profil</h4>
+       <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Nama Lengkap</label>
+          <input type="text" id="edit-profile-name" placeholder="Masukkan nama Anda..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-goge-primary">
+       </div>
+       <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Alamat Utama Pengiriman</label>
+          <textarea id="edit-profile-address" placeholder="Masukkan alamat lengkap pengiriman..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-goge-primary h-20 resize-none"></textarea>
+       </div>
+       <button onclick="saveUserProfileData()" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3 rounded-xl shadow-md transition-all text-xs flex justify-center items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan (Lokal)
+       </button>
+    </div>
+    <button onclick="handleLogout()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 rounded-xl shadow-md transition-all text-sm cursor-pointer">KELUAR</button>
+  </div>
+</section>
 
-    function closeScannerModal() {
-        if (html5QrCode && html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => {
-                document.getElementById('modal-scanner').classList.add('hidden');
-            }).catch(err => {
-                document.getElementById('modal-scanner').classList.add('hidden');
-            });
-        } else {
-            document.getElementById('modal-scanner').classList.add('hidden');
-        }
-    }
+<!-- Dashboard Admin Menu Utama -->
+<section id="content-settings" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3"><h2 class="font-bold text-lg">Dashboard Admin</h2></div>
+  <div class="pt-[88px] px-5 pb-24 space-y-4">
+     
+     <div onclick="switchTab('admin-master')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+        <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Master Barang</h4><p class="text-[10px] text-slate-400">Tambah, Edit, Hapus Buku</p></div>
+        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+     </div>
 
-    function handleScanSuccess(codeText) {
-        closeScannerModal();
-        // Masukkan hasil scan ke kolom pencarian otomatis
-        const searchInput = document.getElementById('global-search');
-        if (searchInput) {
-            searchInput.value = codeText;
-            handleSearch();
-        }
-        showCustomAlert("Berhasil Scan", `Kode terdeteksi: <b>${codeText}</b>`, "success");
-    }
+     <div onclick="switchTab('admin-cabang')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+        <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-store"></i></div>
+        <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Kelola Cabang</h4><p class="text-[10px] text-slate-400">Atur lokasi dan daftar toko</p></div>
+        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+     </div>
 
-    // --- FILTER & RENDER KATALOG ---
-    function filterByCabang(cabang) { 
-        currentCabangFilter = cabang; 
-        renderCabangDropdowns(); 
-        applyFilters(); 
-    }
+     <div onclick="switchTab('admin-orders')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+        <div class="w-12 h-12 bg-green-50 text-green-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-list"></i></div>
+        <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Daftar Pesanan</h4><p class="text-[10px] text-slate-400">Konfirmasi & update status order</p></div>
+        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+     </div>
 
-    function applyFilters() {
-      const searchInput = document.getElementById('global-search') ? document.getElementById('global-search').value : '';
-      let filtered = masterData.filter(item => {
-        let itemCabangStr = String(item.cabang || "Lainnya").toLowerCase();
-        let matchCabang = (currentCabangFilter === 'Semua') || (itemCabangStr === currentCabangFilter.toLowerCase());
-        let matchQuery = matchFlexibleQuery((item.idBarang || '') + ' ' + (item.namaBarang || '') + ' ' + (item.rak || ''), searchInput);
-        return matchCabang && matchQuery;
-      });
-      renderCatalog(filtered);
-    }
+     <div onclick="switchTab('admin-logo')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+        <div class="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-icons"></i></div>
+        <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Pengaturan Logo Website</h4><p class="text-[10px] text-slate-400">Ganti logo di samping teks GRAVION</p></div>
+        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+     </div>
 
-    function handleSearch() {
-        const searchInput = document.getElementById('global-search');
-        const clearBtn = document.getElementById('clear-search-btn');
-        if (searchInput && searchInput.value.trim().length > 0) {
-            clearBtn.classList.remove('hidden');
-        } else if (clearBtn) {
-            clearBtn.classList.add('hidden');
-        }
-        applyFilters();
-    }
+     <div onclick="switchTab('admin-promo')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+        <div class="w-12 h-12 bg-pink-50 text-pink-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-image"></i></div>
+        <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Banner Promo Minggu Ini</h4><p class="text-[10px] text-slate-400">Ganti gambar & teks promo</p></div>
+        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+     </div>
 
-    function clearSearchInput() {
-        const searchInput = document.getElementById('global-search');
-        if (searchInput) {
-            searchInput.value = '';
-            document.getElementById('clear-search-btn').classList.add('hidden');
-            applyFilters();
-        }
-    }
+     <div onclick="switchTab('admin-users')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+        <div class="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-users-gear"></i></div>
+        <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Kelola Pengguna</h4><p class="text-[10px] text-slate-400">Atur hak akses & No WhatsApp Admin</p></div>
+        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+     </div>
 
-    function matchFlexibleQuery(text, query) {
-        if (!query) return true;
-        const cleanText = String(text || '').toLowerCase(); 
-        const words = String(query).toLowerCase().trim().split(/\s+/);
-        return words.every(word => cleanText.includes(word));
-    }
+     <div onclick="switchTab('admin-qris')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+        <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-qrcode"></i></div>
+        <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Pengaturan QRIS</h4><p class="text-[10px] text-slate-400">Perbarui barcode pembayaran</p></div>
+        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+     </div>
 
-    function renderCabangDropdowns() {
-        const filterContainer = document.getElementById('cabang-filter-container');
-        if(!filterContainer) return;
-        let activeStyle = "bg-goge-primary text-white"; 
-        let inactiveStyle = "bg-white text-goge-primary";
-        let html = `<div onclick="filterByCabang('Semua')" class="flex flex-col items-center gap-1 cursor-pointer shrink-0"><div class="w-11 h-11 rounded-xl shadow-sm flex items-center justify-center text-sm border border-slate-200 transition-colors ${currentCabangFilter === 'Semua' ? activeStyle : inactiveStyle}"><i class="fa-solid fa-layer-group"></i></div><span class="text-[9px] font-semibold ${currentCabangFilter === 'Semua' ? 'text-goge-primary' : 'text-slate-500'}">Semua</span></div>`;
-        cabangList.forEach(c => {
-            let isActive = currentCabangFilter === c;
-            html += `<div onclick="filterByCabang('${c}')" class="flex flex-col items-center gap-1 cursor-pointer shrink-0"><div class="w-11 h-11 rounded-xl shadow-sm flex items-center justify-center text-sm border border-slate-200 transition-colors ${isActive ? activeStyle : inactiveStyle}"><i class="fa-solid fa-store"></i></div><span class="text-[9px] font-semibold truncate max-w-[60px] text-center ${isActive ? 'text-goge-primary' : 'text-slate-500'}">${c}</span></div>`;
-        });
-        filterContainer.innerHTML = html;
-    }
+  </div>
+</section>
 
-    function renderCatalog(items) {
-      const grid = document.getElementById('catalog-grid'); 
-      if (!grid) return; 
-      grid.innerHTML = ''; 
-      if (!items || items.length === 0) { 
-          grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku yang ditemukan.</p>'; 
-          return; 
-      }
-      items.forEach((item) => {
-        let stock = item.stok || item.stock || 0; 
-        let rak = item.rak || item.lokasiRak || '-'; 
-        let imgUrl = item.image ? item.image : 'https://placehold.co/150x200/e2e8f0/94a3b8?text=No+Cover'; 
-        
-        grid.insertAdjacentHTML('beforeend', `
-          <div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 relative group flex flex-col justify-between">
-            <div>
-              <div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 flex items-center justify-center overflow-hidden relative">
-                <img src="${imgUrl}" alt="${item.namaBarang}" class="w-full h-full object-cover">
-                <div class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md text-white text-[7px] font-bold px-1.5 py-0.5 rounded shadow flex items-center gap-0.5 z-10 border border-white/20">
-                   <i class="fa-solid fa-bookmark text-[6px] text-amber-400"></i> ${rak}
+<!-- Sub-page: Admin Logo Settings -->
+<section id="content-admin-logo" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
+     <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
+     <h2 class="font-bold text-lg">Pengaturan Logo Website</h2>
+  </div>
+  <div class="pt-[100px] px-5 pb-24 space-y-4">
+     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-5 text-center">
+         <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2 text-left">Upload Logo Baru (Format PNG/JPG/SVG)</label>
+            <div class="w-32 h-32 mx-auto bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex items-center justify-center relative overflow-hidden cursor-pointer group shadow-inner" onclick="document.getElementById('admin-logo-upload').click()">
+                <img id="admin-logo-preview" src="" class="w-full h-full object-contain p-2 hidden">
+                <div id="admin-logo-placeholder-preview" class="flex flex-col items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-image text-3xl mb-1"></i>
+                    <span class="text-[10px]">Pilih Logo</span>
                 </div>
-              </div>
-              <div class="space-y-0.5">
-                <h4 class="font-bold text-[9px] text-slate-800 line-clamp-2 leading-tight">${item.namaBarang}</h4>
-                <div class="flex items-center justify-between text-[7px] text-slate-400">
-                   <span class="font-mono text-[8px] text-blue-600">${item.idBarang || ''}</span>
-                   <span class="font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 shrink-0 ml-1">Stok: ${stock}</span>
+                <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
+                    <i class="fa-solid fa-camera text-2xl mb-1"></i><span class="text-[10px] font-bold">Ganti Logo</span>
                 </div>
-              </div>
             </div>
-            <div class="flex items-center justify-between pt-1.5 mt-auto">
-               <span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span>
+            <input type="file" id="admin-logo-upload" accept="image/*" class="hidden" onchange="handleAdminLogoUpload(event)">
+         </div>
+         <div class="flex gap-2">
+             <button onclick="resetDefaultLogo()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition-colors cursor-pointer"><i class="fa-solid fa-rotate-left mr-1"></i> Gunakan Ikon Default</button>
+             <button id="btn-simpan-logo" onclick="simpanPengaturanLogo()" class="flex-1 bg-goge-primary hover:bg-goge-dark transition-colors text-white font-bold py-3 rounded-xl shadow-lg shadow-goge-primary/30 text-xs cursor-pointer flex justify-center items-center gap-1"><i class="fa-solid fa-save"></i> Simpan Logo</button>
+         </div>
+     </div>
+  </div>
+</section>
+
+<!-- Sub-page: Admin Promo Banner -->
+<section id="content-admin-promo" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
+     <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
+     <h2 class="font-bold text-lg">Pengaturan Banner Promo</h2>
+  </div>
+  <div class="pt-[100px] px-5 pb-24 space-y-4">
+     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+         <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2">Upload Gambar Banner Baru</label>
+            <div class="w-full h-40 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer group" onclick="document.getElementById('admin-promo-upload').click()">
+                <img id="admin-promo-preview" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
+                    <i class="fa-solid fa-camera text-2xl mb-1"></i><span class="text-[10px] font-bold">Ganti Gambar Banner</span>
+                </div>
             </div>
-          </div>
-        `);
-      });
-    }
+            <input type="file" id="admin-promo-upload" accept="image/*" class="hidden" onchange="handleAdminPromoUpload(event)">
+         </div>
+         <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Badge Atas (Cth: PROMO MINGGU INI!)</label>
+              <input type="text" id="admin-promo-badge" placeholder="PROMO MINGGU INI!" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-goge-primary text-slate-700">
+         </div>
+         <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Judul / Teks Promo (Bisa pakai &lt;br&gt; untuk baris baru)</label>
+              <textarea id="admin-promo-title" placeholder="Spesial Diskon Buku Populer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:border-goge-primary h-20 resize-none text-slate-700"></textarea>
+         </div>
+         <button id="btn-simpan-promo" onclick="simpanPengaturanPromo()" class="w-full bg-goge-primary hover:bg-goge-dark transition-colors text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 text-sm cursor-pointer flex justify-center items-center gap-1"><i class="fa-solid fa-save"></i> Terapkan Banner Promo</button>
+     </div>
+  </div>
+</section>
 
-    function showCustomAlert(title, message, type = 'info') {
-        const modal = document.getElementById('custom-alert'); 
-        const content = document.getElementById('custom-alert-content'); 
-        const iconContainer = document.getElementById('custom-alert-icon');
-        document.getElementById('custom-alert-title').innerText = title; 
-        document.getElementById('custom-alert-message').innerHTML = String(message).replace(/\n/g, '<br>');
-        if (type === 'success') iconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-5xl text-goge-primary drop-shadow-md"></i>';
-        else if (type === 'warning' || type === 'error') iconContainer.innerHTML = '<i class="fa-solid fa-circle-exclamation text-5xl text-red-500 drop-shadow-md"></i>';
-        else iconContainer.innerHTML = '<i class="fa-solid fa-circle-info text-5xl text-blue-500 drop-shadow-md"></i>';
-        modal.classList.remove('hidden'); 
-        setTimeout(() => { content.classList.remove('scale-95', 'opacity-0'); content.classList.add('scale-100', 'opacity-100'); }, 10);
-    }
-    
-    function closeCustomAlert() { 
-        const modal = document.getElementById('custom-alert'); 
-        const content = document.getElementById('custom-alert-content'); 
-        content.classList.remove('scale-100', 'opacity-100'); 
-        content.classList.add('scale-95', 'opacity-0'); 
-        setTimeout(() => { modal.classList.add('hidden'); }, 200); 
-    }
+<!-- Sub-page: Admin Master Barang -->
+<section id="content-admin-master" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md space-y-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3"><button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Master Barang</h2></div>
+      <button onclick="openBarangModalBaru()" class="text-xs bg-white text-goge-primary px-3 py-1.5 rounded-lg font-bold cursor-pointer hover:bg-goge-light transition-colors shadow-sm"><i class="fa-solid fa-plus"></i> Baru</button>
+    </div>
+    <div class="relative"><i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i><input type="text" id="admin-search-barang" oninput="handleAdminSearch()" placeholder="Cari nama buku (bebas/acak)..." class="w-full bg-white rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none text-slate-700 font-medium placeholder-slate-400 cursor-text shadow-inner"></div>
+  </div>
+  <div class="pt-[130px] px-5 pb-24 space-y-3" id="admin-master-list"></div>
+</section>
 
-    function handleSearchFocus() {}
-    function handleSearchBlur() {}
-    function tanyaAdmin() {
-        window.open(`https://wa.me/6281234567890?text=${encodeURIComponent("Halo Admin, saya ingin bertanya...")}`, '_blank');
-    }
-  </script>
-</body>
-</html>
+<!-- Sub-page: Admin Kelola Cabang -->
+<section id="content-admin-cabang" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
+     <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
+     <h2 class="font-bold text-lg">Kelola Cabang</h2>
+  </div>
+  <div class="pt-[100px] px-5 pb-24 space-y-4">
+     <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-2 items-center">
+         <input type="text" id="new-cabang-input" placeholder="Masukkan nama cabang baru..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-goge-primary">
+         <button onclick="tambahCabangAdmin()" class="bg-orange-500 hover:bg-orange-600 text-white w-11 h-11 rounded-xl shadow-md flex justify-center items-center transition-colors cursor-pointer"><i class="fa-solid fa-plus text-lg"></i></button>
+     </div>
+     <div>
+        <h3 class="font-bold text-xs text-slate-500 mb-2 uppercase tracking-wide">Daftar Cabang Aktif</h3>
+        <div id="admin-cabang-list" class="space-y-2"></div>
+     </div>
+  </div>
+</section>
+
+<!-- Sub-page: Admin Daftar Pesanan -->
+<section id="content-admin-orders" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
+     <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
+     <h2 class="font-bold text-lg">Daftar Semua Pesanan</h2>
+  </div>
+  <div class="pt-[100px] px-5 pb-24 space-y-4" id="admin-all-orders-list"></div>
+</section>
+
+<!-- Sub-page: Admin Kelola Pengguna & WhatsApp -->
+<section id="content-admin-users" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
+     <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
+     <h2 class="font-bold text-lg">Kelola Pengguna & WhatsApp</h2>
+  </div>
+  <div class="pt-[100px] px-5 pb-24 space-y-6">
+     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+         <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> Pengaturan No. WA Admin (Maks 5)</h4>
+         <p class="text-[10px] text-slate-400">Masukkan nomor WhatsApp admin (format 62..., pisahkan dengan koma jika lebih dari satu).</p>
+         <textarea id="admin-whatsapp-input" placeholder="Cth: 6281234567890, 6289876543210" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-goge-primary h-20 resize-none font-mono"></textarea>
+         <button onclick="saveAdminWhatsAppSettings()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all cursor-pointer"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Nomor WA Admin</button>
+     </div>
+
+     <div>
+        <h3 class="font-bold text-xs text-slate-500 mb-2 uppercase tracking-wide">Daftar Akun Pengguna & Hak Akses</h3>
+        <div id="admin-users-list" class="space-y-3"></div>
+     </div>
+  </div>
+</section>
+
+<!-- Sub-page: Admin QRIS -->
+<section id="content-admin-qris" class="fade-in hidden bg-slate-50 min-h-screen">
+  <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
+     <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
+     <h2 class="font-bold text-lg">Pengaturan QRIS</h2>
+  </div>
+  <div class="pt-[100px] px-5 pb-24 space-y-4">
+     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-5 text-center">
+         <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2 text-left">Upload Barcode Baru</label>
+            <div class="w-48 h-48 mx-auto bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer group" onclick="document.getElementById('admin-qris-upload').click()">
+                <img id="admin-qris-preview" src="" class="w-full h-full object-contain p-2">
+                <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
+                    <i class="fa-solid fa-camera text-2xl mb-1"></i><span class="text-[10px] font-bold">Ubah Gambar</span>
+                </div>
+            </div>
+            <input type="file" id="admin-qris-upload" accept="image/*" class="hidden" onchange="handleAdminQrisUpload(event)">
+         </div>
+         <div class="text-left">
+              <label class="block text-xs font-bold text-slate-600 mb-1">Nama Merchant (BCA / GoPay / Jago)</label>
+              <input type="text" id="admin-qris-name" placeholder="Misal: Toko Buku Virion" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-goge-primary text-slate-700">
+         </div>
+         <button id="btn-simpan-qris" onclick="simpanPengaturanQris()" class="w-full bg-goge-primary hover:bg-goge-dark transition-colors text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 text-sm cursor-pointer flex justify-center items-center gap-1"><i class="fa-solid fa-save"></i> Terapkan Pengaturan</button>
+     </div>
+  </div>
+</section>
+
+<!-- Bottom Navigation Bar -->
+<nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[414px] mx-auto bg-white border-t border-slate-200 flex justify-around items-center pt-2 pb-3 shadow-[0_-10px_20px_rgba(0,0,0,0.03)] z-40 rounded-t-2xl desktop-nav-fixed md:rounded-b-2xl">
+  <div onclick="switchTab('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-goge-primary transition-colors"><i class="fa-solid fa-house text-lg"></i><span class="text-[9px] font-bold">Beranda</span></div>
+  <div onclick="switchTab('cart')" id="nav-cart" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors relative"><i class="fa-solid fa-cart-shopping text-lg relative"><span id="cart-badge" class="absolute -top-1 -right-1.5 bg-red-500 border border-white text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center hidden">0</span></i><span class="text-[9px] font-bold">Keranjang</span></div>
+  <div onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-solid fa-clock-rotate-left text-lg"></i><span class="text-[9px] font-bold">Riwayat</span></div>
+  <div onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-regular fa-user text-lg"></i><span class="text-[9px] font-bold">Profil</span></div>
+  <div onclick="switchTab('settings')" id="hidden-desktop-settings" class="hidden flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-solid fa-gear text-lg"></i><span class="text-[9px] font-bold">Pengaturan</span></div>
+</nav>
