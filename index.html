@@ -707,7 +707,14 @@
             }
         }, 3000);
 
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
+        fetch(GAS_WEB_APP_URL + "?action=getOptimizedMasterItems")
+          .then(res => res.json())
+          .then(res => {
+             dataHasLoaded = true; clearTimeout(safetyTimer); onDataLoaded(res);
+          })
+          .catch(err => {
+             dataHasLoaded = true; clearTimeout(safetyTimer); onDataLoaded({ status: "error" });
+          });
             google.script.run.withSuccessHandler(function(res) { 
                 dataHasLoaded = true; clearTimeout(safetyTimer); onDataLoaded(res); 
             }).withFailureHandler(function(err) { 
