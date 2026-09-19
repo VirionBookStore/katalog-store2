@@ -4,25 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Gravion Book Online - Katalog & Pembelian</title>
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: { extend: { fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'], }, colors: { goge: { primary: '#1A6B52', dark: '#13503D', light: '#E8F5E9', bg: '#F8FAFC', navy: '#1E293B' } } } }
     }
   </script>
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Pustaka Scanner Kamera -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
   <style>
     body { background-color: #e2e8f0; -webkit-tap-highlight-color: transparent; }
     .app-container { max-width: 414px; margin: 0 auto; background-color: #F8FAFC; min-height: 100vh; position: relative; overflow-x: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.1); padding-bottom: 80px; }
+    
     @media (min-width: 768px) {
-      .app-container { max-width: 1536px !important; border-radius: 1.5rem; margin: 2rem auto; min-height: calc(100vh - 4rem); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); padding-bottom: 4rem; }
+      .app-container {
+        max-width: 1536px !important;
+        border-radius: 1.5rem;
+        margin: 2rem auto;
+        min-height: calc(100vh - 4rem);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        padding-bottom: 4rem;
+      }
       .desktop-grid-catalog { display: grid !important; grid-template-columns: repeat(8, minmax(0, 1fr)) !important; gap: 0.75rem !important; }
       .desktop-header-fixed { max-width: 1536px !important; left: 50% !important; transform: translateX(-50%) !important; border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem; }
       .desktop-nav-fixed { max-width: 1536px !important; left: 50% !important; transform: translateX(-50%) !important; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; }
       .desktop-content-max { max-width: 1480px; margin: 0 auto; }
     }
+
     ::-webkit-scrollbar { width: 0px; background: transparent; }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -32,6 +45,7 @@
   </style>
 </head>
 <body class="text-slate-800">
+
   <div class="app-container">
 
     <!-- Modal Scanner Kamera -->
@@ -59,7 +73,7 @@
     <!-- Floating WhatsApp -->
     <a href="#" onclick="tanyaAdmin()" class="fixed bottom-[90px] right-5 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg z-[95] hover:bg-green-600"><i class="fa-brands fa-whatsapp text-3xl"></i></a>
 
-    <!-- Katalog -->
+    <!-- 1. Katalog / Beranda -->
     <section id="content-catalog" class="fade-in block">
       <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-30 bg-goge-primary rounded-b-2xl pt-4 pb-3 px-5 shadow-md space-y-2.5 desktop-header-fixed md:px-10">
         <div class="flex justify-between items-center text-white">
@@ -93,60 +107,91 @@
       </div>
     </section>
 
-    <!-- Login -->
+    <!-- 2. Login & Pendaftaran -->
     <section id="content-login" class="min-h-screen login-bg flex-col justify-center items-center p-6 fade-in hidden z-50 relative overflow-y-auto pt-10 pb-20">
       <div class="w-full max-w-sm flex flex-col items-center">
-        <h1 class="text-3xl font-extrabold text-white mb-4 tracking-wide text-center">GRAVION</h1>
+        <h1 class="text-3xl font-extrabold text-white mb-2 tracking-wide text-center">GRAVION</h1>
+        <div class="flex bg-black/30 rounded-full p-1 w-full max-w-[240px] mb-6 relative">
+            <div id="auth-bg-slider" class="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-goge-primary rounded-full transition-all duration-300"></div>
+            <button onclick="toggleAuthMode('login')" id="btn-tab-login" class="flex-1 text-white text-xs font-bold py-2 relative z-10">MASUK</button>
+            <button onclick="toggleAuthMode('register')" id="btn-tab-register" class="flex-1 text-white/70 text-xs font-bold py-2 relative z-10 transition-colors">DAFTAR</button>
+        </div>
         <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="w-full space-y-4">
           <input type="text" id="login-phone" placeholder="No. HP / Username" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm">
           <input type="password" id="login-password" placeholder="Password" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm">
-          <button type="submit" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm cursor-pointer">MASUK</button>
+          <button type="submit" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm cursor-pointer shadow-lg">MASUK</button>
+        </form>
+        <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="w-full space-y-4 hidden">
+          <input type="text" id="reg-phone" placeholder="No. HP WhatsApp Aktif" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm">
+          <input type="text" id="reg-name" placeholder="Nama Lengkap" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm">
+          <textarea id="reg-address" placeholder="Alamat Pengiriman" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm h-20 resize-none"></textarea>
+          <input type="password" id="reg-password" placeholder="Buat Password" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm">
+          <button type="submit" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl text-sm cursor-pointer shadow-lg">DAFTAR SEKARANG</button>
         </form>
         <div class="text-center pt-4"><button type="button" onclick="switchTab('catalog')" class="text-white/80 text-xs font-bold cursor-pointer">Kembali ke Katalog</button></div>
       </div>
     </section>
 
-    <!-- Keranjang -->
+    <!-- 3. Keranjang Belanja -->
     <section id="content-cart" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><button onclick="switchTab('catalog')" class="w-8 h-8 rounded-full bg-white/20"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Keranjang Saya</h2></div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><button onclick="switchTab('catalog')" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Keranjang Saya</h2></div>
       <div id="cart-items-container" class="pt-[88px] px-5 pb-24 space-y-4"></div>
     </section>
 
-    <!-- Pesanan -->
+    <!-- 4. Riwayat Pesanan -->
     <section id="content-orders" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><button onclick="switchTab('profile')" class="w-8 h-8 rounded-full bg-white/20"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Riwayat Pesanan</h2></div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><button onclick="switchTab('profile')" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Riwayat Pesanan</h2></div>
       <div id="customer-orders-container" class="pt-[100px] px-5 pb-24 space-y-4"></div>
     </section>
 
-    <!-- Profil -->
+    <!-- 5. Profil Akun -->
     <section id="content-profile" class="fade-in hidden bg-slate-50 min-h-screen">
       <div class="bg-slate-800 rounded-b-[2.5rem] pt-10 pb-10 px-5 text-center shadow-lg text-white">
         <h3 id="profile-name" class="font-bold text-xl">Pengguna</h3>
         <p id="profile-phone" class="text-sm text-slate-300">-</p>
         <span id="profile-role-badge" class="inline-block bg-white/20 text-[10px] px-3 py-1 rounded-full font-bold mt-2">CUSTOMER</span>
       </div>
-      <div class="px-5 pt-6 pb-24"><button onclick="handleLogout()" class="w-full bg-red-500 text-white font-bold py-3.5 rounded-xl cursor-pointer">KELUAR</button></div>
+      <div class="px-5 pt-6 pb-24 space-y-3">
+        <button onclick="switchTab('orders')" class="w-full bg-white border border-slate-200 text-slate-800 font-bold py-3.5 rounded-xl shadow-sm cursor-pointer flex items-center justify-between px-4"><span><i class="fa-solid fa-clock-rotate-left mr-2 text-goge-primary"></i> Lihat Riwayat Pesanan</span><i class="fa-solid fa-chevron-right text-xs text-slate-400"></i></button>
+        <button onclick="handleLogout()" class="w-full bg-red-500 text-white font-bold py-3.5 rounded-xl cursor-pointer shadow-md">KELUAR</button>
+      </div>
     </section>
 
-    <!-- Dashboard Admin / Pengaturan -->
+    <!-- 6. Dashboard Admin / Pengaturan Utama -->
     <section id="content-settings" class="fade-in hidden bg-slate-50 min-h-screen">
       <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><h2 class="font-bold text-lg">Dashboard Admin</h2></div>
       <div class="pt-[88px] px-5 pb-24 space-y-4">
-         <div onclick="switchTab('admin-master')" class="bg-white rounded-2xl p-4 shadow-sm border flex items-center gap-4 cursor-pointer">
+         <div onclick="switchTab('admin-master')" class="bg-white rounded-2xl p-4 shadow-sm border flex items-center gap-4 cursor-pointer hover:bg-slate-50">
             <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-stacked"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Master Barang</h4><p class="text-[10px] text-slate-400">Lihat data dari Google Sheets</p></div>
+            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Master Barang</h4><p class="text-[10px] text-slate-400">Kelola database produk</p></div>
+            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+         </div>
+         <div onclick="switchTab('admin-cabang')" class="bg-white rounded-2xl p-4 shadow-sm border flex items-center gap-4 cursor-pointer hover:bg-slate-50">
+            <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-store"></i></div>
+            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Kelola Cabang</h4><p class="text-[10px] text-slate-400">Atur lokasi toko</p></div>
             <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
          </div>
       </div>
     </section>
 
-    <!-- Master Barang List Admin -->
+    <!-- Sub-menu: Master Barang -->
     <section id="content-admin-master" class="fade-in hidden bg-slate-50 min-h-screen">
       <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 rounded-full bg-white/20"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Master Barang (Google Sheets)</h2>
+         <button onclick="switchTab('settings')" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+         <h2 class="font-bold text-lg">Master Barang</h2>
       </div>
       <div class="pt-[90px] px-5 pb-24 space-y-3" id="admin-master-list"></div>
+    </section>
+
+    <!-- Sub-menu: Kelola Cabang -->
+    <section id="content-admin-cabang" class="fade-in hidden bg-slate-50 min-h-screen">
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3">
+         <button onclick="switchTab('settings')" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+         <h2 class="font-bold text-lg">Kelola Cabang</h2>
+      </div>
+      <div class="pt-[90px] px-5 pb-24 space-y-3">
+         <div id="admin-cabang-list" class="space-y-2"></div>
+      </div>
     </section>
 
     <!-- Bottom Nav -->
@@ -164,6 +209,7 @@
 
     let masterData = [];
     let cartData = [];
+    let globalOrders = [];
     let currentCabangFilter = 'Semua';
     let cabangList = ["Toko Miko", "Pam Miko", "Toko Pusat", "New Store"];
     let currentUser = { phone: "", name: "Pengguna", role: "guest", address: "" }; 
@@ -183,8 +229,8 @@
         if (savedUser) { try { currentUser = JSON.parse(savedUser); } catch(e){} }
         updateAuthUI(); 
         renderCabangDropdowns();
+        loadCartFromStorage();
 
-        // Tarik data langsung dari Google Sheets
         callGasApi("getOptimizedMasterItems", null, function(res) {
             onDataLoaded(res);
         });
@@ -198,26 +244,39 @@
         renderAdminMasterList(masterData);
     }
 
-    function openScannerModal() {
-        document.getElementById('modal-scanner').classList.remove('hidden');
-        setTimeout(() => {
-            if (!html5QrCode) { html5QrCode = new Html5Qrcode("reader"); }
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, (text) => {
-                closeScannerModal();
-                document.getElementById('global-search').value = text;
-                handleSearch();
-                showCustomAlert("Berhasil Scan", `Kode: <b>${text}</b>`, "success");
-            }, () => {}).catch(() => {
-                showCustomAlert("Akses Ditolak", "Gagal membuka kamera.", "error");
-                closeScannerModal();
-            });
-        }, 300);
+    // Toggle Login / Register Tab
+    function toggleAuthMode(mode) {
+       const btnLogin = document.getElementById('btn-tab-login');
+       const btnReg = document.getElementById('btn-tab-register');
+       const slider = document.getElementById('auth-bg-slider');
+       const formLogin = document.getElementById('form-login');
+       const formReg = document.getElementById('form-register');
+       if(mode === 'login') {
+            slider.style.left = '4px';
+            btnLogin.classList.replace('text-white/70', 'text-white');
+            btnReg.classList.replace('text-white', 'text-white/70');
+            formLogin.classList.remove('hidden'); formReg.classList.add('hidden');
+       } else {
+            slider.style.left = 'calc(50%)';
+            btnReg.classList.replace('text-white/70', 'text-white');
+            btnLogin.classList.replace('text-white', 'text-white/70');
+            formReg.classList.remove('hidden'); formLogin.classList.add('hidden');
+       }
     }
 
-    function closeScannerModal() {
-        if (html5QrCode && html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => { document.getElementById('modal-scanner').classList.add('hidden'); });
-        } else { document.getElementById('modal-scanner').classList.add('hidden'); }
+    function handleRegister() {
+        const phone = document.getElementById('reg-phone').value.trim();
+        const name = document.getElementById('reg-name').value.trim();
+        const address = document.getElementById('reg-address').value.trim();
+        const password = document.getElementById('reg-password').value.trim();
+        if(!phone || !name || !address || !password) return showCustomAlert('Perhatian', 'Lengkapi semua data.', 'warning');
+
+        callGasApi("registerNewCustomer", { phone, name, address, password }, function(res) {
+            if(res.status === 'success') {
+                showCustomAlert('Berhasil', res.message, 'success');
+                toggleAuthMode('login');
+            } else { showCustomAlert('Gagal', res.message, 'error'); }
+        });
     }
 
     function handleLogin() {
@@ -227,7 +286,7 @@
           if(res.status === 'success') {
              currentUser = res.data;
              localStorage.setItem('gravion_user', JSON.stringify(currentUser)); 
-             updateAuthUI(); switchTab('catalog'); 
+             updateAuthUI(); loadCartFromStorage(); switchTab('catalog'); 
              showCustomAlert('Berhasil Masuk', `Selamat datang, <b>${currentUser.name}</b>`, 'success');
           } else { showCustomAlert('Gagal Masuk', res.message, 'error'); }
       });
@@ -236,7 +295,7 @@
     function handleLogout() { 
         currentUser = { phone: "", name: "Pengguna", role: "guest", address: "" }; 
         localStorage.removeItem('gravion_user'); 
-        updateAuthUI(); switchTab('catalog'); 
+        loadCartFromStorage(); updateAuthUI(); switchTab('catalog'); 
     }
 
     function updateAuthUI() {
@@ -258,8 +317,112 @@
         document.getElementById('profile-role-badge').innerText = (currentUser.role || 'guest').toUpperCase();
     }
 
+    // Keranjang Belanja
+    function addToCart(idBarang, cabang) {
+        if (currentUser.role === 'guest') {
+            showCustomAlert('Akses Terbatas', 'Silakan masuk terlebih dahulu untuk berbelanja.', 'warning');
+            switchTab('login');
+            return;
+        }
+        let item = masterData.find(m => String(m.idBarang) === String(idBarang));
+        let exist = cartData.find(c => String(c.idBarang) === String(idBarang));
+        if (exist) { exist.qty += 1; } 
+        else { cartData.push({ idBarang, cabang, qty: 1, detailBarang: item }); }
+        saveCartToStorage();
+        updateCartBadge();
+        showCustomAlert('Berhasil', 'Buku dimasukkan ke keranjang.', 'success');
+    }
+
+    function updateCartQty(idBarang, change) {
+        let item = cartData.find(c => String(c.idBarang) === String(idBarang));
+        if (item) {
+            item.qty += change;
+            if (item.qty <= 0) cartData = cartData.filter(c => String(c.idBarang) !== String(idBarang));
+        }
+        saveCartToStorage();
+        updateCartBadge();
+        renderCartUI();
+    }
+
+    function updateCartBadge() {
+        const badge = document.getElementById('cart-badge');
+        let total = cartData.reduce((sum, i) => sum + i.qty, 0);
+        if (total > 0) { badge.innerText = total; badge.classList.remove('hidden'); }
+        else { badge.classList.add('hidden'); }
+    }
+
+    function saveCartToStorage() {
+        localStorage.setItem('gravion_cart_' + (currentUser.phone || 'guest'), JSON.stringify(cartData));
+    }
+
+    function loadCartFromStorage() {
+        let saved = localStorage.getItem('gravion_cart_' + (currentUser.phone || 'guest'));
+        if (saved) { try { cartData = JSON.parse(saved) || []; } catch(e){ cartData = []; } }
+        updateCartBadge();
+    }
+
+    function renderCartUI() {
+        const container = document.getElementById('cart-items-container');
+        if(!container) return;
+        if(cartData.length === 0) {
+            container.innerHTML = `<div class="text-center text-slate-400 py-10"><i class="fa-solid fa-cart-shopping text-4xl mb-2"></i><p class="text-sm">Keranjang Anda kosong</p></div>`;
+            return;
+        }
+        let html = '';
+        let subtotal = 0;
+        cartData.forEach(item => {
+            let p = item.detailBarang || { namaBarang: "Buku", harga: 0, image: "" };
+            subtotal += (p.harga || 0) * item.qty;
+            html += `<div class="bg-white p-3 rounded-2xl shadow-sm border flex items-center gap-3">
+                <div class="w-14 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0"><img src="${p.image || 'https://placehold.co/100'}" class="w-full h-full object-cover"></div>
+                <div class="flex-1"><h4 class="font-bold text-xs line-clamp-1">${p.namaBarang}</h4><p class="text-xs font-extrabold text-goge-primary">Rp ${(p.harga||0).toLocaleString('id-ID')}</p></div>
+                <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-lg">
+                    <button onclick="updateCartQty('${item.idBarang}', -1)" class="w-6 h-6 bg-white rounded shadow-sm text-xs font-bold">-</button>
+                    <span class="text-xs font-bold w-4 text-center">${item.qty}</span>
+                    <button onclick="updateCartQty('${item.idBarang}', 1)" class="w-6 h-6 bg-white rounded shadow-sm text-xs font-bold">+</button>
+                </div>
+            </div>`;
+        });
+        html += `<div class="bg-white p-4 rounded-2xl shadow-sm border mt-4">
+            <div class="flex justify-between font-bold text-sm mb-3"><span>Subtotal:</span><span class="text-goge-primary">Rp ${subtotal.toLocaleString('id-ID')}</span></div>
+            <button onclick="checkoutCart()" class="w-full bg-goge-primary text-white font-bold py-3 rounded-xl text-xs cursor-pointer">BUAT PESANAN</button>
+        </div>`;
+        container.innerHTML = html;
+    }
+
+    function checkoutCart() {
+        if(cartData.length === 0) return;
+        let orderData = { phone: currentUser.phone, name: currentUser.name, delivery: "Dikirim", totalOngkir: 15000, items: cartData, total: cartData.reduce((s, i) => s + ((i.detailBarang.harga||0)*i.qty), 0) + 15000 };
+        callGasApi("createNewOrder", { orderData, receiptBase64: "" }, function(res) {
+            if(res.status === 'success') {
+                showCustomAlert('Berhasil', 'Pesanan dibuat! ID: ' + res.orderId, 'success');
+                cartData = []; saveCartToStorage(); updateCartBadge();
+                switchTab('orders');
+            } else { showCustomAlert('Gagal', res.message, 'error'); }
+        });
+    }
+
+    function loadOrderHistory() {
+        const container = document.getElementById('customer-orders-container');
+        if(!container) return;
+        callGasApi("getCustomerOrders", { phone: currentUser.phone }, function(res) {
+            if(res.status === 'success' && res.data.length > 0) {
+                let html = '';
+                res.data.forEach(ord => {
+                    html += `<div class="bg-white p-4 rounded-2xl shadow-sm border space-y-2">
+                        <div class="flex justify-between items-center"><span class="font-bold text-xs">${ord.orderId}</span><span class="text-[10px] font-bold bg-orange-50 text-orange-500 px-2 py-0.5 rounded">${ord.status}</span></div>
+                        <p class="text-xs text-slate-500">${ord.delivery} • Total: Rp ${Number(ord.total).toLocaleString('id-ID')}</p>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<div class="text-center text-slate-400 py-10"><p class="text-sm">Belum ada riwayat pesanan.</p></div>`;
+            }
+        });
+    }
+
+    // Katalog & Filter
     function filterByCabang(cabang) { currentCabangFilter = cabang; renderCabangDropdowns(); applyFilters(); }
-    
     function applyFilters() {
       const query = document.getElementById('global-search').value.toLowerCase();
       let filtered = masterData.filter(item => {
@@ -269,13 +432,12 @@
       });
       renderCatalog(filtered);
     }
-
     function handleSearch() { applyFilters(); }
     function clearSearchInput() { document.getElementById('global-search').value = ''; applyFilters(); }
 
     function renderCatalog(items) {
       const grid = document.getElementById('catalog-grid'); if (!grid) return; grid.innerHTML = ''; 
-      if (!items || items.length === 0) { grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku ditemukan di Google Sheets.</p>'; return; }
+      if (!items || items.length === 0) { grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku ditemukan.</p>'; return; }
       items.forEach((item) => {
         let imgUrl = item.image ? item.image : 'https://placehold.co/150x200?text=No+Cover'; 
         grid.insertAdjacentHTML('beforeend', `
@@ -285,7 +447,10 @@
               <h4 class="font-bold text-[9px] text-slate-800 line-clamp-2">${item.namaBarang}</h4>
               <p class="text-[8px] text-slate-400">${item.cabang} | Stok: ${item.stok}</p>
             </div>
-            <div class="flex items-center justify-between pt-1.5"><span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span></div>
+            <div class="flex items-center justify-between pt-1.5">
+               <span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span>
+               <button onclick="addToCart('${item.idBarang}', '${item.cabang}')" class="w-5 h-5 bg-goge-light text-goge-primary rounded flex items-center justify-center cursor-pointer hover:bg-goge-primary hover:text-white"><i class="fa-solid fa-plus text-[9px]"></i></button>
+            </div>
           </div>
         `);
       });
@@ -303,10 +468,40 @@
 
     function renderAdminMasterList(items) {
         const list = document.getElementById('admin-master-list'); if(!list) return; list.innerHTML = '';
-        if(items.length === 0) { list.innerHTML = '<p class="text-center text-xs text-slate-400 py-6">Belum ada data barang di Sheet.</p>'; return; }
+        if(items.length === 0) { list.innerHTML = '<p class="text-center text-xs text-slate-400 py-6">Belum ada data barang.</p>'; return; }
         items.forEach(item => {
-            list.insertAdjacentHTML('beforeend', `<div class="bg-white p-3 rounded-xl shadow-sm border"><h4 class="font-bold text-sm">${item.namaBarang}</h4><p class="text-xs text-slate-500">Cabang: ${item.cabang} | Stok: ${item.stok} | Rak: ${item.rak} | Rp ${Number(item.harga).toLocaleString('id-ID')}</p></div>`);
+            list.insertAdjacentHTML('beforeend', `<div class="bg-white p-3 rounded-xl shadow-sm border"><h4 class="font-bold text-sm">${item.namaBarang}</h4><p class="text-xs text-slate-500">Cabang: ${item.cabang} | Stok: ${item.stok} | Rp ${Number(item.harga).toLocaleString('id-ID')}</p></div>`);
         });
+        
+        const cabangListContainer = document.getElementById('admin-cabang-list');
+        if(cabangListContainer) {
+            cabangListContainer.innerHTML = '';
+            cabangList.forEach(cb => {
+                cabangListContainer.insertAdjacentHTML('beforeend', `<div class="bg-white p-3 rounded-xl shadow-sm border flex justify-between items-center"><span class="font-bold text-sm">${cb}</span></div>`);
+            });
+        }
+    }
+
+    // Scanner Kamera
+    function openScannerModal() {
+        document.getElementById('modal-scanner').classList.remove('hidden');
+        setTimeout(() => {
+            if (!html5QrCode) { html5QrCode = new Html5Qrcode("reader"); }
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, (text) => {
+                closeScannerModal();
+                document.getElementById('global-search').value = text;
+                handleSearch();
+                showCustomAlert("Berhasil Scan", `Kode: <b>${text}</b>`, "success");
+            }, () => {}).catch(() => {
+                showCustomAlert("Akses Ditolak", "Gagal membuka kamera.", "error");
+                closeScannerModal();
+            });
+        }, 300);
+    }
+    function closeScannerModal() {
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().then(() => { document.getElementById('modal-scanner').classList.add('hidden'); });
+        } else { document.getElementById('modal-scanner').classList.add('hidden'); }
     }
 
     function showCustomAlert(title, message, type = 'info') {
@@ -323,13 +518,15 @@
           showCustomAlert('Akses Terbatas', 'Silakan Masuk terlebih dahulu.', 'warning'); 
           tabId = 'login'; 
       }
-      const sections = ['content-login', 'content-catalog', 'content-cart', 'content-orders', 'content-profile', 'content-settings', 'content-admin-master', 'content-admin-cabang', 'content-admin-orders', 'content-admin-qris', 'content-admin-promo', 'content-admin-logo'];
+      const sections = ['content-login', 'content-catalog', 'content-cart', 'content-orders', 'content-profile', 'content-settings', 'content-admin-master', 'content-admin-cabang'];
       sections.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
 
       const target = document.getElementById('content-' + tabId);
       if (target) {
           target.classList.remove('hidden');
           if (tabId === 'login') target.classList.add('flex'); else target.classList.add('block');
+          if (tabId === 'cart') renderCartUI();
+          if (tabId === 'orders') loadOrderHistory();
       }
       document.getElementById('bottom-nav').classList.toggle('hidden', tabId === 'login');
     }
