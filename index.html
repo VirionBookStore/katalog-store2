@@ -4,49 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Gravion Book Online - Katalog & Pembelian</title>
-  
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: { extend: { fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'], }, colors: { goge: { primary: '#1A6B52', dark: '#13503D', light: '#E8F5E9', bg: '#F8FAFC', navy: '#1E293B' } } } }
     }
   </script>
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Pustaka Scanner QR/Barcode -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-
   <style>
     body { background-color: #e2e8f0; -webkit-tap-highlight-color: transparent; }
     .app-container { max-width: 414px; margin: 0 auto; background-color: #F8FAFC; min-height: 100vh; position: relative; overflow-x: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.1); padding-bottom: 80px; }
-    
     @media (min-width: 768px) {
-      .app-container {
-        max-width: 1536px !important;
-        border-radius: 1.5rem;
-        margin: 2rem auto;
-        min-height: calc(100vh - 4rem);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        padding-bottom: 4rem;
-      }
+      .app-container { max-width: 1536px !important; border-radius: 1.5rem; margin: 2rem auto; min-height: calc(100vh - 4rem); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); padding-bottom: 4rem; }
       .desktop-grid-catalog { display: grid !important; grid-template-columns: repeat(8, minmax(0, 1fr)) !important; gap: 0.75rem !important; }
       .desktop-header-fixed { max-width: 1536px !important; left: 50% !important; transform: translateX(-50%) !important; border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem; }
       .desktop-nav-fixed { max-width: 1536px !important; left: 50% !important; transform: translateX(-50%) !important; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; }
       .desktop-content-max { max-width: 1480px; margin: 0 auto; }
     }
-
     ::-webkit-scrollbar { width: 0px; background: transparent; }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .login-bg { background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?q=80&w=1000&auto=format&fit=crop') center/cover; }
     input[type="file"] { display: none; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="text-slate-800">
-
   <div class="app-container">
 
     <!-- Modal Scanner Kamera -->
@@ -57,7 +42,6 @@
              <button onclick="closeScannerModal()" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-xs"></i></button>
           </div>
           <div id="reader" class="w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 mb-4 min-h-[250px]"></div>
-          <p class="text-[11px] text-slate-500 mb-3">Arahkan kamera ke barcode atau QR Code pada buku.</p>
           <button onclick="closeScannerModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs cursor-pointer">Tutup Scanner</button>
        </div>
     </div>
@@ -65,148 +49,41 @@
     <!-- Custom Alert Modal -->
     <div id="custom-alert" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-5 backdrop-blur-sm transition-opacity">
        <div id="custom-alert-content" class="bg-white rounded-3xl w-full max-w-[320px] p-6 text-center transform transition-all scale-95 opacity-0 shadow-2xl">
-          <div id="custom-alert-icon" class="mb-4 flex justify-center"></div>
+          <div id="custom-alert-icon" class="mb-4 flex justify-center"><i class="fa-solid fa-circle-info text-5xl text-blue-500"></i></div>
           <h3 id="custom-alert-title" class="text-lg font-extrabold text-slate-800 mb-2">Pemberitahuan</h3>
-          <p id="custom-alert-message" class="text-sm text-slate-500 mb-6 leading-relaxed">Pesan disini</p>
-          <button onclick="closeCustomAlert()" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm hover:bg-goge-dark transition-all shadow-lg shadow-goge-primary/30 cursor-pointer">MENGERTI</button>
+          <p id="custom-alert-message" class="text-sm text-slate-500 mb-6 leading-relaxed">Pesan</p>
+          <button onclick="closeCustomAlert()" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm cursor-pointer">MENGERTI</button>
        </div>
     </div>
 
-    <!-- Floating WhatsApp Button -->
-    <a href="#" onclick="tanyaAdmin()" class="fixed bottom-[90px] right-5 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-500/40 z-[95] hover:bg-green-600 transition-transform hover:scale-105 cursor-pointer">
-       <i class="fa-brands fa-whatsapp text-3xl"></i>
-    </a>
+    <!-- Floating WhatsApp -->
+    <a href="#" onclick="tanyaAdmin()" class="fixed bottom-[90px] right-5 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg z-[95] hover:bg-green-600"><i class="fa-brands fa-whatsapp text-3xl"></i></a>
 
-    <!-- Modal Admin Master Barang -->
-    <div id="modal-admin-barang" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-       <div class="bg-white rounded-3xl w-full max-w-sm p-6 transform transition-all shadow-2xl relative">
-          <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-box text-blue-500 mr-2"></i>Data Barang</h3>
-          <div class="space-y-3">
-             <input type="hidden" id="admin-input-idbarang" value="">
-             <div><label class="text-xs font-bold text-slate-500">Nama Buku</label><input type="text" id="admin-input-namabarang" placeholder="Masukkan nama..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
-             <div>
-                <label class="text-xs font-bold text-slate-500">Pilih Cabang</label>
-                <select id="admin-input-cabangbarang" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></select>
-             </div>
-             <div class="flex gap-2">
-                <div class="flex-1"><label class="text-xs font-bold text-slate-500">Stok (Sistem)</label><input type="number" id="admin-input-stok" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div class="flex-1"><label class="text-xs font-bold text-slate-500">Lokasi Rak</label><input type="text" id="admin-input-rak" placeholder="Cth: A-01" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
-             </div>
-             <div><label class="text-xs font-bold text-slate-500">Harga (Rp)</label><input type="number" id="admin-input-hargabarang" placeholder="Contoh: 50000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
-             <div class="pt-3 flex gap-2">
-                <button type="button" onclick="closeAdminModal('modal-admin-barang')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm cursor-pointer">Batal</button>
-                <button type="button" onclick="simpanDataBarangMaster()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md cursor-pointer">Simpan Data</button>
-             </div>
-          </div>
-       </div>
-    </div>
-
-    <!-- Modal Status Pesanan Admin -->
-    <div id="modal-admin-status" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-      <div class="bg-white rounded-3xl w-full max-w-[320px] p-6 transform transition-all shadow-2xl relative">
-         <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2">Ubah Status Pesanan</h3>
-         <input type="hidden" id="admin-status-orderid">
-         <div class="space-y-3">
-            <select id="admin-status-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-goge-primary">
-               <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
-               <option value="Diproses">Diproses</option>
-               <option value="Dikirim">Dikirim</option>
-               <option value="Siap Diambil">Siap Diambil</option>
-               <option value="Selesai">Selesai</option>
-               <option value="Dibatalkan">Dibatalkan</option>
-            </select>
-            <div class="pt-2 flex gap-2">
-               <button onclick="closeAdminModal('modal-admin-status')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-sm cursor-pointer">Batal</button>
-               <button onclick="simpanStatusPesanan()" class="flex-1 bg-goge-primary text-white font-bold py-2.5 rounded-xl text-sm shadow-md cursor-pointer">Simpan</button>
-            </div>
-         </div>
-      </div>
-    </div>
-
-    <!-- Halaman Login / Daftar -->
-    <section id="content-login" class="min-h-screen login-bg flex-col justify-center items-center p-6 fade-in hidden z-50 relative overflow-y-auto pt-10 pb-20">
-      <div class="w-full max-w-sm flex flex-col items-center">
-        <div id="login-logo-container" class="bg-white p-4 rounded-3xl mb-2 shadow-lg flex items-center justify-center w-16 h-16 overflow-hidden">
-           <i id="login-logo-icon" class="fa-solid fa-book-open text-4xl text-goge-primary relative"></i>
-           <img id="login-logo-img" src="" alt="Logo" class="w-full h-full object-contain hidden">
-        </div>
-        <h1 class="text-3xl font-extrabold text-white mb-1 tracking-wide text-center">GRAVION</h1>
-        
-        <div class="flex bg-black/30 rounded-full p-1 w-full max-w-[240px] mt-4 mb-6 relative">
-            <div id="auth-bg-slider" class="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-goge-primary rounded-full transition-all duration-300"></div>
-            <button onclick="toggleAuthMode('login')" id="btn-tab-login" class="flex-1 text-white text-xs font-bold py-2 relative z-10">MASUK</button>
-            <button onclick="toggleAuthMode('register')" id="btn-tab-register" class="flex-1 text-white/70 text-xs font-bold py-2 relative z-10 transition-colors">DAFTAR</button>
-        </div>
-
-        <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="w-full space-y-4">
-          <div class="relative"><input type="text" id="login-phone" placeholder="No. HP / Username" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
-          <div class="relative"><input type="password" id="login-password" placeholder="Password" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-goge-primary shadow-sm text-slate-800 font-medium"></div>
-          <button type="submit" id="btn-submit-login" class="w-full bg-goge-primary hover:bg-goge-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-goge-primary/30 transition-all text-sm cursor-pointer mt-2 flex justify-center items-center gap-2">MASUK</button>
-        </form>
-
-        <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="w-full space-y-4 hidden">
-          <div><input type="number" id="reg-phone" placeholder="No. HP WhatsApp Aktif" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none shadow-sm text-slate-800"></div>
-          <div><input type="text" id="reg-name" placeholder="Nama Lengkap" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none shadow-sm text-slate-800"></div>
-          <div><textarea id="reg-address" placeholder="Alamat Pengiriman Lengkap" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none shadow-sm text-slate-800 h-20 resize-none"></textarea></div>
-          <div><input type="password" id="reg-password" placeholder="Buat Password" required class="w-full bg-white/95 rounded-xl px-4 py-3 text-sm focus:outline-none shadow-sm text-slate-800"></div>
-          <button type="submit" id="btn-submit-register" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all text-sm cursor-pointer mt-2">DAFTAR SEKARANG</button>
-        </form>
-
-        <div class="text-center pt-1 mt-6"><button type="button" onclick="switchTab('catalog')" class="text-white/80 text-xs font-bold hover:text-white transition-colors cursor-pointer"><i class="fa-solid fa-arrow-left"></i> Kembali ke Katalog</button></div>
-      </div>
-    </section>
-
-    <!-- Halaman Katalog Utama -->
+    <!-- Katalog -->
     <section id="content-catalog" class="fade-in block">
       <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-30 bg-goge-primary rounded-b-2xl pt-4 pb-3 px-5 shadow-md space-y-2.5 desktop-header-fixed md:px-10">
         <div class="flex justify-between items-center text-white">
-          <div class="flex items-center gap-2">
-             <div id="header-logo-wrapper" class="w-7 h-7 flex items-center justify-center bg-white/20 rounded-lg overflow-hidden">
-                <i id="header-logo-icon" class="fa-solid fa-book-open text-sm"></i>
-                <img id="header-logo-img" src="" alt="Logo" class="w-full h-full object-contain hidden">
-             </div>
-             <span class="font-bold text-base tracking-wide">GRAVION</span>
-          </div>
-          <div id="top-auth-btn" onclick="switchTab('login')" class="flex items-center gap-2 text-xs bg-white/20 pl-2 pr-3 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors max-w-[170px]">
-            <div class="w-6 h-6 rounded-full overflow-hidden bg-white/30 flex items-center justify-center shrink-0 border border-white/50" id="top-auth-avatar-box">
-              <i class="fa-solid fa-user text-white text-[10px]" id="top-auth-icon"></i>
-            </div>
+          <div class="flex items-center gap-2"><span class="font-bold text-base tracking-wide">GRAVION</span></div>
+          <div id="top-auth-btn" onclick="switchTab('login')" class="flex items-center gap-2 text-xs bg-white/20 pl-2 pr-3 py-1 rounded-full cursor-pointer">
+            <div class="w-6 h-6 rounded-full overflow-hidden bg-white/30 flex items-center justify-center shrink-0 border border-white/50"><i class="fa-solid fa-user text-white text-[10px]"></i></div>
             <span class="font-bold truncate text-[11px]" id="top-auth-text">Masuk / Daftar</span>
           </div>
         </div>
-        
-        <!-- Pencarian & Tombol Scanner Kamera -->
         <div class="relative flex items-center gap-2">
            <div class="relative flex-1">
               <i class="fa-solid fa-search absolute left-4 top-3 text-slate-400 text-xs"></i>
               <input type="text" id="global-search" oninput="handleSearch()" placeholder="Cari Buku / Scan Barcode..." class="w-full bg-white rounded-xl pl-9 pr-9 py-2 text-xs focus:outline-none shadow-sm text-slate-700 font-medium placeholder-slate-400">
-              <button id="clear-search-btn" onclick="clearSearchInput()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 hidden cursor-pointer text-xs"><i class="fa-solid fa-xmark"></i></button>
+              <button id="clear-search-btn" onclick="clearSearchInput()" class="absolute right-3 top-2.5 text-slate-400 hidden cursor-pointer text-xs"><i class="fa-solid fa-xmark"></i></button>
            </div>
-           <button onclick="openScannerModal()" class="bg-white text-goge-primary px-3 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-goge-light transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="Scan Barcode">
-              <i class="fa-solid fa-camera text-sm"></i>
-           </button>
+           <button onclick="openScannerModal()" class="bg-white text-goge-primary px-3 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-goge-light flex items-center gap-1 shrink-0 cursor-pointer"><i class="fa-solid fa-camera text-sm"></i></button>
         </div>
       </div>
 
       <div class="pt-[110px] px-3 space-y-4 md:px-6 md:pt-[130px] desktop-content-max">
-        <div id="collapsible-search-hide" class="space-y-4 transition-all duration-300">
-          <div class="bg-goge-primary/10 p-3 rounded-2xl border border-goge-primary/20">
-            <p class="text-[10px] font-bold text-goge-primary mb-2 text-center uppercase tracking-wider">Pilih Cabang Toko</p>
-            <div id="cabang-filter-container" class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar justify-start md:justify-center"></div>
-          </div>
-
-          <div class="bg-slate-800 rounded-2xl overflow-hidden shadow-lg relative flex items-center p-0 md:h-36">
-            <div class="p-5 flex-1 relative z-10 md:p-6">
-               <span id="promo-badge-text" class="inline-block bg-yellow-400 text-slate-900 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase mb-1">PROMO MINGGU INI!</span>
-               <h2 id="promo-title-text" class="text-white text-lg font-extrabold leading-tight mb-1 md:text-xl">Spesial Diskon<br>Buku Populer</h2>
-            </div>
-            <div class="w-1/2 h-full absolute right-0">
-               <img id="promo-banner-img" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop" class="w-full h-full object-cover rounded-l-3xl opacity-80" alt="Promo">
-               <div class="absolute inset-0 bg-gradient-to-r from-slate-800 to-transparent"></div>
-            </div>
-          </div>
+        <div class="bg-goge-primary/10 p-3 rounded-2xl border border-goge-primary/20">
+          <p class="text-[10px] font-bold text-goge-primary mb-2 text-center uppercase tracking-wider">Pilih Cabang Toko</p>
+          <div id="cabang-filter-container" class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar justify-start md:justify-center"></div>
         </div>
-
         <div>
           <div class="flex items-center justify-between mb-2"><h3 class="font-bold text-sm text-slate-800">Katalog Produk</h3></div>
           <div id="catalog-grid" class="grid grid-cols-3 gap-2 pb-4 desktop-grid-catalog">
@@ -216,170 +93,80 @@
       </div>
     </section>
 
-    <!-- Halaman Keranjang -->
+    <!-- Login -->
+    <section id="content-login" class="min-h-screen login-bg flex-col justify-center items-center p-6 fade-in hidden z-50 relative overflow-y-auto pt-10 pb-20">
+      <div class="w-full max-w-sm flex flex-col items-center">
+        <h1 class="text-3xl font-extrabold text-white mb-4 tracking-wide text-center">GRAVION</h1>
+        <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="w-full space-y-4">
+          <input type="text" id="login-phone" placeholder="No. HP / Username" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm">
+          <input type="password" id="login-password" placeholder="Password" required class="w-full bg-white/95 rounded-xl px-4 py-3.5 text-sm">
+          <button type="submit" class="w-full bg-goge-primary text-white font-bold py-3.5 rounded-xl text-sm cursor-pointer">MASUK</button>
+        </form>
+        <div class="text-center pt-4"><button type="button" onclick="switchTab('catalog')" class="text-white/80 text-xs font-bold cursor-pointer">Kembali ke Katalog</button></div>
+      </div>
+    </section>
+
+    <!-- Keranjang -->
     <section id="content-cart" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3 rounded-b-2xl shadow-md"><button onclick="switchTab('catalog')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Keranjang Saya</h2></div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><button onclick="switchTab('catalog')" class="w-8 h-8 rounded-full bg-white/20"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Keranjang Saya</h2></div>
       <div id="cart-items-container" class="pt-[88px] px-5 pb-24 space-y-4"></div>
     </section>
 
-    <!-- Halaman Riwayat Pesanan -->
+    <!-- Pesanan -->
     <section id="content-orders" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50">
-        <div class="bg-goge-primary text-white p-4 flex items-center gap-3 shadow-md"><button onclick="switchTab('profile')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Riwayat Pesanan</h2></div>
-      </div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><button onclick="switchTab('profile')" class="w-8 h-8 rounded-full bg-white/20"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Riwayat Pesanan</h2></div>
       <div id="customer-orders-container" class="pt-[100px] px-5 pb-24 space-y-4"></div>
     </section>
 
-    <!-- Halaman Profil -->
+    <!-- Profil -->
     <section id="content-profile" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="bg-slate-800 rounded-b-[2.5rem] pt-10 pb-10 px-5 text-center shadow-lg relative">
-        <h3 id="profile-name" class="font-bold text-xl text-white tracking-wide">Pengguna Gravion</h3>
-        <p id="profile-phone" class="text-sm text-slate-300 mt-0.5 font-medium">-</p>
-        <div class="mt-2 inline-block bg-white/20 text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider" id="profile-role-badge">CUSTOMER</div>
+      <div class="bg-slate-800 rounded-b-[2.5rem] pt-10 pb-10 px-5 text-center shadow-lg text-white">
+        <h3 id="profile-name" class="font-bold text-xl">Pengguna</h3>
+        <p id="profile-phone" class="text-sm text-slate-300">-</p>
+        <span id="profile-role-badge" class="inline-block bg-white/20 text-[10px] px-3 py-1 rounded-full font-bold mt-2">CUSTOMER</span>
       </div>
-      <div class="px-5 pt-6 pb-24 space-y-4">
-        <button onclick="handleLogout()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 rounded-xl shadow-md transition-all text-sm cursor-pointer">KELUAR</button>
-      </div>
+      <div class="px-5 pt-6 pb-24"><button onclick="handleLogout()" class="w-full bg-red-500 text-white font-bold py-3.5 rounded-xl cursor-pointer">KELUAR</button></div>
     </section>
 
-    <!-- Halaman Utama Menu Pengaturan / Dashboard Admin -->
+    <!-- Dashboard Admin / Pengaturan -->
     <section id="content-settings" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3"><h2 class="font-bold text-lg">Dashboard Admin</h2></div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3"><h2 class="font-bold text-lg">Dashboard Admin</h2></div>
       <div class="pt-[88px] px-5 pb-24 space-y-4">
-         <div onclick="switchTab('admin-master')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
+         <div onclick="switchTab('admin-master')" class="bg-white rounded-2xl p-4 shadow-sm border flex items-center gap-4 cursor-pointer">
             <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-stacked"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Master Barang</h4><p class="text-[10px] text-slate-400">Tambah, Edit, Hapus Buku</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-         <div onclick="switchTab('admin-cabang')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-store"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Kelola Cabang</h4><p class="text-[10px] text-slate-400">Atur lokasi dan daftar toko</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-         <div onclick="switchTab('admin-orders')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-green-50 text-green-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-list"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Daftar Pesanan</h4><p class="text-[10px] text-slate-400">Konfirmasi & update status order</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-         <div onclick="switchTab('admin-logo')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-icons"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Pengaturan Logo Website</h4><p class="text-[10px] text-slate-400">Ganti logo di samping teks GRAVION</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-         <div onclick="switchTab('admin-promo')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-pink-50 text-pink-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-image"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Banner Promo Minggu Ini</h4><p class="text-[10px] text-slate-400">Ganti gambar & teks promo</p></div>
-            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-         </div>
-         <div onclick="switchTab('admin-qris')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-qrcode"></i></div>
-            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Pengaturan QRIS</h4><p class="text-[10px] text-slate-400">Perbarui barcode pembayaran</p></div>
+            <div class="flex-1"><h4 class="font-bold text-slate-800 text-sm">Master Barang</h4><p class="text-[10px] text-slate-400">Lihat data dari Google Sheets</p></div>
             <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
          </div>
       </div>
     </section>
 
-    <!-- Sub-page: Admin Master Barang -->
+    <!-- Master Barang List Admin -->
     <section id="content-admin-master" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md space-y-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3"><button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button><h2 class="font-bold text-lg">Master Barang</h2></div>
-          <button onclick="openBarangModalBaru()" class="text-xs bg-white text-goge-primary px-3 py-1.5 rounded-lg font-bold cursor-pointer hover:bg-goge-light transition-colors shadow-sm"><i class="fa-solid fa-plus"></i> Baru</button>
-        </div>
+      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 flex items-center gap-3">
+         <button onclick="switchTab('settings')" class="w-8 h-8 rounded-full bg-white/20"><i class="fa-solid fa-arrow-left"></i></button>
+         <h2 class="font-bold text-lg">Master Barang (Google Sheets)</h2>
       </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-3" id="admin-master-list"></div>
+      <div class="pt-[90px] px-5 pb-24 space-y-3" id="admin-master-list"></div>
     </section>
 
-    <!-- Sub-page: Admin Kelola Cabang -->
-    <section id="content-admin-cabang" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Kelola Cabang</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4">
-         <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-2 items-center">
-             <input type="text" id="new-cabang-input" placeholder="Masukkan nama cabang baru..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-goge-primary">
-             <button onclick="tambahCabangAdmin()" class="bg-orange-500 hover:bg-orange-600 text-white w-11 h-11 rounded-xl shadow-md flex justify-center items-center transition-colors cursor-pointer"><i class="fa-solid fa-plus text-lg"></i></button>
-         </div>
-         <div>
-            <h3 class="font-bold text-xs text-slate-500 mb-2 uppercase tracking-wide">Daftar Cabang Aktif</h3>
-            <div id="admin-cabang-list" class="space-y-2"></div>
-         </div>
-      </div>
-    </section>
-
-    <!-- Sub-page: Admin Daftar Pesanan -->
-    <section id="content-admin-orders" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Daftar Semua Pesanan</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4" id="admin-all-orders-list"></div>
-    </section>
-
-    <!-- Sub-page: Admin Logo Website -->
-    <section id="content-admin-logo" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Pengaturan Logo Website</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4">
-         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-5 text-center">
-             <input type="text" id="admin-logo-url-input" placeholder="Masukkan URL Gambar Logo..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs mb-2">
-             <button onclick="simpanPengaturanLogo()" class="w-full bg-goge-primary text-white font-bold py-3 rounded-xl text-xs cursor-pointer">Simpan Logo</button>
-         </div>
-      </div>
-    </section>
-
-    <!-- Sub-page: Admin Banner Promo -->
-    <section id="content-admin-promo" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Banner Promo</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4">
-         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-             <input type="text" id="admin-promo-title-input" placeholder="Teks Judul Promo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-             <button onclick="simpanPengaturanPromo()" class="w-full bg-goge-primary text-white font-bold py-3 rounded-xl text-xs cursor-pointer">Simpan Promo</button>
-         </div>
-      </div>
-    </section>
-
-    <!-- Sub-page: Admin QRIS -->
-    <section id="content-admin-qris" class="fade-in hidden bg-slate-50 min-h-screen">
-      <div class="fixed top-0 left-0 right-0 max-w-[414px] mx-auto z-50 bg-goge-primary text-white p-4 rounded-b-2xl shadow-md flex items-center gap-3">
-         <button onclick="switchTab('settings')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></button>
-         <h2 class="font-bold text-lg">Pengaturan QRIS</h2>
-      </div>
-      <div class="pt-[100px] px-5 pb-24 space-y-4">
-         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-5 text-center">
-             <input type="text" id="admin-qris-name-input" placeholder="Nama Merchant" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs mb-2">
-             <button onclick="simpanPengaturanQris()" class="w-full bg-goge-primary text-white font-bold py-3 rounded-xl text-xs cursor-pointer">Simpan QRIS</button>
-         </div>
-      </div>
-    </section>
-
-    <!-- Bottom Navigation Bar -->
-    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[414px] mx-auto bg-white border-t border-slate-200 flex justify-around items-center pt-2 pb-3 shadow-[0_-10px_20px_rgba(0,0,0,0.03)] z-40 rounded-t-2xl desktop-nav-fixed md:rounded-b-2xl">
-      <div onclick="switchTab('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-goge-primary transition-colors"><i class="fa-solid fa-house text-lg"></i><span class="text-[9px] font-bold">Beranda</span></div>
-      <div onclick="switchTab('cart')" id="nav-cart" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors relative"><i class="fa-solid fa-cart-shopping text-lg relative"><span id="cart-badge" class="absolute -top-1 -right-1.5 bg-red-500 border border-white text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center hidden">0</span></i><span class="text-[9px] font-bold">Keranjang</span></div>
-      <div onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-solid fa-clock-rotate-left text-lg"></i><span class="text-[9px] font-bold">Riwayat</span></div>
-      <div onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-regular fa-user text-lg"></i><span class="text-[9px] font-bold">Profil</span></div>
-      <div onclick="switchTab('settings')" id="hidden-desktop-settings" class="hidden flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 transition-colors"><i class="fa-solid fa-gear text-lg"></i><span class="text-[9px] font-bold">Pengaturan</span></div>
+    <!-- Bottom Nav -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[414px] mx-auto bg-white border-t border-slate-200 flex justify-around items-center pt-2 pb-3 z-40 rounded-t-2xl desktop-nav-fixed">
+      <div onclick="switchTab('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-goge-primary"><i class="fa-solid fa-house text-lg"></i><span class="text-[9px] font-bold">Beranda</span></div>
+      <div onclick="switchTab('cart')" id="nav-cart" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400 relative"><i class="fa-solid fa-cart-shopping text-lg"><span id="cart-badge" class="absolute -top-1 -right-1.5 bg-red-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center hidden">0</span></i><span class="text-[9px] font-bold">Keranjang</span></div>
+      <div onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400"><i class="fa-solid fa-clock-rotate-left text-lg"></i><span class="text-[9px] font-bold">Riwayat</span></div>
+      <div onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-1 cursor-pointer w-16 text-slate-400"><i class="fa-regular fa-user text-lg"></i><span class="text-[9px] font-bold">Profil</span></div>
+      <div onclick="switchTab('settings')" id="hidden-desktop-settings" class="hidden flex-col items-center gap-1 cursor-pointer w-16 text-slate-400"><i class="fa-solid fa-gear text-lg"></i><span class="text-[9px] font-bold">Admin</span></div>
     </nav>
-
   </div>
 
   <script>
-    // Ganti dengan URL /exec Google Apps Script Anda yang aktif
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxlhNdENZd1dnfAL0IzKaFKg5UmzXk1r6nOKlEIELpXwrdbXGaSssnnBTGl8-3K6Ykm/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx6huah4LoGGoRpjs5n2Lt9ApBIBtxhdaFLkYyU_j2MtCVxYO60LL95q9J0sZcfyw5U/exec";
 
     let masterData = [];
     let cartData = [];
-    let globalOrders = [];
     let currentCabangFilter = 'Semua';
     let cabangList = ["Toko Miko", "Pam Miko", "Toko Pusat", "New Store"];
-    let currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" }; 
+    let currentUser = { phone: "", name: "Pengguna", role: "guest", address: "" }; 
     let html5QrCode = null;
 
     function callGasApi(action, payload, callback) {
@@ -393,20 +180,24 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         let savedUser = localStorage.getItem('gravion_user');
-        if (savedUser) { try { let parsed = JSON.parse(savedUser); if (parsed && parsed.role) currentUser = parsed; } catch(e){} }
-        
-        let savedCabang = localStorage.getItem('gravion_cabang_list');
-        if(savedCabang) { try { cabangList = JSON.parse(savedCabang); } catch(e){} }
+        if (savedUser) { try { currentUser = JSON.parse(savedUser); } catch(e){} }
+        updateAuthUI(); 
+        renderCabangDropdowns();
 
-        updateAuthUI(); loadCartFromStorage(); renderCabangDropdowns();
-
-        // Ambil data produk langsung dari Google Sheets
+        // Tarik data langsung dari Google Sheets
         callGasApi("getOptimizedMasterItems", null, function(res) {
             onDataLoaded(res);
         });
     });
 
-    // Scanner Kamera
+    function onDataLoaded(response) {
+        try {
+            masterData = (response && response.status === "success" && Array.isArray(response.data)) ? response.data : [];
+        } catch (e) { masterData = []; }
+        filterByCabang(currentCabangFilter);
+        renderAdminMasterList(masterData);
+    }
+
     function openScannerModal() {
         document.getElementById('modal-scanner').classList.remove('hidden');
         setTimeout(() => {
@@ -422,81 +213,35 @@
             });
         }, 300);
     }
+
     function closeScannerModal() {
         if (html5QrCode && html5QrCode.isScanning) {
             html5QrCode.stop().then(() => { document.getElementById('modal-scanner').classList.add('hidden'); });
         } else { document.getElementById('modal-scanner').classList.add('hidden'); }
     }
 
-    function onDataLoaded(response) {
-        try {
-            if (typeof response === 'string') response = JSON.parse(response);
-            masterData = (response && response.status === "success" && Array.isArray(response.data)) ? response.data : [];
-        } catch (e) { masterData = []; }
-        filterByCabang(currentCabangFilter);
-        renderAdminMasterList(masterData);
-    }
-
-    function toggleAuthMode(mode) {
-       const btnLogin = document.getElementById('btn-tab-login');
-       const btnReg = document.getElementById('btn-tab-register');
-       const slider = document.getElementById('auth-bg-slider');
-       const formLogin = document.getElementById('form-login');
-       const formReg = document.getElementById('form-register');
-       if(mode === 'login') {
-            slider.style.left = '4px';
-            btnLogin.classList.replace('text-white/70', 'text-white');
-            btnReg.classList.replace('text-white', 'text-white/70');
-            formLogin.classList.remove('hidden'); formReg.classList.add('hidden');
-       } else {
-            slider.style.left = 'calc(50%)';
-            btnReg.classList.replace('text-white/70', 'text-white');
-            btnLogin.classList.replace('text-white', 'text-white/70');
-            formReg.classList.remove('hidden'); formLogin.classList.add('hidden');
-       }
-    }
-
-    function handleRegister() {
-        const phone = document.getElementById('reg-phone').value.trim();
-        const name = document.getElementById('reg-name').value.trim();
-        const address = document.getElementById('reg-address').value.trim();
-        const password = document.getElementById('reg-password').value.trim();
-        if(!phone || !name || !address || !password) return showCustomAlert('Perhatian', 'Lengkapi semua data.', 'warning');
-
-        callGasApi("registerNewCustomer", { phone, name, address, password }, function(res) {
-            if(res.status === 'success') {
-                showCustomAlert('Berhasil', res.message, 'success');
-                toggleAuthMode('login');
-            } else { showCustomAlert('Gagal', res.message, 'error'); }
-        });
-    }
-
     function handleLogin() {
       const phoneInput = document.getElementById('login-phone').value.trim(); 
       const passInput = document.getElementById('login-password').value.trim();
-      if (!phoneInput || !passInput) return showCustomAlert('Perhatian', 'Masukkan No HP dan Password.', 'warning');
-
       callGasApi("verifyLogin", { username: phoneInput, password: passInput }, function(res) {
           if(res.status === 'success') {
              currentUser = res.data;
              localStorage.setItem('gravion_user', JSON.stringify(currentUser)); 
              updateAuthUI(); switchTab('catalog'); 
-             showCustomAlert('Berhasil Masuk', `Selamat datang, <b>${currentUser.name}</b> (${currentUser.role.toUpperCase()}).`, 'success');
+             showCustomAlert('Berhasil Masuk', `Selamat datang, <b>${currentUser.name}</b>`, 'success');
           } else { showCustomAlert('Gagal Masuk', res.message, 'error'); }
       });
     }
-    
+
     function handleLogout() { 
-        currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" }; 
+        currentUser = { phone: "", name: "Pengguna", role: "guest", address: "" }; 
         localStorage.removeItem('gravion_user'); 
         updateAuthUI(); switchTab('catalog'); 
     }
 
     function updateAuthUI() {
-        if (!currentUser) currentUser = { phone: "", name: "Pengguna", role: "guest", avatar: "", address: "" };
         const topText = document.getElementById('top-auth-text'); 
         const desktopSettings = document.getElementById('hidden-desktop-settings');
-        
         if (currentUser.role === 'guest') { 
             if(topText) topText.innerText = "Masuk / Daftar"; 
             if(desktopSettings) desktopSettings.classList.add('hidden');
@@ -530,20 +275,17 @@
 
     function renderCatalog(items) {
       const grid = document.getElementById('catalog-grid'); if (!grid) return; grid.innerHTML = ''; 
-      if (!items || items.length === 0) { grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku ditemukan.</p>'; return; }
+      if (!items || items.length === 0) { grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku ditemukan di Google Sheets.</p>'; return; }
       items.forEach((item) => {
         let imgUrl = item.image ? item.image : 'https://placehold.co/150x200?text=No+Cover'; 
         grid.insertAdjacentHTML('beforeend', `
           <div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 flex flex-col justify-between">
             <div>
-              <div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 overflow-hidden relative">
-                <img src="${imgUrl}" class="w-full h-full object-cover">
-              </div>
+              <div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 overflow-hidden relative"><img src="${imgUrl}" class="w-full h-full object-cover"></div>
               <h4 class="font-bold text-[9px] text-slate-800 line-clamp-2">${item.namaBarang}</h4>
+              <p class="text-[8px] text-slate-400">${item.cabang} | Stok: ${item.stok}</p>
             </div>
-            <div class="flex items-center justify-between pt-1.5">
-               <span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span>
-            </div>
+            <div class="flex items-center justify-between pt-1.5"><span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span></div>
           </div>
         `);
       });
@@ -561,18 +303,11 @@
 
     function renderAdminMasterList(items) {
         const list = document.getElementById('admin-master-list'); if(!list) return; list.innerHTML = '';
+        if(items.length === 0) { list.innerHTML = '<p class="text-center text-xs text-slate-400 py-6">Belum ada data barang di Sheet.</p>'; return; }
         items.forEach(item => {
-            list.insertAdjacentHTML('beforeend', `<div class="bg-white p-3 rounded-xl shadow-sm border"><h4 class="font-bold text-sm">${item.namaBarang}</h4><p class="text-xs">Stok: ${item.stok} | Rp ${item.harga}</p></div>`);
+            list.insertAdjacentHTML('beforeend', `<div class="bg-white p-3 rounded-xl shadow-sm border"><h4 class="font-bold text-sm">${item.namaBarang}</h4><p class="text-xs text-slate-500">Cabang: ${item.cabang} | Stok: ${item.stok} | Rak: ${item.rak} | Rp ${Number(item.harga).toLocaleString('id-ID')}</p></div>`);
         });
     }
-
-    // Fungsi Admin Dummy/Placeholder untuk tombol menu pengaturan
-    function tambahCabangAdmin() { showCustomAlert('Info', 'Cabang baru ditambahkan.', 'success'); }
-    function simpanPengaturanLogo() { showCustomAlert('Berhasil', 'Logo berhasil disimpan.', 'success'); }
-    function simpanPengaturanPromo() { showCustomAlert('Berhasil', 'Promo berhasil disimpan.', 'success'); }
-    function simpanPengaturanQris() { showCustomAlert('Berhasil', 'QRIS berhasil disimpan.', 'success'); }
-    function openBarangModalBaru() { showCustomAlert('Info', 'Fitur Tambah Barang aktif.', 'info'); }
-    function simpanDataBarangMaster() {}
 
     function showCustomAlert(title, message, type = 'info') {
         const modal = document.getElementById('custom-alert'); 
@@ -581,8 +316,6 @@
         modal.classList.remove('hidden');
     }
     function closeCustomAlert() { document.getElementById('custom-alert').classList.add('hidden'); }
-    function openAdminModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeAdminModal(id) { document.getElementById(id).classList.add('hidden'); }
     function tanyaAdmin() { window.open(`https://wa.me/6281234567890?text=` + encodeURIComponent("Halo Admin"), '_blank'); }
 
     function switchTab(tabId) {
