@@ -529,7 +529,7 @@
     // ==========================================
     // MASUKKAN LINK /EXEC GOOGLE APPS SCRIPT ANDA DI SINI:
     // ==========================================
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPKpQ7TsbrRgNWFrvGk2Nd99GIiGka0GVobiOHZJYZlrUt7TXiRagoirPmAOJCl7o2/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby-4q0xX8Dsudpjt7_R22hUXqKMYCcO34VtaP2hxhukForDssTCl8XKSZb_O_DKygQM/exec";
 
     let masterData = [];
     let cartData = [];
@@ -584,25 +584,42 @@
 
     // Fungsi Utama Koneksi GAS melalui Fetch
     function callGasApi(action, payload, callback) {
-        let url = GAS_WEB_APP_URL + "?action=" + action;
-        if (payload) { url += "&data=" + encodeURIComponent(JSON.stringify(payload)); }
-        fetch(url)
-            .then(res => res.json())
-            .then(res => { if (callback) callback(res); })
-            .catch(err => { if (callback) callback({ status: "error", message: err.toString() }); });
+        let bodyData = JSON.stringify({ action: action, data: payload });
+        fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            body: bodyData,
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8' // Wajib text/plain agar tidak diblokir CORS Google
+            }
+        })
+        .then(res => res.json())
+        .then(res => { if (callback) callback(res); })
+        .catch(err => { if (callback) callback({ status: "error", message: err.toString() }); });
     }
-
     document.addEventListener('DOMContentLoaded', function() {
         let savedUser = localStorage.getItem('gravion_user');
         if (savedUser) { try { let parsed = JSON.parse(savedUser); if (parsed && parsed.role) currentUser = parsed; } catch(e){} }
         
         updateAuthUI(); loadCartFromStorage(); renderCabangDropdowns();
 
-        // Ambil data langsung dari Google Sheets via Fetch URL Web App
-        fetch(GAS_WEB_APP_URL + "?action=getOptimizedMasterItems")
-            .then(res => res.json())
-            .then(res => { onDataLoaded(res); })
-            .catch(err => { onDataLoaded({ status: "success", data: [] }); });
+        // Ambil Data Master Barang menggunakan metode POST yang aman
+        callGasApi("getOptimizedMasterItems", null, function(res) {
+            onDataLoaded(res);
+        });
+
+        // Ambil data admin dan konfigurasi
+        callGasApi("getAllUsers", null, function(res) {
+            if(res && res.status === "success" && res.data) { globalUsers = res.data; }
+        });
+        callGasApi("getStoreSettings", null, function(res) {
+            if(res && res.status === "success" && res.data) {
+                if(res.data.waNumbers) adminWhatsAppNumbers = res.data.waNumbers;
+                if(res.data.promoBanner) { promoBannerSettings = res.data.promoBanner; applyPromoBannerUI(); }
+                if(res.data.storeLogo) { storeLogoSettings = res.data.storeLogo; applyStoreLogoUI(); }
+                if(res.data.qrisSettings) qrisSettings = res.data.qrisSettings;
+            }
+        });
+    });
 
         // Ambil data pengguna dan pengaturan dari GAS jika tersedia
         callGasApi("getAllUsers", null, function(res) {
