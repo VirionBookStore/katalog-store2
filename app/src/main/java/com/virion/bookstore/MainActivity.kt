@@ -1,64 +1,103 @@
-package www.VirionBookStore.github.io/katalog-store2/; // Sesuaikan dengan nama package di project kamu
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.os.Bundle;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
+package com.virion.bookstore
 
-public class MainActivity extends AppCompatActivity {
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Bundle
+import android.webkit.*
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
-    private WebView webView;
+class MainActivity : ComponentActivity() {
+    private lateinit var webView: WebView
+    private var fileCallback: ValueCallback<Array<Uri>>? = null
+    private val appUrl = "https://virionbookstore.github.io/katalog-store2/"
 
-    @SuppressLint("SetJavaScriptEnabled")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        webView = new WebView(this);
-        setContentView(webView);
+    private val filePicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val results = if (result.resultCode == Activity.RESULT_OK) {
+            WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data)
+        } else null
+        fileCallback?.onReceiveValue(results)
+        fileCallback = null
+    }
 
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setDatabaseEnabled(true);
-        webSettings.setMediaPlaybackRequiresUserGesture(false);
+    private val cameraPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val request = pendingPermissionRequest
+        pendingPermissionRequest = null
+        if (granted) request?.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+        else request?.deny()
+    }
 
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
+    private var pendingPermissionRequest: PermissionRequest? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        webView = findViewById(R.id.webView)
+        webView.settings.javaScriptEnabled = true
+        webView.settings.domStorageEnabled = true
+        webView.settings.allowFileAccess = true
+        webView.settings.allowContentAccess = true
+        webView.settings.mediaPlaybackRequiresUserGesture = false
+        webView.settings.javaScriptCanOpenWindowsAutomatically = true
+
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val url = request.url.toString()
+                if (url.startsWith("https://wa.me/") || url.startsWith("whatsapp://")) {
+                    try { startActivity(Intent(Intent.ACTION_VIEW, request.url)) } catch (_: Exception) {}
+                    return true
+                }
+                return false
             }
-        });
-        
-        webView.setWebChromeClient(new WebChromeClient());
+        }
 
-        webView.loadUrl("file:///android_asset/index.html");
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (webView.canGoBack()) {
-                    webView.goBack();
-                } else {
-                    tampilkanPeringatanKeluar();
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                webView: WebView?,
+                callback: ValueCallback<Array<Uri>>?,
+                params: FileChooserParams?
+            ): Boolean {
+                fileCallback?.onReceiveValue(null)
+                fileCallback = callback
+                val intent = params?.createIntent() ?: return false
+                return try {
+                    filePicker.launch(intent)
+                    true
+                } catch (_: Exception) {
+                    fileCallback = null
+                    false
                 }
             }
-        });
+
+            override fun onPermissionRequest(request: PermissionRequest) {
+                runOnUiThread {
+                    if (request.resources.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) &&
+                        ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        pendingPermissionRequest = request
+                        cameraPermission.launch(Manifest.permission.CAMERA)
+                    } else {
+                        request.grant(request.resources)
+                    }
+                }
+            }
+        }
+
+        webView.loadUrl(appUrl)
     }
 
-    private void tampilkanPeringatanKeluar() {
-        new AlertDialog.Builder(this)
-                .setTitle("Konfirmasi Keluar")
-                .setMessage("Apakah Anda yakin ingin keluar dari aplikasi Virion Book Online?")
-                .setPositiveButton("Ya", (dialog, which) -> finish())
-                .setNegativeButton("Tidak", null)
-                .show();
+    @Deprecated("Deprecated in Android API")
+    override fun onBackPressed() {
+        if (webView.canGoBack()) webView.goBack() else super.onBackPressed()
     }
 }
-
