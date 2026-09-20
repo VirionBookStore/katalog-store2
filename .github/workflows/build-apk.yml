@@ -29,6 +29,7 @@ jobs:
       - name: Apply custom launcher icon
         run: |
           test -f icon.png
+          mkdir -p app/src/main/res/mipmap
           cp icon.png app/src/main/res/mipmap/ic_launcher.png
           cp icon.png app/src/main/res/mipmap/ic_launcher_round.png
 
