@@ -1,102 +1,95 @@
-package com.virion.bookstore
+package com.virion.katalog; // Sesuaikan package name aplikasi katalog Anda jika berbeda
 
-import android.Manifest
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Bundle
-import android.webkit.*
-import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.webkit.*;
+import android.widget.Toast;
 
-class MainActivity : ComponentActivity() {
-    private lateinit var webView: WebView
-    private var fileCallback: ValueCallback<Array<Uri>>? = null
-    private val appUrl = "https://virionbookstore.github.io/katalog-store2/"
+public class MainActivity extends Activity {
+    WebView w;
+    ValueCallback<Uri[]> f;
+    static final int C = 1001;
+    boolean doubleBackToExitPressedOnce = false;
 
-    private val filePicker = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val results = if (result.resultCode == Activity.RESULT_OK) {
-            WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data)
-        } else null
-        fileCallback?.onReceiveValue(results)
-        fileCallback = null
-    }
-
-    private val cameraPermission = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        val request = pendingPermissionRequest
-        pendingPermissionRequest = null
-        if (granted) request?.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
-        else request?.deny()
-    }
-
-    private var pendingPermissionRequest: PermissionRequest? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        webView = findViewById(R.id.webView)
-        webView.settings.javaScriptEnabled = true
-        webView.settings.domStorageEnabled = true
-        webView.settings.allowFileAccess = true
-        webView.settings.allowContentAccess = true
-        webView.settings.mediaPlaybackRequiresUserGesture = false
-        webView.settings.javaScriptCanOpenWindowsAutomatically = true
-
-        webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                val url = request.url.toString()
-                if (url.startsWith("https://wa.me/") || url.startsWith("whatsapp://")) {
-                    try { startActivity(Intent(Intent.ACTION_VIEW, request.url)) } catch (_: Exception) {}
-                    return true
-                }
-                return false
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_main);
+        
+        w = findViewById(R.id.webView);
+        WebSettings s = w.getSettings();
+        
+        s.setJavaScriptEnabled(true);
+        s.setDomStorageEnabled(true);
+        s.setAllowFileAccess(true);
+        s.setAllowContentAccess(true);
+        s.setDatabaseEnabled(true);
+        
+        w.setWebViewClient(new WebViewClient());
+        w.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onGeolocationPermissionsShowPrompt(String o, GeolocationPermissions.Callback c) {
+                c.invoke(o, true, false);
             }
+
+            @Override
+            public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> c, FileChooserParams q) {
+                f = c;
+                try {
+                    startActivityForResult(q.createIntent(), C);
+                    return true;
+                } catch (Exception e) {
+                    f = null;
+                    return false;
+                }
+            }
+        });
+
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            requestPermissions(new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            }, 10);
         }
 
-        webView.webChromeClient = object : WebChromeClient() {
-            override fun onShowFileChooser(
-                webView: WebView?,
-                callback: ValueCallback<Array<Uri>>?,
-                params: FileChooserParams?
-            ): Boolean {
-                fileCallback?.onReceiveValue(null)
-                fileCallback = callback
-                val intent = params?.createIntent() ?: return false
-                return try {
-                    filePicker.launch(intent)
-                    true
-                } catch (_: Exception) {
-                    fileCallback = null
-                    false
-                }
-            }
-
-            override fun onPermissionRequest(request: PermissionRequest) {
-                runOnUiThread {
-                    if (request.resources.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) &&
-                        ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                        pendingPermissionRequest = request
-                        cameraPermission.launch(Manifest.permission.CAMERA)
-                    } else {
-                        request.grant(request.resources)
-                    }
-                }
-            }
-        }
-
-        webView.loadUrl(appUrl)
+        // Ganti URL di bawah ini dengan link GitHub Pages dari katalog Anda
+        w.loadUrl("https://virionbookstore.github.io/KatalogOnline/");
     }
 
-    @Deprecated("Deprecated in Android API")
-    override fun onBackPressed() {
-        if (webView.canGoBack()) webView.goBack() else super.onBackPressed()
+    @Override
+    protected void onActivityResult(int r, int c, Intent d) {
+        super.onActivityResult(r, c, d);
+        if (r == C && f != null) {
+            f.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(c, d));
+            f = null;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (w.canGoBack()) {
+            w.goBack();
+        } else {
+            if (doubleBackToExitPressedOnce) {
+                super.onBackPressed();
+                return;
+            }
+
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Tekan sekali lagi untuk keluar aplikasi", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce = false;
+                }
+            }, 2000); // Jeda waktu 2 detik
+        }
     }
 }
+
