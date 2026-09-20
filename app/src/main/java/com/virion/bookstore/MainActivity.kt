@@ -1,4 +1,3 @@
-
 package com.virion.bookstore
 
 import android.Manifest
@@ -9,7 +8,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.webkit.*
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
@@ -93,11 +94,35 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Mengatur logika tombol kembali (Back Button) agar aman dan memunculkan peringatan
+        setupBackPressHandler()
+
         webView.loadUrl(appUrl)
     }
 
-    @Deprecated("Deprecated in Android API")
-    override fun onBackPressed() {
-        if (webView.canGoBack()) webView.goBack() else super.onBackPressed()
+    private fun setupBackPressHandler() {
+        onBackPressedDispatcher.addCallback(this) {
+            if (webView.canGoBack()) {
+                // Jika WebView masih punya riwayat halaman sebelumnya, kembali ke halaman dalam web
+                webView.goBack()
+            } else {
+                // Jika sudah di halaman utama/terdepan, tampilkan dialog konfirmasi keluar
+                showExitConfirmationDialog()
+            }
+        }
+    }
+
+    private fun showExitConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Keluar Aplikasi")
+            .setMessage("Apakah Anda yakin ingin keluar dari aplikasi Virion Book?")
+            .setCancelable(true)
+            .setNegativeButton("Batal", null)
+            .setPositiveButton("Keluar") { _, _ ->
+                // Menutup aplikasi secara bersih
+                finish()
+            }
+            .show()
     }
 }
+
