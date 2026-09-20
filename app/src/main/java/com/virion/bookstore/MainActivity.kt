@@ -70,7 +70,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    // Menggunakan onKeyDown sebagai pengganti onBackPressed yang error
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -99,4 +98,3 @@ public class MainActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 }
-
