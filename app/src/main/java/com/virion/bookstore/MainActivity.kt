@@ -1,7 +1,6 @@
 package com.virion.katalog;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,8 +8,9 @@ import android.os.Handler;
 import android.webkit.*;
 import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     WebView w;
     ValueCallback<Uri[]> f;
     static final int C = 1001;
@@ -33,8 +33,9 @@ public class MainActivity extends Activity {
         w.setWebViewClient(new WebViewClient());
         w.setWebChromeClient(new WebChromeClient() {
             @Override
-            public void onGeolocationPermissionsShowPrompt(String o, GeolocationPermissions.Callback c) {
+            public boolean onGeolocationPermissionsShowPrompt(String o, GeolocationPermissions.Callback c) {
                 c.invoke(o, true, false);
+                return true;
             }
 
             @Override
@@ -58,7 +59,7 @@ public class MainActivity extends Activity {
             }, 10);
         }
 
-        // Pengganti onBackPressed modern (OnBackPressedDispatcher)
+        // Pengganti tombol Back modern
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
