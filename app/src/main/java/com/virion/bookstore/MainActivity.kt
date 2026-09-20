@@ -1,4 +1,4 @@
-package com.virion.katalog; // Sesuaikan package name aplikasi katalog Anda jika berbeda
+package com.virion.katalog;
 
 import android.Manifest;
 import android.app.Activity;
@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.webkit.*;
 import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 
 public class MainActivity extends Activity {
     WebView w;
@@ -57,7 +58,31 @@ public class MainActivity extends Activity {
             }, 10);
         }
 
-        // Ganti URL di bawah ini dengan link GitHub Pages dari katalog Anda
+        // Pengganti onBackPressed modern (OnBackPressedDispatcher)
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (w.canGoBack()) {
+                    w.goBack();
+                } else {
+                    if (doubleBackToExitPressedOnce) {
+                        finish();
+                        return;
+                    }
+
+                    doubleBackToExitPressedOnce = true;
+                    Toast.makeText(MainActivity.this, "Tekan sekali lagi untuk keluar aplikasi", Toast.LENGTH_SHORT).show();
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            doubleBackToExitPressedOnce = false;
+                        }
+                    }, 2000);
+                }
+            }
+        });
+
         w.loadUrl("https://virionbookstore.github.io/KatalogOnline/");
     }
 
@@ -67,28 +92,6 @@ public class MainActivity extends Activity {
         if (r == C && f != null) {
             f.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(c, d));
             f = null;
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (w.canGoBack()) {
-            w.goBack();
-        } else {
-            if (doubleBackToExitPressedOnce) {
-                super.onBackPressed();
-                return;
-            }
-
-            this.doubleBackToExitPressedOnce = true;
-            Toast.makeText(this, "Tekan sekali lagi untuk keluar aplikasi", Toast.LENGTH_SHORT).show();
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    doubleBackToExitPressedOnce = false;
-                }
-            }, 2000); // Jeda waktu 2 detik
         }
     }
 }
