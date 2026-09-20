@@ -1,100 +1,64 @@
-package com.virion.katalog;
+package www.VirionBookStore.github.io/katalog-store2/; // Sesuaikan dengan nama package di project kamu
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.KeyEvent;
-import android.webkit.*;
-import android.widget.Toast;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends Activity {
-    WebView w;
-    ValueCallback<Uri[]> f;
-    static final int C = 1001;
-    boolean doubleBackToExitPressedOnce = false;
+public class MainActivity extends AppCompatActivity {
 
+    private WebView webView;
+
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        setContentView(R.layout.activity_main);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         
-        w = findViewById(R.id.webView);
-        WebSettings s = w.getSettings();
-        
-        s.setJavaScriptEnabled(true);
-        s.setDomStorageEnabled(true);
-        s.setAllowFileAccess(true);
-        s.setAllowContentAccess(true);
-        s.setDatabaseEnabled(true);
-        
-        w.setWebViewClient(new WebViewClient());
-        w.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onGeolocationPermissionsShowPrompt(String o, GeolocationPermissions.Callback c) {
-                c.invoke(o, true, false);
-            }
+        webView = new WebView(this);
+        setContentView(webView);
 
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+
+        webView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> c, FileChooserParams q) {
-                f = c;
-                try {
-                    startActivityForResult(q.createIntent(), C);
-                    return true;
-                } catch (Exception e) {
-                    f = null;
-                    return false;
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
+        
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.loadUrl("file:///android_asset/index.html");
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (webView.canGoBack()) {
+                    webView.goBack();
+                } else {
+                    tampilkanPeringatanKeluar();
                 }
             }
         });
-
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
-            requestPermissions(new String[]{
-                Manifest.permission.CAMERA,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            }, 10);
-        }
-
-        w.loadUrl("https://virionbookstore.github.io/KatalogOnline/");
     }
 
-    @Override
-    protected void onActivityResult(int r, int c, Intent d) {
-        super.onActivityResult(r, c, d);
-        if (r == C && f != null) {
-            f.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(c, d));
-            f = null;
-        }
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (w.canGoBack()) {
-                w.goBack();
-                return true;
-            } else {
-                if (doubleBackToExitPressedOnce) {
-                    finish();
-                    return true;
-                }
-
-                this.doubleBackToExitPressedOnce = true;
-                Toast.makeText(this, "Tekan sekali lagi untuk keluar aplikasi", Toast.LENGTH_SHORT).show();
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        doubleBackToExitPressedOnce = false;
-                    }
-                }, 2000);
-                
-                return true;
-            }
-        }
-        return super.onKeyDown(keyCode, event);
+    private void tampilkanPeringatanKeluar() {
+        new AlertDialog.Builder(this)
+                .setTitle("Konfirmasi Keluar")
+                .setMessage("Apakah Anda yakin ingin keluar dari aplikasi Virion Book Online?")
+                .setPositiveButton("Ya", (dialog, which) -> finish())
+                .setNegativeButton("Tidak", null)
+                .show();
     }
 }
+
