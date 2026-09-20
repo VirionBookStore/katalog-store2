@@ -6,8 +6,8 @@
     <application
         android:allowBackup="true"
         android:label="Katalog Online GV"
-        android:icon="@drawable/ic_launcher"
-        android:roundIcon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.VirionBook">
         <activity
             android:name=".MainActivity"
