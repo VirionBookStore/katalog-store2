@@ -1,16 +1,16 @@
 package com.virion.katalog;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.webkit.*;
 import android.widget.Toast;
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     WebView w;
     ValueCallback<Uri[]> f;
     static final int C = 1001;
@@ -33,9 +33,8 @@ public class MainActivity extends AppCompatActivity {
         w.setWebViewClient(new WebViewClient());
         w.setWebChromeClient(new WebChromeClient() {
             @Override
-            public boolean onGeolocationPermissionsShowPrompt(String o, GeolocationPermissions.Callback c) {
+            public void onGeolocationPermissionsShowPrompt(String o, GeolocationPermissions.Callback c) {
                 c.invoke(o, true, false);
-                return true;
             }
 
             @Override
@@ -59,31 +58,6 @@ public class MainActivity extends AppCompatActivity {
             }, 10);
         }
 
-        // Pengganti tombol Back modern
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (w.canGoBack()) {
-                    w.goBack();
-                } else {
-                    if (doubleBackToExitPressedOnce) {
-                        finish();
-                        return;
-                    }
-
-                    doubleBackToExitPressedOnce = true;
-                    Toast.makeText(MainActivity.this, "Tekan sekali lagi untuk keluar aplikasi", Toast.LENGTH_SHORT).show();
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            doubleBackToExitPressedOnce = false;
-                        }
-                    }, 2000);
-                }
-            }
-        });
-
         w.loadUrl("https://virionbookstore.github.io/KatalogOnline/");
     }
 
@@ -94,6 +68,35 @@ public class MainActivity extends AppCompatActivity {
             f.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(c, d));
             f = null;
         }
+    }
+
+    // Menggunakan onKeyDown sebagai pengganti onBackPressed yang error
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (w.canGoBack()) {
+                w.goBack();
+                return true;
+            } else {
+                if (doubleBackToExitPressedOnce) {
+                    finish();
+                    return true;
+                }
+
+                this.doubleBackToExitPressedOnce = true;
+                Toast.makeText(this, "Tekan sekali lagi untuk keluar aplikasi", Toast.LENGTH_SHORT).show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        doubleBackToExitPressedOnce = false;
+                    }
+                }, 2000);
+                
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
 
