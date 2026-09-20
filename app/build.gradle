@@ -11,7 +11,7 @@ android {
         applicationId 'com.virion.bookstore'
         minSdk 23
         targetSdk 35
-        versionCode 2
+        versionCode (System.getenv("GITHUB_RUN_NUMBER")?.toInteger() ?: 2)
         versionName '1.1'
     }
 

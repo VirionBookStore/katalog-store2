@@ -26,6 +26,12 @@ jobs:
         with:
           gradle-version: '8.7'
 
+      - name: Apply custom launcher icon
+        run: |
+          test -f icon.png
+          cp icon.png app/src/main/res/mipmap/ic_launcher.png
+          cp icon.png app/src/main/res/mipmap/ic_launcher_round.png
+
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon
 
