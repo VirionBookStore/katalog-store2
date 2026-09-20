@@ -5,7 +5,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="Virion Book Online"
+        android:label="Katalog Online GV"
         android:theme="@style/Theme.VirionBook">
         <activity
             android:name=".MainActivity"
