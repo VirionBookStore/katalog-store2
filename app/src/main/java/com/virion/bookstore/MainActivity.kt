@@ -8,15 +8,34 @@ import android.net.Uri
 import android.os.Bundle
 import android.webkit.*
 import androidx.activity.ComponentActivity
-import androidx.core.app.ActivityCompat
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
     private var fileCallback: ValueCallback<Array<Uri>>? = null
-    private val fileRequestCode = 1001
-    private val cameraRequestCode = 1002
     private val appUrl = "https://virionbookstore.github.io/katalog-store2/"
+
+    private val filePicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val results = if (result.resultCode == Activity.RESULT_OK) {
+            WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data)
+        } else null
+        fileCallback?.onReceiveValue(results)
+        fileCallback = null
+    }
+
+    private val cameraPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val request = pendingPermissionRequest
+        pendingPermissionRequest = null
+        if (granted) request?.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+        else request?.deny()
+    }
+
+    private var pendingPermissionRequest: PermissionRequest? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +68,9 @@ class MainActivity : ComponentActivity() {
             ): Boolean {
                 fileCallback?.onReceiveValue(null)
                 fileCallback = callback
+                val intent = params?.createIntent() ?: return false
                 return try {
-                    startActivityForResult(params?.createIntent(), fileRequestCode)
+                    filePicker.launch(intent)
                     true
                 } catch (_: Exception) {
                     fileCallback = null
@@ -60,18 +80,11 @@ class MainActivity : ComponentActivity() {
 
             override fun onPermissionRequest(request: PermissionRequest) {
                 runOnUiThread {
-                    if (request.resources.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
-                        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.CAMERA)
-                            != PackageManager.PERMISSION_GRANTED) {
-                            pendingPermissionRequest = request
-                            ActivityCompat.requestPermissions(
-                                this@MainActivity,
-                                arrayOf(Manifest.permission.CAMERA),
-                                cameraRequestCode
-                            )
-                        } else {
-                            request.grant(request.resources)
-                        }
+                    if (request.resources.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) &&
+                        ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        pendingPermissionRequest = request
+                        cameraPermission.launch(Manifest.permission.CAMERA)
                     } else {
                         request.grant(request.resources)
                     }
@@ -82,33 +95,7 @@ class MainActivity : ComponentActivity() {
         webView.loadUrl(appUrl)
     }
 
-    private var pendingPermissionRequest: PermissionRequest? = null
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == cameraRequestCode) {
-            val request = pendingPermissionRequest
-            pendingPermissionRequest = null
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                request?.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
-            } else {
-                request?.deny()
-            }
-        }
-    }
-
     @Deprecated("Deprecated in Android API")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == fileRequestCode) {
-            val results = if (resultCode == Activity.RESULT_OK) {
-                WebChromeClient.FileChooserParams.parseResult(resultCode, data)
-            } else null
-            fileCallback?.onReceiveValue(results)
-            fileCallback = null
-        }
-    }
-
     override fun onBackPressed() {
         if (webView.canGoBack()) webView.goBack() else super.onBackPressed()
     }
