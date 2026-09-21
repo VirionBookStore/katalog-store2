@@ -1,3 +1,4 @@
+
 package com.virion.bookstore
 
 import android.Manifest
@@ -6,17 +7,22 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.webkit.*
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
     private var fileCallback: ValueCallback<Array<Uri>>? = null
     private val appUrl = "https://virionbookstore.github.io/katalog-store2/"
+    
+    // Variabel untuk mendeteksi klik tombol kembali 2 kali
+    private var doubleBackToExitPressedOnce = false
 
     private val filePicker = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -50,6 +56,11 @@ class MainActivity : ComponentActivity() {
         webView.settings.allowContentAccess = true
         webView.settings.mediaPlaybackRequiresUserGesture = false
         webView.settings.javaScriptCanOpenWindowsAutomatically = true
+        
+        // PERBAIKAN: Menambahkan penanda "VirionAPK" ke User-Agent
+        // Agar kode web (GAS) tahu bahwa web sedang dibuka di dalam aplikasi APK
+        val userAgent = webView.settings.userAgentString
+        webView.settings.userAgentString = "$userAgent VirionAPK"
 
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -94,7 +105,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Mengatur logika tombol kembali (Back Button) agar aman dan memunculkan peringatan
+        // Mengatur logika tombol kembali (Back Button)
         setupBackPressHandler()
 
         webView.loadUrl(appUrl)
@@ -103,26 +114,23 @@ class MainActivity : ComponentActivity() {
     private fun setupBackPressHandler() {
         onBackPressedDispatcher.addCallback(this) {
             if (webView.canGoBack()) {
-                // Jika WebView masih punya riwayat halaman sebelumnya, kembali ke halaman dalam web
+                // Jika WebView masih punya riwayat, kembali ke halaman web sebelumnya
                 webView.goBack()
             } else {
-                // Jika sudah di halaman utama/terdepan, tampilkan dialog konfirmasi keluar
-                showExitConfirmationDialog()
+                // PERBAIKAN: Logika tekan dua kali untuk keluar
+                if (doubleBackToExitPressedOnce) {
+                    finish()
+                    return@addCallback
+                }
+
+                doubleBackToExitPressedOnce = true
+                Toast.makeText(this@MainActivity, "Tekan sekali lagi untuk keluar aplikasi", Toast.LENGTH_SHORT).show()
+
+                // Kembalikan status menjadi false setelah 2 detik
+                Handler(Looper.getMainLooper()).postDelayed({
+                    doubleBackToExitPressedOnce = false
+                }, 2000)
             }
         }
     }
-
-    private fun showExitConfirmationDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Keluar Aplikasi")
-            .setMessage("Apakah Anda yakin ingin keluar dari aplikasi Virion Book?")
-            .setCancelable(true)
-            .setNegativeButton("Batal", null)
-            .setPositiveButton("Keluar") { _, _ ->
-                // Menutup aplikasi secara bersih
-                finish()
-            }
-            .show()
-    }
 }
-
