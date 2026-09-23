@@ -724,18 +724,27 @@
 
     // PENGATURAN TOMBOL KEMBALI HP (BACK BUTTON) UNTUK KONFIRMASI KELUAR
     function setupBackHandler() {
-        history.pushState({ page: 'main' }, '', '');
-        window.addEventListener('popstate', function(event) {
-            // Jika ada modal aktif, tutup modal dulu
-            if(!document.getElementById('custom-alert').classList.contains('hidden')) {
-                closeCustomAlert();
-                history.pushState({ page: 'main' }, '', '');
-                return;
-            }
-            // Munculkan konfirmasi keluar aplikasi
-            document.getElementById('exit-confirm-modal').classList.remove('hidden');
+        // Cek apakah dibuka di APK Android (berdasarkan User-Agent)
+        const isAPK = navigator.userAgent.includes("VirionAPK");
+        
+        // Jika BUKAN dibuka di APK (artinya dibuka di Browser HP/Web), aktifkan popup Gambar 1
+        if (!isAPK) {
             history.pushState({ page: 'main' }, '', '');
-        });
+            window.addEventListener('popstate', function(event) {
+                // Jika ada modal alert khusus yang terbuka, tutup modal itu dulu
+                if(!document.getElementById('custom-alert').classList.contains('hidden')) {
+                    closeCustomAlert();
+                    history.pushState({ page: 'main' }, '', '');
+                    return;
+                }
+                
+                // Munculkan konfirmasi keluar aplikasi (Gambar 1)
+                document.getElementById('exit-confirm-modal').classList.remove('hidden');
+                history.pushState({ page: 'main' }, '', '');
+            });
+        }
+        // Jika dibuka di APK, biarkan saja (JavaScript tidak menahan popstate), 
+        // sehingga MainActivity.java di APK yang akan mengambil alih memunculkan teks "Tekan sekali lagi untuk keluar aplikasi" (Gambar 2).
     }
 
     function closeExitModal() {
