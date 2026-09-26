@@ -637,7 +637,7 @@
     let checkoutState = { targetCabang: "", subtotal: 0, ongkir: 0, total: 0, receiptBase64: "" };
     let currentOrderFilter = 'active';
 
-    let cabangList = ["Toko Miko", "Pam Miko", "Pam MIM", "New"];
+    let cabangList = [];
     let qrisSettings = { image: "https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg", name: "TOKO BUKU VIRION" };
     let storeLogoSettings = { type: "icon", value: "fa-solid fa-book-open" };
     let promoBannerSettings = {
@@ -763,9 +763,6 @@
         let savedUser = localStorage.getItem('Virion_user');
         if (savedUser) { try { let parsed = JSON.parse(savedUser); if (parsed && parsed.role) currentUser = parsed; } catch(e){} }
         
-        let savedCabang = localStorage.getItem('Virion_cabang_list');
-        if(savedCabang) { try { cabangList = JSON.parse(savedCabang); } catch(e){} }
-        
         let savedQris = localStorage.getItem('Virion_qris');
         if(savedQris) { try { qrisSettings = JSON.parse(savedQris); } catch(e){} }
         
@@ -819,6 +816,10 @@
                         if(res.data.qrisSettings) {
                             qrisSettings = res.data.qrisSettings;
                             localStorage.setItem('Virion_qris', JSON.stringify(qrisSettings));
+                        }
+                        if(res.data.cabangList && Array.isArray(res.data.cabangList)) { 
+                            cabangList = res.data.cabangList; 
+                            renderCabangDropdowns(); 
                         }
                         if(res.data.cabangList) {
                             cabangList = res.data.cabangList;
