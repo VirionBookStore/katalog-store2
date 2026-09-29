@@ -88,9 +88,6 @@
           <h3 class="text-lg font-extrabold text-slate-800 mb-2">Keluar Aplikasi?</h3>
           <p class="text-sm text-slate-500 mb-6">Tekan sekali lagi untuk keluar dari aplikasi Virion Book</p>
              <button onclick="closeExitModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl text-sm cursor-pointer">Batal</button>
-          <div class="flex gap-2">
-            
-          </div>
        </div>
     </div>
 
@@ -114,7 +111,7 @@
 
     <!-- Modal Admin Master Barang -->
     <div id="modal-admin-barang" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-       <div class="bg-white rounded-3xl w-full max-w-sm p-6 transform transition-all shadow-2xl relative">
+       <div class="bg-white rounded-3xl w-full max-w-sm p-6 transform transition-all shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scrollbar">
           <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-box text-blue-500 mr-2"></i>Data Barang</h3>
           <div class="space-y-3">
              <div class="flex gap-2 items-end">
@@ -126,6 +123,26 @@
              </div>
              
              <div><label class="text-xs font-bold text-slate-500">Nama Buku</label><input type="text" id="admin-input-namabarang" placeholder="Masukkan nama..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
+             
+             <!-- Input Gambar -->
+             <div>
+                 <label class="text-xs font-bold text-slate-500 block mb-1">Gambar Buku (Opsional)</label>
+                 <div class="flex gap-3 items-center">
+                     <div class="w-14 h-20 bg-slate-50 rounded-xl border border-slate-200 flex flex-col items-center justify-center overflow-hidden shrink-0 relative cursor-pointer group" onclick="document.getElementById('admin-input-gambar-file').click()">
+                         <img id="admin-preview-gambar" src="" class="w-full h-full object-cover hidden">
+                         <i id="admin-placeholder-gambar" class="fa-solid fa-image text-slate-300 text-xl"></i>
+                         <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center transition-all">
+                             <i class="fa-solid fa-camera text-white text-sm"></i>
+                         </div>
+                     </div>
+                     <div class="flex-1">
+                         <input type="file" id="admin-input-gambar-file" accept="image/*" class="hidden" onchange="handleBarangImageUpload(event)">
+                         <input type="text" id="admin-input-gambar-url" placeholder="Paste link/URL gambar disini..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[11px] focus:outline-none focus:border-blue-500 mb-1" oninput="handleBarangImageUrlChange()">
+                         <p class="text-[9px] text-slate-400 leading-tight">Ketuk ikon kiri untuk upload foto dari HP, atau tempel link URL di atas.</p>
+                     </div>
+                 </div>
+             </div>
+             
              <div>
                 <label class="text-xs font-bold text-slate-500">Pilih Cabang</label>
                 <select id="admin-input-cabangbarang" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></select>
@@ -134,6 +151,10 @@
                 <div class="flex-1"><label class="text-xs font-bold text-slate-500">Stok (Sistem)</label><input type="number" id="admin-input-stok" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
                 <div class="flex-1"><label class="text-xs font-bold text-slate-500">Lokasi Rak</label><input type="text" id="admin-input-rak" placeholder="Cth: A-01" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
              </div>
+             
+             <!-- Supplier -->
+             <div><label class="text-xs font-bold text-slate-500">Supplier</label><input type="text" id="admin-input-supplier" placeholder="Nama Supplier / Penerbit..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
+             
              <div><label class="text-xs font-bold text-slate-500">Harga (Rp)</label><input type="number" id="admin-input-hargabarang" placeholder="Contoh: 50000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500"></div>
              <div class="pt-3 flex gap-2">
                 <button type="button" onclick="closeAdminModal('modal-admin-barang')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm cursor-pointer">Batal</button>
@@ -591,7 +612,7 @@
     // =========================================================================================
     // KONFIGURASI URL API GOOGLE APPS SCRIPT
     // =========================================================================================
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxerrUzS1R84bwKxONox6MDdOGq_SnSbnP_lyTVC-h6ZVObvlR2E6hYhbg7eNJNfeg82g/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz0vaVzmzGXZXT9RASbAb-jVPcdZ6fR-H3m3HXZ_ByKNVNDKUu3QnNP3gzGqMGCU5v8Bg/exec"; 
 
     async function apiCall(actionName, payloadData = {}) {
         if (GAS_URL === "URL_WEB_APP_GAS_ANDA_DISINI" || !GAS_URL) {
@@ -649,6 +670,7 @@
     let tempLogoBase64 = "";
     let tempPromoBase64 = "";
     let tempQrisBase64 = "";
+    let tempBarangImageBase64 = "";
 
     // Fitur Scanner Barcode
     let html5QrcodeScanner = null;
@@ -865,6 +887,32 @@
             preview.src = compressedBase64; preview.classList.remove('hidden'); placeholder.classList.add('hidden'); tempLogoBase64 = compressedBase64; 
         });
     }
+    
+    function handleBarangImageUpload(event) {
+        const file = event.target.files[0]; if (!file) return;
+        compressImage(file, 400, 'image/jpeg', 0.8, function(compressedBase64) {
+            tempBarangImageBase64 = compressedBase64;
+            document.getElementById('admin-preview-gambar').src = compressedBase64;
+            document.getElementById('admin-preview-gambar').classList.remove('hidden');
+            document.getElementById('admin-placeholder-gambar').classList.add('hidden');
+            document.getElementById('admin-input-gambar-url').value = "";
+        });
+    }
+
+    function handleBarangImageUrlChange() {
+        const url = document.getElementById('admin-input-gambar-url').value.trim();
+        if (url) {
+            tempBarangImageBase64 = url;
+            document.getElementById('admin-preview-gambar').src = url;
+            document.getElementById('admin-preview-gambar').classList.remove('hidden');
+            document.getElementById('admin-placeholder-gambar').classList.add('hidden');
+        } else {
+            tempBarangImageBase64 = "";
+            document.getElementById('admin-preview-gambar').src = "";
+            document.getElementById('admin-preview-gambar').classList.add('hidden');
+            document.getElementById('admin-placeholder-gambar').classList.remove('hidden');
+        }
+    }
 
     async function resetDefaultLogo() {
         storeLogoSettings = { type: "icon", value: "fa-solid fa-book-open" };
@@ -1011,7 +1059,10 @@
 
         listContainer.innerHTML = '';
         filtered.forEach(item => {
-           let stock = item.stok || item.stock || 0; let rak = item.rak || item.lokasiRak || '-'; let imgUrl = item.image ? item.image : 'https://placehold.co/150x200?text=No+Cover'; let itemCabangStr = getItemCabang(item);
+           let stock = item.stok || item.stock || 0; let rak = item.rak || item.lokasiRak || '-'; 
+           let supplier = item.supplier ? item.supplier : '-';
+           let imgUrl = item.image ? item.image : 'https://placehold.co/150x200?text=No+Cover'; let itemCabangStr = getItemCabang(item);
+           
            listContainer.insertAdjacentHTML('beforeend', `
            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-3 items-center">
                 <div class="w-14 h-20 bg-slate-100 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden"><img src="${imgUrl}" class="w-full h-full object-cover"></div>
@@ -1019,7 +1070,10 @@
                     <p class="text-[9px] font-mono text-slate-400 mb-0.5">${item.idBarang}</p>
                     <h4 class="font-bold text-sm text-slate-800 line-clamp-1 mb-0.5">${item.namaBarang || 'Tanpa Nama'}</h4>
                     <p class="text-[10px] text-slate-500 mb-1.5"><i class="fa-solid fa-store mr-1"></i>${itemCabangStr} (Stok: ${stock}) • <span class="font-bold text-slate-700">Rp ${Number(item.harga||0).toLocaleString('id-ID')}</span></p>
-                    <div class="flex gap-2"><span class="text-[9px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 truncate max-w-[120px]">Rak: ${rak}</span></div>
+                    <div class="flex gap-2">
+                        <span class="text-[9px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 truncate max-w-[120px]">Rak: ${rak}</span>
+                        <span class="text-[9px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 truncate max-w-[120px]"><i class="fa-solid fa-truck"></i> Sup: ${supplier}</span>
+                    </div>
                 </div>
                 <div class="flex flex-col gap-2 shrink-0">
                     <button onclick="editMasterItem('${item.idBarang}', '${itemCabangStr}')" class="w-8 h-8 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center cursor-pointer hover:bg-blue-100 transition-colors"><i class="fa-solid fa-pen text-xs"></i></button>
@@ -1032,21 +1086,50 @@
     function handleAdminSearch() { renderAdminMasterList(masterData); }
 
     function openBarangModalBaru() {
-        document.getElementById('admin-input-idbarang').value = ''; document.getElementById('admin-input-namabarang').value = ''; document.getElementById('admin-input-cabangbarang').value = (cabangList.length > 0) ? cabangList[0] : 'Toko Pusat'; document.getElementById('admin-input-stok').value = ''; document.getElementById('admin-input-rak').value = ''; document.getElementById('admin-input-hargabarang').value = ''; openAdminModal('modal-admin-barang');
+        document.getElementById('admin-input-idbarang').value = ''; 
+        document.getElementById('admin-input-namabarang').value = ''; 
+        document.getElementById('admin-input-cabangbarang').value = (cabangList.length > 0) ? cabangList[0] : 'Toko Pusat'; 
+        document.getElementById('admin-input-stok').value = ''; 
+        document.getElementById('admin-input-rak').value = ''; 
+        document.getElementById('admin-input-supplier').value = ''; 
+        document.getElementById('admin-input-hargabarang').value = ''; 
+        
+        tempBarangImageBase64 = "";
+        document.getElementById('admin-input-gambar-url').value = "";
+        document.getElementById('admin-preview-gambar').src = "";
+        document.getElementById('admin-preview-gambar').classList.add('hidden');
+        document.getElementById('admin-placeholder-gambar').classList.remove('hidden');
+
+        openAdminModal('modal-admin-barang');
     }
 
     async function simpanDataBarangMaster() {
-        const idBarang = document.getElementById('admin-input-idbarang').value || ('BRG-' + Date.now()); const namaBarang = document.getElementById('admin-input-namabarang').value.trim(); const cabang = document.getElementById('admin-input-cabangbarang').value; const stok = document.getElementById('admin-input-stok').value || 0; const rak = document.getElementById('admin-input-rak').value || '-'; const harga = document.getElementById('admin-input-hargabarang').value || 0;
+        const idBarang = document.getElementById('admin-input-idbarang').value || ('BRG-' + Date.now()); 
+        const namaBarang = document.getElementById('admin-input-namabarang').value.trim(); 
+        const cabang = document.getElementById('admin-input-cabangbarang').value; 
+        const stok = document.getElementById('admin-input-stok').value || 0; 
+        const rak = document.getElementById('admin-input-rak').value || '-'; 
+        const supplier = document.getElementById('admin-input-supplier').value.trim();
+        const harga = document.getElementById('admin-input-hargabarang').value || 0;
+        
         if (!namaBarang || !harga) return showCustomAlert('Perhatian', 'Nama buku dan harga wajib diisi.', 'warning');
         
-        const btn = document.getElementById('btn-simpan-barang'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...'; btn.disabled = true;
+        const btn = document.getElementById('btn-simpan-barang'); 
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...'; 
+        btn.disabled = true;
 
-        const newItem = { idBarang, namaBarang, cabang, stok: Number(stok), rak, harga: Number(harga), image: "" };
+        let finalImage = tempBarangImageBase64 || document.getElementById('admin-input-gambar-url').value.trim() || "";
+
+        const newItem = { idBarang, namaBarang, cabang, stok: Number(stok), rak, supplier, harga: Number(harga), image: finalImage };
         let index = masterData.findIndex(item => String(item.idBarang) === String(idBarang) && getItemCabang(item).toLowerCase() === cabang.toLowerCase());
+        
         if (index !== -1) masterData[index] = newItem; else masterData.push(newItem);
 
-        closeAdminModal('modal-admin-barang'); filterByCabang(currentCabangFilter); renderAdminMasterList(masterData); 
-        btn.innerHTML = 'Simpan Data'; btn.disabled = false;
+        closeAdminModal('modal-admin-barang'); 
+        filterByCabang(currentCabangFilter); 
+        renderAdminMasterList(masterData); 
+        btn.innerHTML = 'Simpan Data'; 
+        btn.disabled = false;
         
         apiCall("saveMasterItem", { itemObj: newItem });
         showCustomAlert('Berhasil', 'Data barang berhasil disimpan.', 'success');
@@ -1054,7 +1137,32 @@
 
     function editMasterItem(idBarang, cabang) {
         let item = findMasterProduct(idBarang, cabang); if (!item) return;
-        document.getElementById('admin-input-idbarang').value = item.idBarang; document.getElementById('admin-input-namabarang').value = item.namaBarang; document.getElementById('admin-input-cabangbarang').value = getItemCabang(item); document.getElementById('admin-input-stok').value = item.stok || 0; document.getElementById('admin-input-rak').value = item.rak || ''; document.getElementById('admin-input-hargabarang').value = item.harga || 0; openAdminModal('modal-admin-barang');
+        document.getElementById('admin-input-idbarang').value = item.idBarang; 
+        document.getElementById('admin-input-namabarang').value = item.namaBarang; 
+        document.getElementById('admin-input-cabangbarang').value = getItemCabang(item); 
+        document.getElementById('admin-input-stok').value = item.stok || 0; 
+        document.getElementById('admin-input-rak').value = item.rak || ''; 
+        document.getElementById('admin-input-supplier').value = item.supplier || ''; 
+        document.getElementById('admin-input-hargabarang').value = item.harga || 0; 
+
+        tempBarangImageBase64 = item.image || "";
+        if (item.image) {
+            document.getElementById('admin-preview-gambar').src = item.image;
+            document.getElementById('admin-preview-gambar').classList.remove('hidden');
+            document.getElementById('admin-placeholder-gambar').classList.add('hidden');
+            if(item.image.startsWith('http')) {
+                document.getElementById('admin-input-gambar-url').value = item.image;
+            } else {
+                document.getElementById('admin-input-gambar-url').value = "";
+            }
+        } else {
+            document.getElementById('admin-input-gambar-url').value = "";
+            document.getElementById('admin-preview-gambar').src = "";
+            document.getElementById('admin-preview-gambar').classList.add('hidden');
+            document.getElementById('admin-placeholder-gambar').classList.remove('hidden');
+        }
+
+        openAdminModal('modal-admin-barang');
     }
 
     function hapusMasterItem(idBarang, cabang) {
