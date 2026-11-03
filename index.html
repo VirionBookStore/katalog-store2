@@ -1311,7 +1311,7 @@
     
     function applyFilters() {
       const searchQuery = document.getElementById('global-search') ? document.getElementById('global-search').value.trim().toLowerCase() : '';
-      const words = searchQuery ? searchQuery.split(/\\s+/) : [];
+      const words = searchQuery ? searchQuery.split(/\s+/) : [];
       const selectedCabang = currentCabangFilter === 'Semua' ? '' : currentCabangFilter.toLowerCase();
       let filtered = [];
       for (let i = 0; i < masterData.length; i++) {
