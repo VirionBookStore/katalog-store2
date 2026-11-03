@@ -874,7 +874,8 @@
                     }
                 });
             } catch (err) {
-                onDataLoaded({ status: "error" });
+                console.error('Gagal mengambil master dari server:', err);
+                if (!hasCachedMaster) onDataLoaded({ status: "error" });
             }
         }
     });
@@ -1140,7 +1141,7 @@
            
            listContainer.insertAdjacentHTML('beforeend', `
            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-3 items-center">
-                <div class="w-14 h-20 bg-slate-100 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden"><img src="${imgUrl}" class="w-full h-full object-cover"></div>
+                <div class="w-14 h-20 bg-slate-100 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden"><img src="${imgUrl}" loading="lazy" decoding="async" class="w-full h-full object-cover"></div>
                 <div class="flex-1">
                     <p class="text-[9px] font-mono text-slate-400 mb-0.5">${item.idBarang}</p>
                     <h4 class="font-bold text-sm text-slate-800 line-clamp-1 mb-0.5">${item.namaBarang || 'Tanpa Nama'}</h4>
@@ -1424,7 +1425,7 @@
         grid.insertAdjacentHTML('beforeend', `<div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 relative group flex flex-col justify-between"><div><div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 flex items-center justify-center overflow-hidden relative"><img src="${imgUrl}" alt="${item.namaBarang}" loading="lazy" decoding="async" class="w-full h-full object-cover"><div class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md text-white text-[7px] font-bold px-1.5 py-0.5 rounded shadow flex items-center gap-0.5 z-10 border border-white/20"><i class="fa-solid fa-bookmark text-[6px] text-amber-400"></i> ${rak}</div></div><div class="space-y-0.5"><h4 class="font-bold text-[9px] text-slate-800 line-clamp-2 leading-tight">${item.namaBarang}</h4><div class="flex items-center justify-between text-[7px] text-slate-400"><span class="truncate">${itemCabangStr}</span><span class="font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 shrink-0 ml-1">Stok: ${stock}</span></div></div></div><div class="flex items-center justify-between pt-1.5 mt-auto"><span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span><button onclick="addToCart('${item.idBarang}', '${itemCabangStr}')" class="w-4 h-4 bg-goge-light text-goge-primary rounded-md flex items-center justify-center hover:bg-goge-primary hover:text-white transition-colors shrink-0 cursor-pointer"><i class="fa-solid fa-plus text-[8px]"></i></button></div></div>`);
       });
       if (items.length > catalogRenderLimit) {
-        grid.insertAdjacentHTML('beforeend', `<button onclick="loadMoreCatalogResults()" class="col-span-3 md:col-span-8 w-full py-3 text-xs font-bold text-goge-primary bg-goge-light rounded-xl">Tampilkan 60 buku lagi (${items.length - catalogRenderLimit} tersisa)</button>`);
+        grid.insertAdjacentHTML('beforeend', `<button onclick="loadMoreCatalogResults()" class="col-span-3 md:col-span-8 w-full py-3 text-xs font-bold text-goge-primary bg-goge-light rounded-xl">Tampilkan 24 buku lagi (${items.length - catalogRenderLimit} tersisa)</button>`);
       }
     }
 
