@@ -826,57 +826,59 @@
                 }
             } catch (cacheError) { console.warn('Gagal memuat cache katalog:', cacheError); }
 
+            // Mulai tiga permintaan secara bersamaan. Katalog tetap dirender segera
+            // setelah master diterima; data pengguna/pengaturan tidak menahan katalog.
+            const usersRequest = apiCall("getAllUsers");
+            const settingsRequest = apiCall("getStoreSettings");
+
             try {
                 const masterRes = await apiCall("getOptimizedMasterItems");
                 if (masterRes && masterRes.status === "success" && Array.isArray(masterRes.data)) {
                     onDataLoaded(masterRes);
+                    // Simpan cache di latar belakang agar tampilan tidak menunggu IndexedDB.
                     writeMasterCache(masterRes.data);
                 } else if (!hasCachedMaster) {
                     onDataLoaded(masterRes);
                 }
-
-                apiCall("getAllUsers").then(res => {
-                    if(res && res.status === "success" && res.data) {
-                        globalUsers = res.data;
-                        localStorage.setItem('Virion_global_users', JSON.stringify(globalUsers));
-                    }
-                });
-
-                apiCall("getStoreSettings").then(res => {
-                    if(res && res.status === "success" && res.data) {
-                        if(res.data.waNumbers) {
-                            adminWhatsAppNumbers = res.data.waNumbers;
-                            localStorage.setItem('Virion_admin_wa', JSON.stringify(adminWhatsAppNumbers));
-                        }
-                        if(res.data.promoBanner) {
-                            promoBannerSettings = res.data.promoBanner;
-                            localStorage.setItem('Virion_promo_banner', JSON.stringify(promoBannerSettings));
-                            applyPromoBannerUI();
-                        }
-                        if(res.data.storeLogo) {
-                            storeLogoSettings = res.data.storeLogo;
-                            localStorage.setItem('Virion_store_logo', JSON.stringify(storeLogoSettings));
-                            applyStoreLogoUI();
-                        }
-                        if(res.data.qrisSettings) {
-                            qrisSettings = res.data.qrisSettings;
-                            localStorage.setItem('Virion_qris', JSON.stringify(qrisSettings));
-                        }
-                        if(res.data.cabangList && Array.isArray(res.data.cabangList)) { 
-                            cabangList = res.data.cabangList; 
-                            renderCabangDropdowns(); 
-                        }
-                        if(res.data.cabangList) {
-                            cabangList = res.data.cabangList;
-                            localStorage.setItem('Virion_cabang_list', JSON.stringify(cabangList));
-                            renderCabangDropdowns();
-                        }
-                    }
-                });
             } catch (err) {
                 console.error('Gagal mengambil master dari server:', err);
                 if (!hasCachedMaster) onDataLoaded({ status: "error" });
             }
+
+            usersRequest.then(res => {
+                if (res && res.status === "success" && res.data) {
+                    globalUsers = res.data;
+                    localStorage.setItem('Virion_global_users', JSON.stringify(globalUsers));
+                }
+            }).catch(err => console.warn('Gagal memuat data pengguna:', err));
+
+            settingsRequest.then(res => {
+                if (res && res.status === "success" && res.data) {
+                    if (res.data.waNumbers) {
+                        adminWhatsAppNumbers = res.data.waNumbers;
+                        localStorage.setItem('Virion_admin_wa', JSON.stringify(adminWhatsAppNumbers));
+                    }
+                    if (res.data.promoBanner) {
+                        promoBannerSettings = res.data.promoBanner;
+                        localStorage.setItem('Virion_promo_banner', JSON.stringify(promoBannerSettings));
+                        applyPromoBannerUI();
+                    }
+                    if (res.data.storeLogo) {
+                        storeLogoSettings = res.data.storeLogo;
+                        localStorage.setItem('Virion_store_logo', JSON.stringify(storeLogoSettings));
+                        applyStoreLogoUI();
+                    }
+                    if (res.data.qrisSettings) {
+                        qrisSettings = res.data.qrisSettings;
+                        localStorage.setItem('Virion_qris', JSON.stringify(qrisSettings));
+                    }
+                    if (Array.isArray(res.data.cabangList)) {
+                        cabangList = res.data.cabangList;
+                        localStorage.setItem('Virion_cabang_list', JSON.stringify(cabangList));
+                        renderCabangDropdowns();
+                    }
+                }
+            }).catch(err => console.warn('Gagal memuat pengaturan toko:', err));
         }
     });
 
