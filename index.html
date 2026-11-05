@@ -612,7 +612,7 @@
     // =========================================================================================
     // KONFIGURASI URL API GOOGLE APPS SCRIPT
     // =========================================================================================
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbz0vaVzmzGXZXT9RASbAb-jVPcdZ6fR-H3m3HXZ_ByKNVNDKUu3QnNP3gzGqMGCU5v8Bg/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxojo_B7AzNYjuqL5wa6h9Xc1aXQN2FRfrnsBj8c1TydgDS0YiJjZOEJFqug_sui0VVFA/exec"; 
 
     async function apiCall(actionName, payloadData = {}) {
         if (GAS_URL === "URL_WEB_APP_GAS_ANDA_DISINI" || !GAS_URL) {
@@ -645,6 +645,13 @@
     }
 
     let masterData = [];
+    // Indeks pencarian dibangun sekali saat data master dimuat, bukan saat setiap karakter diketik.
+    let masterSearchIndex = new WeakMap();
+    let lastCatalogFiltered = [];
+    let catalogRenderLimit = 24;
+    let catalogSearchTimer = null;
+    let lastAdminFiltered = [];
+    let adminRenderLimit = 60;
     let cartData = [];
     let globalOrders = [];
     let globalUsers = [];
@@ -808,51 +815,70 @@
             const grid = document.getElementById('catalog-grid');
             if(grid) grid.innerHTML = '<div class="col-span-3 md:col-span-8 text-center text-slate-400 py-10 text-sm font-medium"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-goge-primary"></i><br>Sedang menghubungi Database...</div>';
 
+            let hasCachedMaster = false;
+            try {
+                const cachedMaster = await readMasterCache();
+                if (Array.isArray(cachedMaster) && cachedMaster.length) {
+                    hasCachedMaster = true;
+                    onDataLoaded({ status: "success", data: cachedMaster });
+                    const loadingNote = document.getElementById('catalog-grid');
+                    if (loadingNote) loadingNote.setAttribute('data-cache-loaded', 'true');
+                }
+            } catch (cacheError) { console.warn('Gagal memuat cache katalog:', cacheError); }
+
+            // Mulai tiga permintaan secara bersamaan. Katalog tetap dirender segera
+            // setelah master diterima; data pengguna/pengaturan tidak menahan katalog.
+            const usersRequest = apiCall("getAllUsers");
+            const settingsRequest = apiCall("getStoreSettings");
+
             try {
                 const masterRes = await apiCall("getOptimizedMasterItems");
-                onDataLoaded(masterRes);
-
-                apiCall("getAllUsers").then(res => {
-                    if(res && res.status === "success" && res.data) {
-                        globalUsers = res.data;
-                        localStorage.setItem('Virion_global_users', JSON.stringify(globalUsers));
-                    }
-                });
-
-                apiCall("getStoreSettings").then(res => {
-                    if(res && res.status === "success" && res.data) {
-                        if(res.data.waNumbers) {
-                            adminWhatsAppNumbers = res.data.waNumbers;
-                            localStorage.setItem('Virion_admin_wa', JSON.stringify(adminWhatsAppNumbers));
-                        }
-                        if(res.data.promoBanner) {
-                            promoBannerSettings = res.data.promoBanner;
-                            localStorage.setItem('Virion_promo_banner', JSON.stringify(promoBannerSettings));
-                            applyPromoBannerUI();
-                        }
-                        if(res.data.storeLogo) {
-                            storeLogoSettings = res.data.storeLogo;
-                            localStorage.setItem('Virion_store_logo', JSON.stringify(storeLogoSettings));
-                            applyStoreLogoUI();
-                        }
-                        if(res.data.qrisSettings) {
-                            qrisSettings = res.data.qrisSettings;
-                            localStorage.setItem('Virion_qris', JSON.stringify(qrisSettings));
-                        }
-                        if(res.data.cabangList && Array.isArray(res.data.cabangList)) { 
-                            cabangList = res.data.cabangList; 
-                            renderCabangDropdowns(); 
-                        }
-                        if(res.data.cabangList) {
-                            cabangList = res.data.cabangList;
-                            localStorage.setItem('Virion_cabang_list', JSON.stringify(cabangList));
-                            renderCabangDropdowns();
-                        }
-                    }
-                });
+                if (masterRes && masterRes.status === "success" && Array.isArray(masterRes.data)) {
+                    onDataLoaded(masterRes);
+                    // Simpan cache di latar belakang agar tampilan tidak menunggu IndexedDB.
+                    writeMasterCache(masterRes.data);
+                } else if (!hasCachedMaster) {
+                    onDataLoaded(masterRes);
+                }
             } catch (err) {
-                onDataLoaded({ status: "error" });
+                console.error('Gagal mengambil master dari server:', err);
+                if (!hasCachedMaster) onDataLoaded({ status: "error" });
             }
+
+            usersRequest.then(res => {
+                if (res && res.status === "success" && res.data) {
+                    globalUsers = res.data;
+                    localStorage.setItem('Virion_global_users', JSON.stringify(globalUsers));
+                }
+            }).catch(err => console.warn('Gagal memuat data pengguna:', err));
+
+            settingsRequest.then(res => {
+                if (res && res.status === "success" && res.data) {
+                    if (res.data.waNumbers) {
+                        adminWhatsAppNumbers = res.data.waNumbers;
+                        localStorage.setItem('Virion_admin_wa', JSON.stringify(adminWhatsAppNumbers));
+                    }
+                    if (res.data.promoBanner) {
+                        promoBannerSettings = res.data.promoBanner;
+                        localStorage.setItem('Virion_promo_banner', JSON.stringify(promoBannerSettings));
+                        applyPromoBannerUI();
+                    }
+                    if (res.data.storeLogo) {
+                        storeLogoSettings = res.data.storeLogo;
+                        localStorage.setItem('Virion_store_logo', JSON.stringify(storeLogoSettings));
+                        applyStoreLogoUI();
+                    }
+                    if (res.data.qrisSettings) {
+                        qrisSettings = res.data.qrisSettings;
+                        localStorage.setItem('Virion_qris', JSON.stringify(qrisSettings));
+                    }
+                    if (Array.isArray(res.data.cabangList)) {
+                        cabangList = res.data.cabangList;
+                        localStorage.setItem('Virion_cabang_list', JSON.stringify(cabangList));
+                        renderCabangDropdowns();
+                    }
+                }
+            }).catch(err => console.warn('Gagal memuat pengaturan toko:', err));
         }
     });
 
@@ -973,6 +999,57 @@
         apiCall("saveStoreSettings", { settingsObj: { promoBanner: promoBannerSettings } });
     }
 
+    function buildMasterSearchIndex() {
+        masterSearchIndex = new WeakMap();
+        masterData.forEach(item => {
+            if (!item || typeof item !== 'object') return;
+            masterSearchIndex.set(item, {
+                nama: String(item.namaBarang || '').toLowerCase(),
+                id: String(item.idBarang || '').toLowerCase(),
+                cabang: String(getItemCabang(item) || '').toLowerCase()
+            });
+        });
+    }
+
+    function openMasterCacheDB() {
+        return new Promise((resolve, reject) => {
+            if (!window.indexedDB) return resolve(null);
+            const request = indexedDB.open('VirionKatalogCache', 1);
+            request.onupgradeneeded = () => { const db = request.result; if (!db.objectStoreNames.contains('master')) db.createObjectStore('master'); };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function readMasterCache() {
+        let db;
+        try {
+            db = await openMasterCacheDB();
+            if (!db) return null;
+            return await new Promise((resolve, reject) => {
+                const request = db.transaction('master', 'readonly').objectStore('master').get('items');
+                request.onsuccess = () => resolve(Array.isArray(request.result) ? request.result : null);
+                request.onerror = () => reject(request.error);
+            });
+        } catch (error) { console.warn('Cache master tidak dapat dibaca:', error); return null; }
+        finally { if (db) db.close(); }
+    }
+
+    async function writeMasterCache(items) {
+        if (!Array.isArray(items)) return;
+        let db;
+        try {
+            db = await openMasterCacheDB();
+            if (!db) return;
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction('master', 'readwrite');
+                tx.objectStore('master').put(items, 'items');
+                tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error);
+            });
+        } catch (error) { console.warn('Cache master tidak dapat disimpan:', error); }
+        finally { if (db) db.close(); }
+    }
+
     function onDataLoaded(response) {
         try {
             if (typeof response === 'string') response = JSON.parse(response);
@@ -982,8 +1059,8 @@
         } catch (e) { masterData = []; }
         
         if (!Array.isArray(masterData)) masterData = [];
+        buildMasterSearchIndex();
         filterByCabang(currentCabangFilter);
-        renderAdminMasterList(masterData);
     }
 
     function toggleAuthMode(mode) {
@@ -1049,23 +1126,24 @@
 
     function handleProfileAvatarUpload(event) { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, 'image/jpeg', 0.8, function(compressedBase64) { currentUser.avatar = compressedBase64; localStorage.setItem('Virion_user', JSON.stringify(currentUser)); updateAuthUI(); showCustomAlert('Foto Diperbarui', 'Foto berhasil diubah.', 'success'); }); }
 
-    function renderAdminMasterList(items) {
+    function renderAdminMasterList(items, keepLimit = false) {
         const listContainer = document.getElementById('admin-master-list'); if (!listContainer) return; 
         const searchInput = document.getElementById('admin-search-barang'); const searchQuery = searchInput ? searchInput.value : '';
         let validItems = (Array.isArray(items)) ? items : masterData;
-        let filtered = validItems.filter(item => item && (matchFlexibleQuery(item.namaBarang || '', searchQuery) || matchFlexibleQuery(item.idBarang || '', searchQuery)));
+        let filtered = keepLimit ? lastAdminFiltered : validItems.filter(item => item && (matchFlexibleQuery(item.namaBarang || '', searchQuery) || matchFlexibleQuery(item.idBarang || '', searchQuery)));
+        if (!keepLimit) { lastAdminFiltered = filtered; adminRenderLimit = 60; }
         
         if (filtered.length === 0) { listContainer.innerHTML = `<div class="text-center text-slate-400 py-10 bg-white rounded-2xl border border-slate-100 shadow-sm mt-2"><i class="fa-solid fa-box-open text-4xl mb-3 text-slate-300"></i><p class="text-sm font-medium">Data barang kosong atau tidak ditemukan.</p></div>`; return; }
 
         listContainer.innerHTML = '';
-        filtered.forEach(item => {
+        filtered.slice(0, adminRenderLimit).forEach(item => {
            let stock = item.stok || item.stock || 0; let rak = item.rak || item.lokasiRak || '-'; 
            let supplier = item.supplier ? item.supplier : '-';
            let imgUrl = item.image ? item.image : 'https://placehold.co/150x200?text=No+Cover'; let itemCabangStr = getItemCabang(item);
            
            listContainer.insertAdjacentHTML('beforeend', `
            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-3 items-center">
-                <div class="w-14 h-20 bg-slate-100 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden"><img src="${imgUrl}" class="w-full h-full object-cover"></div>
+                <div class="w-14 h-20 bg-slate-100 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden"><img src="${imgUrl}" loading="lazy" decoding="async" class="w-full h-full object-cover"></div>
                 <div class="flex-1">
                     <p class="text-[9px] font-mono text-slate-400 mb-0.5">${item.idBarang}</p>
                     <h4 class="font-bold text-sm text-slate-800 line-clamp-1 mb-0.5">${item.namaBarang || 'Tanpa Nama'}</h4>
@@ -1081,7 +1159,10 @@
                 </div>
            </div>`);
         });
+        if (filtered.length > adminRenderLimit) listContainer.insertAdjacentHTML('beforeend', `<button onclick="loadMoreAdminResults()" class="w-full py-3 text-xs font-bold text-goge-primary bg-goge-light rounded-xl">Tampilkan 60 barang lagi (${filtered.length - adminRenderLimit} tersisa)</button>`);
     }
+
+    function loadMoreAdminResults() { adminRenderLimit += 60; renderAdminMasterList(lastAdminFiltered, true); }
 
     function handleAdminSearch() { renderAdminMasterList(masterData); }
 
@@ -1292,14 +1373,34 @@
     function filterByCabang(cabang) { currentCabangFilter = cabang; renderCabangDropdowns(); applyFilters(); }
     
     function applyFilters() {
-      const searchQuery = document.getElementById('global-search') ? document.getElementById('global-search').value : '';
-      let filtered = masterData.filter(item => {
-        let itemCabangStr = getItemCabang(item).toLowerCase();
-        let matchCabang = (currentCabangFilter === 'Semua') || (itemCabangStr === currentCabangFilter.toLowerCase());
-        let matchQuery = matchFlexibleQuery(item.namaBarang || '', searchQuery) || matchFlexibleQuery(item.idBarang || '', searchQuery);
-        return matchCabang && matchQuery;
-      });
+      const searchQuery = document.getElementById('global-search') ? document.getElementById('global-search').value.trim().toLowerCase() : '';
+      const words = searchQuery ? searchQuery.split(/\s+/) : [];
+      const selectedCabang = currentCabangFilter === 'Semua' ? '' : currentCabangFilter.toLowerCase();
+      let filtered = [];
+      for (let i = 0; i < masterData.length; i++) {
+        const item = masterData[i];
+        if (!item) continue;
+        let entry = masterSearchIndex.get(item);
+        if (!entry) {
+          entry = { nama: String(item.namaBarang || '').toLowerCase(), id: String(item.idBarang || '').toLowerCase(), cabang: String(getItemCabang(item) || '').toLowerCase() };
+          masterSearchIndex.set(item, entry);
+        }
+        if (selectedCabang && entry.cabang !== selectedCabang) continue;
+        if (words.length) {
+          const nameMatch = words.every(word => entry.nama.includes(word));
+          const idMatch = words.every(word => entry.id.includes(word));
+          if (!nameMatch && !idMatch) continue;
+        }
+        filtered.push(item);
+      }
+      lastCatalogFiltered = filtered;
+      catalogRenderLimit = 24;
       renderCatalog(filtered);
+    }
+
+    function loadMoreCatalogResults() {
+      catalogRenderLimit += 24;
+      renderCatalog(lastCatalogFiltered);
     }
 
     function handleSearchFocus() { const collapsible = document.getElementById('collapsible-search-hide'); if (collapsible) { collapsible.classList.add('hidden'); } }
@@ -1313,16 +1414,21 @@
     function handleSearch() {
         const searchInput = document.getElementById('global-search'); const clearBtn = document.getElementById('clear-search-btn');
         if (searchInput && searchInput.value.trim().length > 0) { clearBtn.classList.remove('hidden'); } else if (clearBtn) { clearBtn.classList.add('hidden'); }
-        applyFilters();
+        if (catalogSearchTimer) clearTimeout(catalogSearchTimer);
+        catalogSearchTimer = setTimeout(() => applyFilters(), 70);
     }
 
     function renderCatalog(items) {
       const grid = document.getElementById('catalog-grid'); if (!grid) return; grid.innerHTML = ''; 
       if (!items || items.length === 0) { grid.innerHTML = '<p class="col-span-3 md:col-span-8 text-center text-slate-400 text-sm py-10">Tidak ada buku yang ditemukan.</p>'; return; }
-      items.forEach((item) => {
+      const visibleItems = items.slice(0, catalogRenderLimit);
+      visibleItems.forEach((item) => {
         let stock = item.stok || item.stock || 0; let rak = item.rak || item.lokasiRak || '-'; let imgUrl = item.image ? item.image : 'https://placehold.co/150x200/e2e8f0/94a3b8?text=No+Cover'; let itemCabangStr = getItemCabang(item);
-        grid.insertAdjacentHTML('beforeend', `<div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 relative group flex flex-col justify-between"><div><div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 flex items-center justify-center overflow-hidden relative"><img src="${imgUrl}" alt="${item.namaBarang}" class="w-full h-full object-cover"><div class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md text-white text-[7px] font-bold px-1.5 py-0.5 rounded shadow flex items-center gap-0.5 z-10 border border-white/20"><i class="fa-solid fa-bookmark text-[6px] text-amber-400"></i> ${rak}</div></div><div class="space-y-0.5"><h4 class="font-bold text-[9px] text-slate-800 line-clamp-2 leading-tight">${item.namaBarang}</h4><div class="flex items-center justify-between text-[7px] text-slate-400"><span class="truncate">${itemCabangStr}</span><span class="font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 shrink-0 ml-1">Stok: ${stock}</span></div></div></div><div class="flex items-center justify-between pt-1.5 mt-auto"><span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span><button onclick="addToCart('${item.idBarang}', '${itemCabangStr}')" class="w-4 h-4 bg-goge-light text-goge-primary rounded-md flex items-center justify-center hover:bg-goge-primary hover:text-white transition-colors shrink-0 cursor-pointer"><i class="fa-solid fa-plus text-[8px]"></i></button></div></div>`);
+        grid.insertAdjacentHTML('beforeend', `<div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 relative group flex flex-col justify-between"><div><div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 flex items-center justify-center overflow-hidden relative"><img src="${imgUrl}" alt="${item.namaBarang}" loading="lazy" decoding="async" class="w-full h-full object-cover"><div class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md text-white text-[7px] font-bold px-1.5 py-0.5 rounded shadow flex items-center gap-0.5 z-10 border border-white/20"><i class="fa-solid fa-bookmark text-[6px] text-amber-400"></i> ${rak}</div></div><div class="space-y-0.5"><h4 class="font-bold text-[9px] text-slate-800 line-clamp-2 leading-tight">${item.namaBarang}</h4><div class="flex items-center justify-between text-[7px] text-slate-400"><span class="truncate">${itemCabangStr}</span><span class="font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 shrink-0 ml-1">Stok: ${stock}</span></div></div></div><div class="flex items-center justify-between pt-1.5 mt-auto"><span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span><button onclick="addToCart('${item.idBarang}', '${itemCabangStr}')" class="w-4 h-4 bg-goge-light text-goge-primary rounded-md flex items-center justify-center hover:bg-goge-primary hover:text-white transition-colors shrink-0 cursor-pointer"><i class="fa-solid fa-plus text-[8px]"></i></button></div></div>`);
       });
+      if (items.length > catalogRenderLimit) {
+        grid.insertAdjacentHTML('beforeend', `<button onclick="loadMoreCatalogResults()" class="col-span-3 md:col-span-8 w-full py-3 text-xs font-bold text-goge-primary bg-goge-light rounded-xl">Tampilkan 24 buku lagi (${items.length - catalogRenderLimit} tersisa)</button>`);
+      }
     }
 
     function addToCart(idBarang, cabang) { 
