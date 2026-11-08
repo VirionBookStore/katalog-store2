@@ -1466,7 +1466,7 @@
         nameLabel.style.maxHeight = '22vh';
         nameLabel.style.overflowY = 'auto';
         nameLabel.style.overflowWrap = 'anywhere';
-        imageFrame.after(nameLabel);
+
 
 
         const controls = document.createElement('div');
@@ -1496,7 +1496,7 @@
         previewImg.addEventListener('click', () => { zoom = zoom === 1 ? 2 : 1; applyZoom(); });
 
         controls.append(zoomOut, zoomLabel, zoomIn);
-        panel.append(closeBtn, imageFrame, controls);
+        panel.append(closeBtn, imageFrame, nameLabel, controls);
         modal.addEventListener('click', closeImagePreview);
         modal.appendChild(panel);
         document.body.appendChild(modal);
