@@ -1424,11 +1424,88 @@
       const visibleItems = items.slice(0, catalogRenderLimit);
       visibleItems.forEach((item) => {
         let stock = item.stok || item.stock || 0; let rak = item.rak || item.lokasiRak || '-'; let imgUrl = item.image ? item.image : 'https://placehold.co/150x200/e2e8f0/94a3b8?text=No+Cover'; let itemCabangStr = getItemCabang(item);
-        grid.insertAdjacentHTML('beforeend', `<div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 relative group flex flex-col justify-between"><div><div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 flex items-center justify-center overflow-hidden relative"><img src="${imgUrl}" alt="${item.namaBarang}" loading="lazy" decoding="async" class="w-full h-full object-cover"><div class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md text-white text-[7px] font-bold px-1.5 py-0.5 rounded shadow flex items-center gap-0.5 z-10 border border-white/20"><i class="fa-solid fa-bookmark text-[6px] text-amber-400"></i> ${rak}</div></div><div class="space-y-0.5"><h4 class="font-bold text-[9px] text-slate-800 line-clamp-2 leading-tight">${item.namaBarang}</h4><div class="flex items-center justify-between text-[7px] text-slate-400"><span class="truncate">${itemCabangStr}</span><span class="font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 shrink-0 ml-1">Stok: ${stock}</span></div></div></div><div class="flex items-center justify-between pt-1.5 mt-auto"><span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span><button onclick="addToCart('${item.idBarang}', '${itemCabangStr}')" class="w-4 h-4 bg-goge-light text-goge-primary rounded-md flex items-center justify-center hover:bg-goge-primary hover:text-white transition-colors shrink-0 cursor-pointer"><i class="fa-solid fa-plus text-[8px]"></i></button></div></div>`);
+        grid.insertAdjacentHTML('beforeend', `<div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-100 relative group flex flex-col justify-between"><div><div class="aspect-[3/4] bg-slate-50 rounded-lg mb-1 flex items-center justify-center overflow-hidden relative"><img src="${imgUrl}" alt="${item.namaBarang}" loading="lazy" decoding="async" onclick="openImagePreview(this.src)" class="w-full h-full object-cover cursor-zoom-in" title="Klik untuk melihat gambar utuh"><div class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md text-white text-[7px] font-bold px-1.5 py-0.5 rounded shadow flex items-center gap-0.5 z-10 border border-white/20"><i class="fa-solid fa-bookmark text-[6px] text-amber-400"></i> ${rak}</div></div><div class="space-y-0.5"><h4 class="font-bold text-[9px] text-slate-800 line-clamp-2 leading-tight">${item.namaBarang}</h4><div class="flex items-center justify-between text-[7px] text-slate-400"><span class="truncate">${itemCabangStr}</span><span class="font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 shrink-0 ml-1">Stok: ${stock}</span></div></div></div><div class="flex items-center justify-between pt-1.5 mt-auto"><span class="font-extrabold text-[9px] text-slate-800">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span><button onclick="addToCart('${item.idBarang}', '${itemCabangStr}')" class="w-4 h-4 bg-goge-light text-goge-primary rounded-md flex items-center justify-center hover:bg-goge-primary hover:text-white transition-colors shrink-0 cursor-pointer"><i class="fa-solid fa-plus text-[8px]"></i></button></div></div>`);
       });
       if (items.length > catalogRenderLimit) {
         grid.insertAdjacentHTML('beforeend', `<button onclick="loadMoreCatalogResults()" class="col-span-3 md:col-span-8 w-full py-3 text-xs font-bold text-goge-primary bg-goge-light rounded-xl">Tampilkan 24 buku lagi (${items.length - catalogRenderLimit} tersisa)</button>`);
       }
+    }
+
+    // Pratinjau gambar sampul: tampilkan gambar utuh tanpa mengubah data produk.
+    function openImagePreview(imageUrl) {
+      if (!imageUrl) return;
+      let modal = document.getElementById('catalog-image-preview');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'catalog-image-preview';
+        modal.className = 'fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-3';
+        modal.style.touchAction = 'manipulation';
+
+        const panel = document.createElement('div');
+        panel.className = 'relative w-full h-full flex flex-col items-center justify-center gap-3';
+        panel.addEventListener('click', (event) => event.stopPropagation());
+
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.textContent = '✕';
+        closeBtn.setAttribute('aria-label', 'Tutup gambar');
+        closeBtn.className = 'absolute top-2 right-2 z-10 w-10 h-10 rounded-full bg-white/20 text-white text-2xl font-bold';
+        closeBtn.addEventListener('click', closeImagePreview);
+
+        const imageFrame = document.createElement('div');
+        imageFrame.className = 'w-full flex-1 min-h-0 flex items-center justify-center overflow-auto rounded-xl';
+        const previewImg = document.createElement('img');
+        previewImg.id = 'catalog-image-preview-img';
+        previewImg.alt = 'Gambar sampul buku';
+        previewImg.className = 'max-w-full max-h-full object-contain rounded-lg transition-transform duration-200';
+        previewImg.style.transformOrigin = 'center center';
+        imageFrame.appendChild(previewImg);
+
+        const controls = document.createElement('div');
+        controls.className = 'flex items-center gap-3 pb-2';
+        const zoomOut = document.createElement('button');
+        zoomOut.type = 'button';
+        zoomOut.textContent = '−';
+        zoomOut.className = 'w-11 h-11 rounded-full bg-white/20 text-white text-2xl font-bold';
+        zoomOut.setAttribute('aria-label', 'Perkecil gambar');
+        const zoomLabel = document.createElement('span');
+        zoomLabel.id = 'catalog-image-zoom-label';
+        zoomLabel.className = 'text-white text-xs';
+        zoomLabel.textContent = '100%';
+        const zoomIn = document.createElement('button');
+        zoomIn.type = 'button';
+        zoomIn.textContent = '+';
+        zoomIn.className = 'w-11 h-11 rounded-full bg-white/20 text-white text-2xl font-bold';
+        zoomIn.setAttribute('aria-label', 'Perbesar gambar');
+        let zoom = 1;
+        const applyZoom = () => {
+          previewImg.style.transform = 'scale(' + zoom + ')';
+          zoomLabel.textContent = Math.round(zoom * 100) + '%';
+          imageFrame.style.overflow = zoom > 1 ? 'auto' : 'hidden';
+        };
+        zoomIn.addEventListener('click', () => { zoom = Math.min(3, zoom + 0.5); applyZoom(); });
+        zoomOut.addEventListener('click', () => { zoom = Math.max(1, zoom - 0.5); applyZoom(); });
+        previewImg.addEventListener('click', () => { zoom = zoom === 1 ? 2 : 1; applyZoom(); });
+
+        controls.append(zoomOut, zoomLabel, zoomIn);
+        panel.append(closeBtn, imageFrame, controls);
+        modal.appendChild(panel);
+        modal.addEventListener('click', closeImagePreview);
+        modal.appendChild(panel);
+        document.body.appendChild(modal);
+        modal._resetZoom = () => { zoom = 1; applyZoom(); };
+      }
+      const preview = document.getElementById('catalog-image-preview-img');
+      if (preview) preview.src = imageUrl;
+      if (modal._resetZoom) modal._resetZoom();
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeImagePreview() {
+      const modal = document.getElementById('catalog-image-preview');
+      if (modal) modal.classList.add('hidden');
+      document.body.style.overflow = '';
     }
 
     function addToCart(idBarang, cabang) { 
